@@ -2,20 +2,20 @@ LaTeX-Vorlage für Abschlussarbeiten
 =======
 (English Version below.)
 
-Dies ist die Vorlage für Abschlussarbeiten am Lehrstuhl Software Design and
-Quality (SDQ) am Institut für Datenorganisation und Programmstrukturen (IPD)
-des Karlsruher Instituts für Technologie (KIT).
+Dies ist die Vorlage für Abschlussarbeiten der Forschungsgruppen Software 
+Design and Quality (SDQ) am  KASTEL — Institut für Informationssicherheit 
+und Verlässlichkeit des Karlsruher Instituts für Technologie (KIT).
 
 Vielen Dank an Markus Kohm (http://www.komascript.de) für die hilfreiche
 Unterstützung beim Erstellen dieser Vorlage.
 
 Version
 =======
-Version: 1.3.5
+Version: 1.3.6
 Autor: Dr.-Ing. Erik Burger (burger@kit.edu)
 mit Beiträgen von Joshua Gleitze
 
-Siehe https://sdqweb.ipd.kit.edu/wiki/Dokumentvorlagen
+Siehe https://sdq.kastel.kit.edu/wiki/Dokumentvorlagen
 
 Verwendung
 ==========
@@ -58,7 +58,7 @@ Im Draft-Modus werden z.B. todo-Notizen sowie Platzhalter für fehlende Abbildun
 
 LaTeX allgemein
 ---------------
-Siehe https://sdqweb.ipd.kit.edu/wiki/LaTeX
+Siehe https://sdq.kastel.kit.edu/wiki/LaTeX
 
 
 Verwendung mit [LyX](https://www.lyx.org/WebDe.Home)
@@ -85,7 +85,7 @@ Dies ist eine BibTeX-Datei, in der Sie Ihre Literatur-Referenzen sammeln
 können. Wir empfehlen die Verwendung von biblatex und biber statt BibTeX. 
 Dies ist in der Ausarbeitungsvorlage bereits so voreingestellt. Für 
 SDQ-relevante Publikationen können Sie die zentralen BibTeX-Dateien einbinden,
-siehe https://sdqweb.ipd.kit.edu/wiki/BibTeX-Literaturlisten
+siehe https://sdq.kastel.kit.edu/wiki/BibTeX-Literaturlisten
 
 `sdqthesis.cls`
 ---------------
@@ -121,20 +121,20 @@ Dieser Text.
 
 English Version
 ===============
-This is a template for student's final theses at the chair of Software Design
-and Quality (SDQ) at the Institute of Program Structures and Data Organization
-(IPD) at Karlsruhe Institute of Technology (KIT).
+This is a template for student's final theses at the research groups of Software Design
+and Quality (SDQ) at the  KASTEL — Institute of Information Security and Dependability 
+at Karlsruhe Institute of Technology (KIT).
 
 Many thanks to Markus Kohm (http://www.komascript.de) for his support in
 creating the template.
 
 Version
 =======
-Version: 1.3.5
+Version: 1.3.6
 Author: Dr.-Ing. Erik Burger (burger@kit.edu)
 with contributions by Joshua Gleitze
 
-See https://sdqweb.ipd.kit.edu/wiki/Dokumentvorlagen
+See https://sdq.kastel.kit.edu/wiki/Dokumentvorlagen
 
 Usage
 =====
@@ -176,12 +176,14 @@ while they are omitted in `final` mode.
 
 LaTeX
 -----
-See https://sdqweb.ipd.kit.edu/wiki/LaTeX
+See https://sdq.kastel.kit.edu/wiki/LaTeX
 
 
 Verwendung mit [LyX](https://www.lyx.org/WebDe.Home)
 ====================================================
-This class also has a layout file, enabling you to use it with the “what you see is what you mean” editor [LyX](https://www.lyx.org). To do so, you have to first install the class and the layout file:
+This class also has a layout file, enabling you to use it with the “what you see
+is what you mean” editor [LyX](https://www.lyx.org). To do so, you have to first
+install the class and the layout file:
 ```
 ./install --lyx
 ```
@@ -202,7 +204,7 @@ You can use this BibTeX file to collect your literature.
 We recommend using biblatex and biber instead of BibTeX.
 The template is already configured in this way.
 You can include the SDQ literature database for SDQ-relevant publications,
-see https://sdqweb.ipd.kit.edu/wiki/BibTeX-Literaturlisten
+see https://sdq.kastel.kit.edu/wiki/BibTeX-Literaturlisten
 
 `sdqthesis.cls`
 ---------------

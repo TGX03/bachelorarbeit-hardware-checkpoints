@@ -8,12 +8,12 @@
 %% Dr.-Ing. Erik Burger
 %% burger@kit.edu
 %%
-%% See https://sdqweb.ipd.kit.edu/wiki/Dokumentvorlagen
+%% See https://sdq.kastel.kit.edu/wiki/Dokumentvorlagen
 %%
-%% Version 1.3.5, 2020-06-26
+%% Version 1.3.6, 2022-09-28
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdqthesis}[2020-06-26 v1.3.5 Student thesis class]
+\ProvidesClass{sdqthesis}[2022-09-28 v1.3.6 Student thesis class]
 % Language options. German is also needed in English thesis for the abstract
 \DeclareOption{ngerman}{\PassOptionsToPackage{\CurrentOption}{babel}}
 \DeclareOption{english}{\PassOptionsToPackage{main=\CurrentOption,ngerman}{babel}}
@@ -131,8 +131,8 @@
 
 %% variables for title page
 \newcommand{\theinstitute}{\ifcurrentbaselanguage{English}
-    {Institute for Program Structures and Data Organization (IPD)}
-    {Institut für Programmstrukturen und Datenorganisation (IPD)}}
+    {KASTEL -- Institute of Information Security and Dependability}
+    {KASTEL -- Institut für Informationssicherheit und Verlässlichkeit}}
 \newcommand{\thethesistype}{}
 \newcommand{\thereviewerone}{}
 \newcommand{\thereviewertwo}{}
