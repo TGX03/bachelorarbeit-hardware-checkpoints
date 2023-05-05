@@ -95,7 +95,7 @@ verändert werden.
 
 `images/`
 --------
-In diesem Verzeichnis befinden das das SDQ-Logo als PDF und EPS.
+In diesem Verzeichnis befindet sich das SDQ-Logo als PDF und EPS.
 
 `sections/`
 -----------
