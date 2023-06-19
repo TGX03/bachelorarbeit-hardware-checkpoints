@@ -11,7 +11,7 @@ Unterstützung beim Erstellen dieser Vorlage.
 
 Version
 =======
-Version: 1.3.6
+Version: 1.4
 Autor: Dr.-Ing. Erik Burger (burger@kit.edu)
 mit Beiträgen von Joshua Gleitze
 
@@ -130,7 +130,7 @@ creating the template.
 
 Version
 =======
-Version: 1.3.6
+Version: 1.4
 Author: Dr.-Ing. Erik Burger (burger@kit.edu)
 with contributions by Joshua Gleitze
 

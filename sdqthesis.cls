@@ -10,10 +10,10 @@
 %%
 %% See https://sdq.kastel.kit.edu/wiki/Dokumentvorlagen
 %%
-%% Version 1.3.6, 2022-09-28
+%% Version 1.4, 2023-06-19
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdqthesis}[2022-09-28 v1.3.6 Student thesis class]
+\ProvidesClass{sdqthesis}[2023-06-19 v1.4 Student thesis class]
 % Language options. German is also needed in English thesis for the abstract
 \DeclareOption{ngerman}{\PassOptionsToPackage{\CurrentOption}{babel}}
 \DeclareOption{english}{\PassOptionsToPackage{main=\CurrentOption,ngerman}{babel}}
@@ -77,13 +77,13 @@
     beforeskip= .7em plus .6em minus .3em
 ]{paragraph}
 
-
 %% ---------------
 %% | Page Layout |
 %% ---------------
 \KOMAoptions{
    fontsize=12pt,
    paper=a4,
+   parskip=half,
    titlepage=true,
    headinclude=true,
    footinclude=false,
@@ -160,16 +160,16 @@
 \newcommand{\settitle}{%
 \publishers{%
 \large
-\ifcurrentbaselanguage{English}{at the Department of Informatics}%
-{an der Fakultät für Informatik}\\
+\ifcurrentbaselanguage{English}{At the KIT Department of Informatics}%
+{An der KIT-Fakultät für Informatik}\\
 \theinstitute\\[2em]
 \begin{tabular}{l l}
-  \ifcurrentbaselanguage{English}{Reviewer}{Erstgutachter}: & \thereviewerone\\
-  \ifcurrentbaselanguage{English}{Second reviewer}{Zweitgutachter}: & \thereviewertwo\\
-  \ifcurrentbaselanguage{English}{Advisor}{Betreuender Mitarbeiter}: &  \theadvisorone\\
+  \ifcurrentbaselanguage{English}{First examiner}{1. Prüfer/Prüferin}: & \thereviewerone\\
+  \ifcurrentbaselanguage{English}{Second examiner}{1. Prüfer/Prüferin}: & \thereviewertwo\\[.5em]
+  \ifcurrentbaselanguage{English}{First advisor}{1. Betreuer/Betreuerin}: &  \theadvisorone\\
   % if there is no second advisor, do not output this line
   \ifthenelse{\equal{\theadvisortwo}{}}{}{%
-  \ifcurrentbaselanguage{English}{Second advisor}{Zweiter betreuender Mitarbeiter}: & \theadvisortwo\\
+  \ifcurrentbaselanguage{English}{Second advisor}{2. Betreuer/Betreuerin}: & \theadvisortwo\\
   }
 \end{tabular}
 \vskip2em
