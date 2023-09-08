@@ -165,7 +165,7 @@
 \theinstitute\\[2em]
 \begin{tabular}{l l}
   \ifcurrentbaselanguage{English}{First examiner}{1. Prüfer/Prüferin}: & \thereviewerone\\
-  \ifcurrentbaselanguage{English}{Second examiner}{1. Prüfer/Prüferin}: & \thereviewertwo\\[.5em]
+  \ifcurrentbaselanguage{English}{Second examiner}{2. Prüfer/Prüferin}: & \thereviewertwo\\[.5em]
   \ifcurrentbaselanguage{English}{First advisor}{1. Betreuer/Betreuerin}: &  \theadvisorone\\
   % if there is no second advisor, do not output this line
   \ifthenelse{\equal{\theadvisortwo}{}}{}{%
