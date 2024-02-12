@@ -10,10 +10,10 @@
 %%
 %% See https://sdq.kastel.kit.edu/wiki/Dokumentvorlagen
 %%
-%% Version 1.4, 2023-06-19
+%% Version 1.5, 2024-02-12
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{sdqthesis}[2023-06-19 v1.4 Student thesis class]
+\ProvidesClass{sdqthesis}[2024-02-12 v1.5 Student thesis class]
 % Language options. German is also needed in English thesis for the abstract
 \DeclareOption{ngerman}{\PassOptionsToPackage{\CurrentOption}{babel}}
 \DeclareOption{english}{\PassOptionsToPackage{main=\CurrentOption,ngerman}{babel}}
@@ -87,19 +87,35 @@
    titlepage=true,
    headinclude=true,
    footinclude=false,
+   headsepline,
+   headlines=1.1,
+   bibliography=totoc,
 }
 
 % Margins
-\if@twoside%
-  \typearea[20mm]{15} % twoside
-\else% 
-  \typearea[10mm]{15} % oneside
-\fi%
-\RequirePackage[headsepline,draft=false]{scrlayer-scrpage}
-\pagestyle{scrheadings}
+\typearea[20mm]{16} % twoside
+
+\raggedbottom
+
+\recalctypearea
+
+%% Caption sizes
+\setkomafont{caption}{\small}
+\setkomafont{captionlabel}{\sffamily\bfseries\small}
+\setcapindent{0em}
 
 \clubpenalty=10000 %prevent orphans
 \widowpenalty=10000 %prevent widows
+\displaywidowpenalty10000
+
+%% allow fuller pages
+\renewcommand{\topfraction}{0.9}	% max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
+\renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
+% Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.85}	% require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.85}	% require fuller float pages
 
 
 %% --------------

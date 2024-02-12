@@ -11,7 +11,7 @@ Unterstützung beim Erstellen dieser Vorlage.
 
 Version
 =======
-Version: 1.4
+Version: 1.5
 Autor: Dr.-Ing. Erik Burger (burger@kit.edu)
 mit Beiträgen von Joshua Gleitze
 
@@ -42,17 +42,10 @@ Die Sprache des Dokuments ist standardmäßig auf Englisch eingestellt.
 Dies kann in der `\documentclass`-Anweisung am Anfang von `thesis.tex` auf Deutsch 
 umgestellt werden.
 
-Einseitig/doppelseitig
-----------------------
-Das Dokument ist standardmäßig auf doppelseitiges Layout eingestellt, kann aber
-durch die Angabe von `oneside` in der `\documentclass`-Anweisung am Anfang von
-`thesis.tex` auf einseitiges Layout umgestellt werden.
-
 Draft-Modus
 -----------
 Der Draft-Modus kann verwendet werden, um eine Entwurfsfassung zu generieren. 
-Das kann durch die Option `draft` in der `\documentclass`-Anweisung am Anfang von `thesis.tex` geschehen, oder durch eine Einstellung innerhalb der LaTeX-Umgebung
-(z.B. Overleaf: "Compile Mode: Fast (draft)").
+Das kann durch die Option `draft` in der `\documentclass`-Anweisung am Anfang von `thesis.tex` geschehen, oder durch eine Einstellung innerhalb der LaTeX-Umgebung.
 Die entsprechende Option für das endgültige Dokument lautet `final`.
 Im Draft-Modus werden z.B. todo-Notizen sowie Platzhalter für fehlende Abbildungen angezeigt, im `final`-Modus jedoch ausgeblendet.
 
@@ -130,7 +123,7 @@ creating the template.
 
 Version
 =======
-Version: 1.4
+Version: 1.5
 Author: Dr.-Ing. Erik Burger (burger@kit.edu)
 with contributions by Joshua Gleitze
 
@@ -159,11 +152,6 @@ Language
 The standard language of this document is English. You can change the
 language in the `\documentclass` command at the beginning of `thesis.tex`.
 German and English are available.
-
-One-sided/two-sided layout
---------------------------
-The standard format is two-sided layout. You can change this to one-sided
-layout in the `\documentclass` command at the beginning of `thesis.tex`.
 
 Draft mode
 ----------
