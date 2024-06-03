@@ -29,7 +29,7 @@ public class Register16Bit extends Register {
 	 */
 	public Register16Bit(String name, int content) throws IllegalArgumentException {
 		super(name);
-		if (content >= (1 << 17)) throw new IllegalArgumentException("Value does not fit in 16 bit");
+		if (content >= (1 << 17) || content < 0) throw new IllegalArgumentException("Value does not fit in 16 bit");
 		this.contents = (short) content;
 	}
 

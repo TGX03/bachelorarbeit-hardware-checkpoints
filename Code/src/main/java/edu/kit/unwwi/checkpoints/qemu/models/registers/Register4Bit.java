@@ -6,13 +6,13 @@ public class Register4Bit extends Register{
 
 	public Register4Bit(String name, byte content) {
 		super(name);
-		if (content >= (1 << 5)) throw new IllegalArgumentException("Value too big for register");
+		if (content >= (1 << 5) || content < 0) throw new IllegalArgumentException("Value too big for register");
 		this.contents = content;
 	}
 
 	public Register4Bit(String name, int content) {
 		super(name);
-		if (content >= (1 << 5)) throw new IllegalArgumentException("Value too big for register");
+		if (content >= (1 << 5) || content < 0) throw new IllegalArgumentException("Value too big for register");
 		this.contents = (byte) content;
 	}
 

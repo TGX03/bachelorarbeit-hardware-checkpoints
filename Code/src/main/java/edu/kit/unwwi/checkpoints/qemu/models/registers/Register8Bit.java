@@ -29,7 +29,7 @@ public class Register8Bit extends Register {
 	 */
 	public Register8Bit(String name, int content) throws IllegalArgumentException {
 		super(name);
-		if (content >= (1 << 9)) throw new IllegalArgumentException("Value too big for an 8bit Register");
+		if (content >= (1 << 9) || content < 0) throw new IllegalArgumentException("Value too big for an 8bit Register");
 		this.contents = (byte) content;
 	}
 
