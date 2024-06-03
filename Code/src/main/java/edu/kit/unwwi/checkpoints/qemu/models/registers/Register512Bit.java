@@ -46,10 +46,15 @@ public class Register512Bit extends Register {
 		return 512;
 	}
 
+	/**
+	 * Formats the contents of this register to a Hex-String that gets correctly padded to the length of the array.
+	 *
+	 * @return The contents of this register as hex.
+	 */
 	@Override
-	public String toString() {
+	public String toHexString() {
 		StringBuilder builder = new StringBuilder(128);
 		for (long current : contents) builder.append(String.format("0x%1$016x", current));
-		return super.name + ": " + builder;
+		return builder.toString();
 	}
 }

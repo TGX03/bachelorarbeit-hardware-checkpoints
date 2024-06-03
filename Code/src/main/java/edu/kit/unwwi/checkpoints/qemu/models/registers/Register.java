@@ -36,7 +36,13 @@ public abstract class Register implements Serializable {
 	public abstract int size();
 
 	@Override
-	public String toString() {
-		return name;
+	public final String toString() {
+		return name + ": " + toHexString();
 	}
+
+	/**
+	 * Formats the contents of this register to a Hex-String that gets correctly padded to the length of the array.
+	 * @return The contents of this register as hex.
+	 */
+	public abstract String toHexString();
 }

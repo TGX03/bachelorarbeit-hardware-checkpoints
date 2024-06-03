@@ -62,8 +62,13 @@ public class Register16Bit extends Register {
 		return 16;
 	}
 
+	/**
+	 * Formats the contents of this register to a Hex-String that gets correctly padded to the length of the array.
+	 *
+	 * @return The contents of this register as hex.
+	 */
 	@Override
-	public String toString() {
-		return name + ": " + String.format("0x%1$04x", contents);
+	public String toHexString() {
+		return String.format("0x%1$04x", contents);
 	}
 }
