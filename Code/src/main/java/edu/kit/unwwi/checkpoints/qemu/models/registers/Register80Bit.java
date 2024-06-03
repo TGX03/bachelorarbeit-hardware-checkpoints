@@ -1,7 +1,5 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.nio.ByteBuffer;
 
 /**
@@ -55,8 +53,9 @@ public class Register80Bit extends Register {
 	 * @param name      The name of the register.
 	 * @param base      The first 64 bit of the register.
 	 * @param extension The last 16 bit of the register as an int.
+	 * @throws IllegalArgumentException When the int is out of bounds.
 	 */
-	public Register80Bit(String name, long base, int extension) {
+	public Register80Bit(String name, long base, int extension) throws IllegalArgumentException {
 		super(name);
 		this.base = base;
 		if (extension >= (1 << 17)) throw new IllegalArgumentException("Extension is too big for this register");
