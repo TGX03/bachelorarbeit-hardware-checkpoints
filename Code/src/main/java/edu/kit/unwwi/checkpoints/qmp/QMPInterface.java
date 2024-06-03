@@ -38,7 +38,7 @@ public class QMPInterface {
 	/**
 	 * The last result which was received.
 	 */
-	private volatile JSONObject lastResult;
+	private volatile Object lastResult;
 	/**
 	 * Whether the client is to be terminated.
 	 */
@@ -71,7 +71,7 @@ public class QMPInterface {
 		lock.lock();
 		out.write(request);
 		awaitResult.awaitUninterruptibly(); //TODO: This isn't thread-safe as another command may enter and send their own command before the result was received
-		JSONObject result = lastResult;
+		Object result = lastResult;
 		lock.unlock();
 		command.receiveResult(result);
 	}
@@ -117,7 +117,7 @@ public class QMPInterface {
 					lock.lock();
 					JSONObject json = new JSONObject(response);
 					if (json.has("return")) {
-						lastResult = json.getJSONObject("return");
+						lastResult = json.get("return");
 						awaitResult.signalAll();
 					} else if (json.has("event")) {
 						String name = json.getString("event");

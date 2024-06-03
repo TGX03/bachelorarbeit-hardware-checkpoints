@@ -71,10 +71,12 @@ public class Status extends Command {
 	 * @param result The result received from QEMU.
 	 */
 	@Override
-	protected void processResult(JSONObject result) {
-		state = State.fromString(result.getString("status"));
-		singlestep = result.getBoolean("singlestep");
-		running = result.getBoolean("running");
+	protected void processResult(Object result) {
+		assert result instanceof JSONObject;
+		JSONObject json = (JSONObject) result;
+		state = State.fromString(json.getString("status"));
+		singlestep = json.getBoolean("singlestep");
+		running = json.getBoolean("running");
 	}
 
 	/**

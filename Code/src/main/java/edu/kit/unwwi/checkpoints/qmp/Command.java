@@ -28,7 +28,7 @@ public abstract class Command {
 	 *
 	 * @param result The result received from QEMU.
 	 */
-	void receiveResult(JSONObject result) {
+	void receiveResult(Object result) {
 		if (executed) throw new IllegalStateException("This command was already executed");
 		else {
 			executed = true;
@@ -41,5 +41,5 @@ public abstract class Command {
 	 *
 	 * @param result The result to parse.
 	 */
-	protected abstract void processResult(JSONObject result);
+	protected abstract void processResult(Object result);
 }
