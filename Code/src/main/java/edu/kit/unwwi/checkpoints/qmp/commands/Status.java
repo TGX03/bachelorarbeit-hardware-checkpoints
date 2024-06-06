@@ -76,7 +76,7 @@ public class Status extends Command {
 		JSONObject json = (JSONObject) result;
 		state = State.fromString(json.getString("status"));
 		singlestep = json.getBoolean("singlestep");
-		running = json.getBoolean("running");
+		running = json.getBoolean("running");   //TODO: Apparently not always
 	}
 
 	/**
