@@ -82,7 +82,7 @@ public class QueryRegisters extends Command {
 				return new Register512Bit(name, content);
 			}
 			default -> {
-				return new FlagRegister("Invalid", false);
+				return new FlagRegister("Invalid", false);  //TODO: Find out why this gets used
 			}
 		}
 	}
