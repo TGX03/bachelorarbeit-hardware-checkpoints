@@ -3,6 +3,8 @@ package edu.kit.unwwi.checkpoints.qmp.commands;
 import edu.kit.unwwi.checkpoints.qemu.models.registers.*;
 import edu.kit.unwwi.checkpoints.qmp.Command;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
@@ -82,7 +84,10 @@ public class QueryRegisters extends Command {
 				return new Register512Bit(name, content);
 			}
 			default -> {
-				return new FlagRegister("Invalid", false);  //TODO: Find out why this gets used
+				BigInteger number = new BigInteger(value, 16);
+				byte[] bytes = number.toByteArray();
+				if (number.bitLength() % 8 == 1) bytes = Arrays.copyOfRange(bytes, 1, bytes.length - 1);
+				return new RegisterFlexible(name, length, bytes);
 			}
 		}
 	}
