@@ -3,7 +3,6 @@ package edu.kit.unwwi.checkpoints.qmp.commands;
 import edu.kit.unwwi.checkpoints.qemu.models.registers.*;
 import edu.kit.unwwi.checkpoints.qmp.Command;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -21,6 +20,7 @@ public class QueryRegisters extends Command {
 	 * The registers after querying.
 	 */
 	private Register[] registers;
+	private char[] flags;
 
 	/**
 	 * Create a new command with an IT to query.
@@ -103,6 +103,25 @@ public class QueryRegisters extends Command {
 	}
 
 	/**
+	 * Whether any flags are associated with the queried CPU core.
+	 * @return Whether any flags are associated with the queried CPU core.
+	 */
+	public boolean hasFlags() {
+		return this.flags != null;
+	}
+
+	/**
+	 * Returns an array of all the set flags of this CPU.
+	 * Flags which aren't set are represented as a null-char.
+	 * @return The flags of this register if set.
+	 * @throws IllegalStateException When no flags were found for this CPU.
+	 */
+	public char[] flags() throws IllegalStateException {
+		if (hasFlags()) return Arrays.copyOf(this.flags, this.flags.length);
+		else throw new IllegalStateException("This CPU has no flags.");
+	}
+
+	/**
 	 * Turn this command into JSON which can then directly be sent to a running QMP server.
 	 *
 	 * @return JSON representation of this command.
@@ -129,6 +148,21 @@ public class QueryRegisters extends Command {
 		input = input.trim();
 		String[] registers = input.split(" ");
 
+		Thread flagger = new Thread(() -> {
+			for (String current : registers) {
+				if (current.matches("\\[[A-Za-z-]*]")) {
+					current = current.replaceAll("-", "\0");
+					char[] flags = current.toCharArray();
+					this.flags = new char[flags.length - 2];
+					System.arraycopy(flags, 1, this.flags, 0, flags.length - 2);
+					break;
+				}
+			}
+		});
+		flagger.start();
 		this.registers = Arrays.stream(registers).parallel().filter(x -> x.matches(".*=[0-9,a-f]+")).map(QueryRegisters::parseRegister).toList().toArray(new Register[0]);
+		try {
+			flagger.join();
+		} catch (InterruptedException _) {}
 	}
 }
