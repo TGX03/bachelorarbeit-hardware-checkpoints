@@ -125,7 +125,7 @@ public class QueryRegisters extends Command {
 		input = input.replaceFirst("CPU#\\d", "");
 		input = input.replaceAll("\\s+", " ");
 		input = input.replaceAll("\\s*=\\s*", "=");
-		input = input.replaceAll("\\b([0-9,a-f]+)\\s+(?=[0-9,a-f])", "$1");
+		input = input.replaceAll("\\b([0-9a-f]+)\\s+(?=[0-9a-f])", "$1");
 		input = input.trim();
 		String[] registers = input.split(" ");
 
