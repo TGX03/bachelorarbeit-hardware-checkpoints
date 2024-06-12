@@ -36,11 +36,12 @@ public class CPU implements Serializable {
 
 	/**
 	 * Create a new CPU from the given data.
-	 * @param id The ID of this CPU (core).
+	 *
+	 * @param id           The ID of this CPU (core).
 	 * @param architecture The architecture of this CPU.
-	 * @param hostId The thread of the host emulating this CPU.
-	 * @param registers The registers present in this CPUd.
-	 * @param flags The flags set in this CPU
+	 * @param hostId       The thread of the host emulating this CPU.
+	 * @param registers    The registers present in this CPU.
+	 * @param flags        The flags set in this CPU
 	 */
 	public CPU(int id, String architecture, int hostId, Register[] registers, char[] flags) {
 		this.id = id;
@@ -52,8 +53,9 @@ public class CPU implements Serializable {
 
 	/**
 	 * A factory method for turning QMP queries into CPU-objects.
-	 * @param id The ID of this CPU.
-	 * @param cpu The result of the "query CPU" command.
+	 *
+	 * @param id        The ID of this CPU.
+	 * @param cpu       The result of the "query CPU" command.
 	 * @param registers The result of the "Query Registers" command.
 	 * @return The CPU object constructed from the given data.
 	 */

@@ -33,6 +33,7 @@ public class QueryRegisters extends Command {
 
 	/**
 	 * Creates a Register from a String matching "name=content"
+	 *
 	 * @param input The string to parse.
 	 * @return The created Register object.
 	 */
@@ -104,6 +105,7 @@ public class QueryRegisters extends Command {
 
 	/**
 	 * Whether any flags are associated with the queried CPU core.
+	 *
 	 * @return Whether any flags are associated with the queried CPU core.
 	 */
 	public boolean hasFlags() {
@@ -113,6 +115,7 @@ public class QueryRegisters extends Command {
 	/**
 	 * Returns an array of all the set flags of this CPU.
 	 * Flags which aren't set are represented as a null-char.
+	 *
 	 * @return The flags of this register if set.
 	 * @throws IllegalStateException When no flags were found for this CPU.
 	 */
@@ -163,6 +166,7 @@ public class QueryRegisters extends Command {
 		this.registers = Arrays.stream(registers).parallel().filter(x -> x.matches(".*=[0-9,a-f]+")).map(QueryRegisters::parseRegister).toList().toArray(new Register[0]);
 		try {
 			flagger.join();
-		} catch (InterruptedException _) {}
+		} catch (InterruptedException _) {
+		}
 	}
 }

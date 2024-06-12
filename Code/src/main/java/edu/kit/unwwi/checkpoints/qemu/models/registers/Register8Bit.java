@@ -12,7 +12,8 @@ public class Register8Bit extends Register {
 
 	/**
 	 * Create a new 8-bit register with the given value.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The content of this register.
 	 */
 	public Register8Bit(String name, byte content) {
@@ -23,13 +24,15 @@ public class Register8Bit extends Register {
 	/**
 	 * Create a new 8-bit Register with the given value.
 	 * Make sure the int actually fits in 8 bits.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The value of this register.
 	 * @throws IllegalArgumentException Gets thrown when the value does not fit in this register.
 	 */
 	public Register8Bit(String name, int content) throws IllegalArgumentException {
 		super(name);
-		if (content >= (1 << 9) || content < 0) throw new IllegalArgumentException("Value too big for an 8bit Register");
+		if (content >= (1 << 9) || content < 0)
+			throw new IllegalArgumentException("Value too big for an 8bit Register");
 		this.contents = (byte) content;
 	}
 
@@ -55,6 +58,7 @@ public class Register8Bit extends Register {
 
 	/**
 	 * The content of this register.
+	 *
 	 * @return The content of this register.
 	 */
 	public byte getContents() {

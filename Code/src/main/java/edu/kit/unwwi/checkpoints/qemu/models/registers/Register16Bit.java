@@ -12,7 +12,8 @@ public class Register16Bit extends Register {
 
 	/**
 	 * Create a new 16-bit register from the given value.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The content of the new register.
 	 */
 	public Register16Bit(String name, short content) {
@@ -23,7 +24,8 @@ public class Register16Bit extends Register {
 	/**
 	 * Create a new 16-bit integer from the given value.
 	 * Make sure the value fits in 16 bits.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The content of the new register.
 	 * @throws IllegalArgumentException If the value does not fit.
 	 */
@@ -35,6 +37,7 @@ public class Register16Bit extends Register {
 
 	/**
 	 * The contents of this register.
+	 *
 	 * @return The contents of this register.
 	 */
 	public short getContents() {

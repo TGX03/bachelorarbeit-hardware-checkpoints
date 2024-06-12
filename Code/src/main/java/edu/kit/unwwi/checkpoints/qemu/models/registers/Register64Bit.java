@@ -12,7 +12,8 @@ public class Register64Bit extends Register {
 
 	/**
 	 * Create a new 64-bit register from the given value.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The content of the new register.
 	 */
 	public Register64Bit(String name, long content) {

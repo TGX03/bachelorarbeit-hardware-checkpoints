@@ -1,7 +1,5 @@
 package edu.kit.unwwi.checkpoints.qmp;
 
-import org.json.JSONObject;
-
 /**
  * An interface representing a command.
  * Such a command can be given to the interface to transmission and will then receive a result,

@@ -14,10 +14,11 @@ public class Register512Bit extends Register {
 
 	/**
 	 * Creates a new 512-bit Register from 8 longs
-	 * @param name The name of the register.
+	 *
+	 * @param name   The name of the register.
 	 * @param values The 8 longs representing the register.
 	 */
-	public Register512Bit(String name, long ...values) {
+	public Register512Bit(String name, long... values) {
 		super(name);
 		assert values.length == 8;
 		System.arraycopy(values, 0, contents, 0, 8);

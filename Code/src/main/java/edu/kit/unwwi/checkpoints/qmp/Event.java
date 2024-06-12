@@ -27,9 +27,9 @@ public class Event {
 	private final int timestampMicroseconds;
 
 	/**
-	 * @param name The name of the event.
-	 * @param data The data included in the event.
-	 * @param timestampSeconds The timestamp in seconds when the event occurred.
+	 * @param name                  The name of the event.
+	 * @param data                  The data included in the event.
+	 * @param timestampSeconds      The timestamp in seconds when the event occurred.
 	 * @param timestampMicroseconds Microseconds for additional precision.
 	 */
 	Event(String name, JSONObject data, long timestampSeconds, int timestampMicroseconds) {
@@ -41,7 +41,7 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return name + " at " +timestampSeconds;
+		return name + " at " + timestampSeconds;
 	}
 
 	/**
@@ -54,6 +54,7 @@ public class Event {
 	/**
 	 * Returns the data included in this event.
 	 * This class makes no effort to parse that data in any way and just includes the raw json.
+	 *
 	 * @return The data included with this event.
 	 */
 	public JSONObject getData() {
@@ -62,6 +63,7 @@ public class Event {
 
 	/**
 	 * The timestamp of this event in seconds.
+	 *
 	 * @return The timestamp of this event.
 	 */
 	public long getTimestamp() {
@@ -71,6 +73,7 @@ public class Event {
 	/**
 	 * Additional microseconds of when this event occurred.
 	 * These are in addition to the normal timestamp, so they must be added to get the complete timestamp.
+	 *
 	 * @return The additional microseconds of this timestamp.
 	 */
 	public int getTimestampMicroseconds() {

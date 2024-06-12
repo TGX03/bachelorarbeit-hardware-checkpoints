@@ -14,6 +14,7 @@ public abstract class Register implements Serializable {
 
 	/**
 	 * Create a new register.
+	 *
 	 * @param name The name of the new register.
 	 */
 	public Register(String name) {
@@ -42,6 +43,7 @@ public abstract class Register implements Serializable {
 
 	/**
 	 * Formats the contents of this register to a Hex-String that gets correctly padded to the length of the array.
+	 *
 	 * @return The contents of this register as hex.
 	 */
 	public abstract String toHexString();

@@ -17,10 +17,11 @@ public class Register128Bit extends Register {
 	/**
 	 * Create a new 128 bit Register.
 	 * Expects exactly 2 longs.
-	 * @param name The name of the register.
+	 *
+	 * @param name   The name of the register.
 	 * @param values The 2 longs representing the value.
 	 */
-	public Register128Bit(String name, long ...values) {
+	public Register128Bit(String name, long... values) {
 		super(name);
 		this.upper = values[0];
 		this.lower = values[1];

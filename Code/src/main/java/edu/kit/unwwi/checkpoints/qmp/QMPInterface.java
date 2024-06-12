@@ -45,7 +45,6 @@ public class QMPInterface {
 	private volatile boolean exit = false;
 
 	/**
-	 *
 	 * @param host The host where the QMP server runs. Is probably localhost in most cases.
 	 * @param port The port the host listens on.
 	 * @throws IOException When the connection couldn't be established.
@@ -63,6 +62,7 @@ public class QMPInterface {
 	/**
 	 * Execute the given command. The command itself will contain the result once this method finishes executing.
 	 * This method itself doesn't check for errors in the data, that's up to the implementation of a command.
+	 *
 	 * @param command The command to execute.
 	 * @throws IOException When something went wrong during transmission.
 	 */
@@ -100,6 +100,7 @@ public class QMPInterface {
 
 		/**
 		 * Constructs a new asynchronous reader, which then must be started.
+		 *
 		 * @param in The InputStream to read from.
 		 */
 		Reader(InputStream in) {

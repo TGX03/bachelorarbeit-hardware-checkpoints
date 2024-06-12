@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 /**
  * A class representing a 256-bit register.
  */
-public class Register256Bit extends Register{
+public class Register256Bit extends Register {
 
 	/**
 	 * The upper 64 bit of the register.
@@ -26,10 +26,11 @@ public class Register256Bit extends Register{
 
 	/**
 	 * Create a new 256-bit register.
-	 * @param name The name of the register.
+	 *
+	 * @param name   The name of the register.
 	 * @param values The longs representing the contents of the register.
 	 */
-	public Register256Bit(String name, long ...values) {
+	public Register256Bit(String name, long... values) {
 		super(name);
 		assert values.length == 4;
 		upper = values[0];

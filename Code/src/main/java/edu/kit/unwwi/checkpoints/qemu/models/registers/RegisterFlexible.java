@@ -20,8 +20,9 @@ public class RegisterFlexible extends Register {
 	/**
 	 * The constructor to create a register from bytes.
 	 * Bounds checks are conducted somewhat.
-	 * @param name The name of the register.
-	 * @param size The number of bits in this register.
+	 *
+	 * @param name    The name of the register.
+	 * @param size    The number of bits in this register.
 	 * @param content The bytes representing the content of this register.
 	 * @throws IllegalArgumentException If the input array is larger than what's specified by size.
 	 */
@@ -38,8 +39,9 @@ public class RegisterFlexible extends Register {
 	/**
 	 * Create a new Register from an int.
 	 * Bounds checks are conducted.
-	 * @param name The name of the register.
-	 * @param size The number of bits this register holds.
+	 *
+	 * @param name    The name of the register.
+	 * @param size    The number of bits this register holds.
 	 * @param content The int representing the contents.
 	 * @throws IllegalArgumentException If the value of the int would not fit in such an array.
 	 */
@@ -54,7 +56,8 @@ public class RegisterFlexible extends Register {
 			case 1 -> this.contents = new byte[]{(byte) content};
 			case 2 -> this.contents = new byte[]{(byte) (content >>> 8), (byte) content};
 			case 3 -> this.contents = new byte[]{(byte) (content >>> 16), (byte) (content >>> 8), (byte) content};
-			case 4 -> this.contents = new byte[]{(byte) (content >>> 24), (byte) (content >>> 16), (byte) (content >>> 8), (byte) content};
+			case 4 ->
+					this.contents = new byte[]{(byte) (content >>> 24), (byte) (content >>> 16), (byte) (content >>> 8), (byte) content};
 			default -> {
 				this.contents = new byte[byteSize];
 				this.contents[this.contents.length - 1] = (byte) content;
@@ -68,15 +71,17 @@ public class RegisterFlexible extends Register {
 	/**
 	 * Create a new array from a long.
 	 * Bounds checks are conducted.
-	 * @param name The name of the register.
-	 * @param size The size of the register in bits.
+	 *
+	 * @param name    The name of the register.
+	 * @param size    The size of the register in bits.
 	 * @param content The long representing the content of the register.
 	 * @throws IllegalArgumentException When the value of the long would not fit in such a register.
 	 */
 	public RegisterFlexible(String name, int size, long content) throws IllegalArgumentException {
 		super(name);
 		this.size = size;
-		if (content >= (1L << (size + 1)) || (size < 64 && content < 0)) throw new IllegalArgumentException("Content does not fit in specified register width");
+		if (content >= (1L << (size + 1)) || (size < 64 && content < 0))
+			throw new IllegalArgumentException("Content does not fit in specified register width");
 		int byteSize = Math.ceilDiv(size, 8);
 		this.contents = new byte[byteSize];
 		ByteBuffer buffer = ByteBuffer.allocate(8);

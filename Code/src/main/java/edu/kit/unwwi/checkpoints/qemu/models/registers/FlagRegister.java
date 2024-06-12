@@ -3,7 +3,7 @@ package edu.kit.unwwi.checkpoints.qemu.models.registers;
 /**
  * A class representing a single flag register.
  */
-public class FlagRegister extends Register{
+public class FlagRegister extends Register {
 
 	/**
 	 * The value of this register.
@@ -12,7 +12,8 @@ public class FlagRegister extends Register{
 
 	/**
 	 * Create a new register from a boolean value.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The value of this register as a boolean.
 	 */
 	public FlagRegister(String name, boolean content) {
@@ -23,7 +24,8 @@ public class FlagRegister extends Register{
 	/**
 	 * Create a new register from its name and its content as an int.
 	 * Currently, bounds checks are done, but maybe that will change.
-	 * @param name The name of the register.
+	 *
+	 * @param name    The name of the register.
 	 * @param content The content of the register.
 	 * @throws IllegalArgumentException When the value is out of bounds.
 	 */
@@ -31,7 +33,8 @@ public class FlagRegister extends Register{
 		super(name);
 		if (content == 0) flag = false;
 		else if (content == 1) flag = true;
-		else throw new IllegalArgumentException("Value out of bounds"); //TODO: In C any value not equal to 0 is true, maybe use that variant instead.
+		else
+			throw new IllegalArgumentException("Value out of bounds"); //TODO: In C any value not equal to 0 is true, maybe use that variant instead.
 	}
 
 	/**

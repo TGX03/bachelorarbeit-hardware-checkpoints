@@ -1,6 +1,6 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
-public class Register4Bit extends Register{
+public class Register4Bit extends Register {
 
 	private final byte contents;
 
