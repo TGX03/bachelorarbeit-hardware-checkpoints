@@ -24,7 +24,7 @@ public class QueryRegisters extends Command {
 	private char[] flags;
 
 	/**
-	 * Create a new command with an IT to query.
+	 * Create a new command with an ID to query.
 	 *
 	 * @param id The CPU ID to query.
 	 */
