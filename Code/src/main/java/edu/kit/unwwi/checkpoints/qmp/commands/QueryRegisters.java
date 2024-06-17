@@ -5,6 +5,7 @@ import edu.kit.unwwi.checkpoints.qmp.Command;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * This command uses the "info registers" command from the human-monitor-interface to read the data from the registers
@@ -37,7 +38,7 @@ public class QueryRegisters extends Command {
 	 * @param input The string to parse.
 	 * @return The created Register object.
 	 */
-	private static Register parseRegister(String input) {
+	private static Register parseRegister(String input, int registerNumber) {
 		String[] split = input.split("=");
 		String name = split[0];
 		String value = split[1];
@@ -45,16 +46,16 @@ public class QueryRegisters extends Command {
 
 		switch (length) {
 			case 4 -> {
-				return new Register4Bit(name, Integer.parseUnsignedInt(value, 16));
+				return new Register4Bit(name, Integer.parseUnsignedInt(value, 16), registerNumber);
 			}
 			case 8 -> {
-				return new Register8Bit(name, Integer.parseUnsignedInt(value, 16));
+				return new Register8Bit(name, Integer.parseUnsignedInt(value, 16), registerNumber);
 			}
 			case 16 -> {
-				return new Register16Bit(name, Integer.parseUnsignedInt(value, 16));
+				return new Register16Bit(name, Integer.parseUnsignedInt(value, 16), registerNumber);
 			}
 			case 32 -> {
-				return new Register32Bit(name, Integer.parseUnsignedInt(value, 16));
+				return new Register32Bit(name, Integer.parseUnsignedInt(value, 16), registerNumber);
 			}
 			case 64 -> {
 				return new Register64Bit(name, Long.parseUnsignedLong(value, 16));
@@ -163,7 +164,7 @@ public class QueryRegisters extends Command {
 			}
 		});
 		flagger.start();
-		this.registers = Arrays.stream(registers).parallel().filter(x -> x.matches(".*=[0-9,a-f]+")).map(QueryRegisters::parseRegister).toList().toArray(new Register[0]);
+		this.registers = IntStream.range(0, registers.length).parallel().mapToObj(x -> parseRegister(registers[x], x)).toArray(Register[]::new);
 		try {
 			flagger.join();
 		} catch (InterruptedException _) {

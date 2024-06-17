@@ -16,8 +16,8 @@ public class FlagRegister extends Register {
 	 * @param name    The name of the register.
 	 * @param content The value of this register as a boolean.
 	 */
-	public FlagRegister(String name, boolean content) {
-		super(name);
+	public FlagRegister(String name, boolean content, int registerNumber) {
+		super(name, registerNumber);
 		this.flag = content;
 	}
 

@@ -15,9 +15,10 @@ public class Register16Bit extends Register {
 	 *
 	 * @param name    The name of the register.
 	 * @param content The content of the new register.
+	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 */
-	public Register16Bit(String name, short content) {
-		super(name);
+	public Register16Bit(String name, short content, int registerNumber) {
+		super(name, registerNumber);
 		this.contents = content;
 	}
 
@@ -27,10 +28,11 @@ public class Register16Bit extends Register {
 	 *
 	 * @param name    The name of the register.
 	 * @param content The content of the new register.
+	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 * @throws IllegalArgumentException If the value does not fit.
 	 */
-	public Register16Bit(String name, int content) throws IllegalArgumentException {
-		super(name);
+	public Register16Bit(String name, int content, int registerNumber) throws IllegalArgumentException {
+		super(name, registerNumber);
 		if (content >= (1 << 17) || content < 0) throw new IllegalArgumentException("Value does not fit in 16 bit");
 		this.contents = (short) content;
 	}

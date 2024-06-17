@@ -15,9 +15,10 @@ public class Register8Bit extends Register {
 	 *
 	 * @param name    The name of the register.
 	 * @param content The content of this register.
+	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 */
-	public Register8Bit(String name, byte content) {
-		super(name);
+	public Register8Bit(String name, byte content, int registerNumber) {
+		super(name, registerNumber);
 		this.contents = content;
 	}
 
@@ -27,10 +28,11 @@ public class Register8Bit extends Register {
 	 *
 	 * @param name    The name of the register.
 	 * @param content The value of this register.
+	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 * @throws IllegalArgumentException Gets thrown when the value does not fit in this register.
 	 */
-	public Register8Bit(String name, int content) throws IllegalArgumentException {
-		super(name);
+	public Register8Bit(String name, int content, int registerNumber) throws IllegalArgumentException {
+		super(name, registerNumber);
 		if (content >= (1 << 9) || content < 0)
 			throw new IllegalArgumentException("Value too big for an 8bit Register");
 		this.contents = (byte) content;

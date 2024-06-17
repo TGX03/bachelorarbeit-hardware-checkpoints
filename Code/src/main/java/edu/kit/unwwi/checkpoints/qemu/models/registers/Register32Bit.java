@@ -15,9 +15,10 @@ public class Register32Bit extends Register {
 	 *
 	 * @param name    The name of the register.
 	 * @param content The content of the new register.
+	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 */
-	public Register32Bit(String name, int content) {
-		super(name);
+	public Register32Bit(String name, int content, int registerNumber) {
+		super(name, registerNumber);
 		this.contents = content;
 	}
 
