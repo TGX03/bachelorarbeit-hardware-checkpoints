@@ -34,7 +34,7 @@ public class Register4Bit extends Register {
 	 */
 	@Override
 	public int size() {
-		return 0;
+		return 4;
 	}
 
 	/**
