@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 
 /**
@@ -18,7 +20,7 @@ public abstract class Register implements Serializable, Comparable<Register> {
 	 *
 	 * @param name The name of the new register.
 	 */
-	public Register(String name) {
+	public Register(@NotNull String name) {
 		this.name = name;
 		this.registerNumber = -1;
 	}
@@ -31,7 +33,7 @@ public abstract class Register implements Serializable, Comparable<Register> {
 	 * @param name           The name of the new register.
 	 * @param registerNumber The number which can be used to order registers of the same name.
 	 */
-	public Register(String name, int registerNumber) {
+	public Register(@NotNull String name, int registerNumber) {
 		this.name = name;
 		this.registerNumber = registerNumber;
 	}
@@ -42,7 +44,7 @@ public abstract class Register implements Serializable, Comparable<Register> {
 	 *
 	 * @return The contents of this register.
 	 */
-	public abstract byte[] contents();
+	public abstract byte @NotNull [] contents();
 
 	/**
 	 * The size in bits of this register.
@@ -52,6 +54,7 @@ public abstract class Register implements Serializable, Comparable<Register> {
 	public abstract int size();
 
 	@Override
+	@NotNull
 	public final String toString() {
 		return name + ": " + toHexString();
 	}
@@ -61,6 +64,7 @@ public abstract class Register implements Serializable, Comparable<Register> {
 	 *
 	 * @return The contents of this register as hex.
 	 */
+	@NotNull
 	public abstract String toHexString();
 
 	/**
@@ -72,7 +76,7 @@ public abstract class Register implements Serializable, Comparable<Register> {
 	 * @throws IllegalStateException    When either register doesn't have enough date to be ordered.
 	 */
 	@Override
-	public int compareTo(Register register) throws IllegalArgumentException, IllegalStateException {
+	public int compareTo(@NotNull Register register) throws IllegalArgumentException, IllegalStateException {
 		if (!register.name.equals(this.name)) throw new IllegalArgumentException("Registers do not have the same name");
 		else if (this.registerNumber == -1 || register.registerNumber == -1)
 			throw new IllegalStateException("One of the registers was not assigned an order");

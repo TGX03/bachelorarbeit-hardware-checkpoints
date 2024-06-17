@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A class representing a 64-bit register.
  */
@@ -16,7 +18,7 @@ public class Register64Bit extends Register {
 	 * @param name    The name of the register.
 	 * @param content The content of the new register.
 	 */
-	public Register64Bit(String name, long content) {
+	public Register64Bit(@NotNull String name, long content) {
 		super(name);
 		this.contents = content;
 	}
@@ -28,7 +30,7 @@ public class Register64Bit extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		return new byte[]{(byte) (contents >>> 56), (byte) (contents >>> 48), (byte) (contents >>> 40), (byte) (contents >>> 32), (byte) (contents >>> 24), (byte) (contents >>> 16), (byte) (contents >>> 8), (byte) contents};
 	}
 
@@ -48,6 +50,7 @@ public class Register64Bit extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		return String.format("0x%1$016x", contents);
 	}

@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A class representing a 32-bit register.
  */
@@ -13,11 +15,11 @@ public class Register32Bit extends Register {
 	/**
 	 * Create a new 32-bit register from the given value.
 	 *
-	 * @param name    The name of the register.
-	 * @param content The content of the new register.
+	 * @param name           The name of the register.
+	 * @param content        The content of the new register.
 	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 */
-	public Register32Bit(String name, int content, int registerNumber) {
+	public Register32Bit(@NotNull String name, int content, int registerNumber) {
 		super(name, registerNumber);
 		this.contents = content;
 	}
@@ -29,7 +31,7 @@ public class Register32Bit extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		return new byte[]{(byte) (contents >>> 24), (byte) (contents >>> 16), (byte) (contents >>> 8), (byte) contents};
 	}
 
@@ -49,6 +51,7 @@ public class Register32Bit extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		return String.format("0x%1$08x", contents);
 	}

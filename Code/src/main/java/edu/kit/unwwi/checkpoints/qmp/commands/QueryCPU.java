@@ -1,6 +1,7 @@
 package edu.kit.unwwi.checkpoints.qmp.commands;
 
 import edu.kit.unwwi.checkpoints.qmp.Command;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 
 /**
@@ -30,7 +31,7 @@ public class QueryCPU extends Command {
 	 *
 	 * @return JSON representing CPU data.
 	 */
-	public JSONArray getResult() {
+	public @NotNull JSONArray getResult() {
 		if (executed) return result;
 		else throw new IllegalStateException("Command hasn't been queried");
 	}
@@ -41,7 +42,7 @@ public class QueryCPU extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected String toJson() {
+	protected @NotNull String toJson() {
 		return "{ \"execute\": \"query-cpus-fast\"}";   // For some reason they removed the normal "query-cpus"-command and didn't tell anyone
 	}
 
@@ -51,7 +52,7 @@ public class QueryCPU extends Command {
 	 * @param result The result to parse.
 	 */
 	@Override
-	protected void processResult(Object result) {
+	protected void processResult(@NotNull Object result) {
 		assert result instanceof JSONArray;
 		this.result = (JSONArray) result;
 	}

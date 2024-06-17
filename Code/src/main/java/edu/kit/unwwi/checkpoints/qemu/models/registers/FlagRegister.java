@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A class representing a single flag register.
  */
@@ -44,7 +46,7 @@ public class FlagRegister extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		if (flag) return new byte[]{(byte) 1};
 		else return new byte[]{(byte) 0};
 	}
@@ -65,7 +67,7 @@ public class FlagRegister extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
-	public String toHexString() {
+	public @NotNull String toHexString() {
 		if (flag) return "0x1";
 		else return "0x0";
 	}

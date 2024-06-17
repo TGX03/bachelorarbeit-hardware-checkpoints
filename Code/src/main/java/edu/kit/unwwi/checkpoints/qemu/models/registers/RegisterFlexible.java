@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -26,7 +28,7 @@ public class RegisterFlexible extends Register {
 	 * @param content The bytes representing the content of this register.
 	 * @throws IllegalArgumentException If the input array is larger than what's specified by size.
 	 */
-	public RegisterFlexible(String name, int size, byte... content) throws IllegalArgumentException {
+	public RegisterFlexible(@NotNull String name, int size, byte @NotNull ... content) throws IllegalArgumentException {
 		super(name);
 		this.size = size;
 		int byteSize = Math.ceilDiv(size, 8);
@@ -46,7 +48,7 @@ public class RegisterFlexible extends Register {
 	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 * @throws IllegalArgumentException If the input array is larger than what's specified by size.
 	 */
-	public RegisterFlexible(String name, int size, int registerNumber, byte... content) throws IllegalArgumentException {
+	public RegisterFlexible(@NotNull String name, int size, int registerNumber, byte @NotNull ... content) throws IllegalArgumentException {
 		super(name, registerNumber);
 		this.size = size;
 		int byteSize = Math.ceilDiv(size, 8);
@@ -65,7 +67,7 @@ public class RegisterFlexible extends Register {
 	 * @param content The int representing the contents.
 	 * @throws IllegalArgumentException If the value of the int would not fit in such an array.
 	 */
-	public RegisterFlexible(String name, int size, int content) throws IllegalArgumentException {
+	public RegisterFlexible(@NotNull String name, int size, int content) throws IllegalArgumentException {
 		super(name);
 		this.size = size;
 		if (content >= (1 << (size + 1)) || (size < 32 && content < 0))
@@ -98,7 +100,7 @@ public class RegisterFlexible extends Register {
 	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 * @throws IllegalArgumentException If the value of the int would not fit in such an array.
 	 */
-	public RegisterFlexible(String name, int size, int registerNumber, int content) throws IllegalArgumentException {
+	public RegisterFlexible(@NotNull String name, int size, int registerNumber, int content) throws IllegalArgumentException {
 		super(name, registerNumber);
 		this.size = size;
 		if (content >= (1 << (size + 1)) || (size < 32 && content < 0))
@@ -130,7 +132,7 @@ public class RegisterFlexible extends Register {
 	 * @param content The long representing the content of the register.
 	 * @throws IllegalArgumentException When the value of the long would not fit in such a register.
 	 */
-	public RegisterFlexible(String name, int size, long content) throws IllegalArgumentException {
+	public RegisterFlexible(@NotNull String name, int size, long content) throws IllegalArgumentException {
 		super(name);
 		this.size = size;
 		if (content >= (1L << (size + 1)) || (size < 64 && content < 0))
@@ -156,7 +158,7 @@ public class RegisterFlexible extends Register {
 	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 * @throws IllegalArgumentException When the value of the long would not fit in such a register.
 	 */
-	public RegisterFlexible(String name, int size, int registerNumber, long content) throws IllegalArgumentException {
+	public RegisterFlexible(@NotNull String name, int size, int registerNumber, long content) throws IllegalArgumentException {
 		super(name, registerNumber);
 		this.size = size;
 		if (content >= (1L << (size + 1)) || (size < 64 && content < 0))
@@ -179,7 +181,7 @@ public class RegisterFlexible extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		return Arrays.copyOf(contents, contents.length);
 	}
 
@@ -199,6 +201,7 @@ public class RegisterFlexible extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		boolean first = (size % 8) >= 4;
 		StringBuilder builder = new StringBuilder(Math.ceilDiv(this.contents.length, 4) + 2);

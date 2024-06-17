@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A class representing a 16-bit register.
  */
@@ -13,11 +15,11 @@ public class Register16Bit extends Register {
 	/**
 	 * Create a new 16-bit register from the given value.
 	 *
-	 * @param name    The name of the register.
-	 * @param content The content of the new register.
+	 * @param name           The name of the register.
+	 * @param content        The content of the new register.
 	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 */
-	public Register16Bit(String name, short content, int registerNumber) {
+	public Register16Bit(@NotNull String name, short content, int registerNumber) {
 		super(name, registerNumber);
 		this.contents = content;
 	}
@@ -26,12 +28,12 @@ public class Register16Bit extends Register {
 	 * Create a new 16-bit integer from the given value.
 	 * Make sure the value fits in 16 bits.
 	 *
-	 * @param name    The name of the register.
-	 * @param content The content of the new register.
+	 * @param name           The name of the register.
+	 * @param content        The content of the new register.
 	 * @param registerNumber The number of this register to be used when ordering same-name registers.
 	 * @throws IllegalArgumentException If the value does not fit.
 	 */
-	public Register16Bit(String name, int content, int registerNumber) throws IllegalArgumentException {
+	public Register16Bit(@NotNull String name, int content, int registerNumber) throws IllegalArgumentException {
 		super(name, registerNumber);
 		if (content >= (1 << 17) || content < 0) throw new IllegalArgumentException("Value does not fit in 16 bit");
 		this.contents = (short) content;
@@ -53,7 +55,7 @@ public class Register16Bit extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		return new byte[]{(byte) (contents >>> 8), (byte) contents};
 	}
 
@@ -73,6 +75,7 @@ public class Register16Bit extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		return String.format("0x%1$04x", contents);
 	}

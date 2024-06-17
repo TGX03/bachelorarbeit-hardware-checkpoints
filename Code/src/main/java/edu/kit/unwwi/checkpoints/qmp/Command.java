@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qmp;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * An interface representing a command.
  * Such a command can be given to the interface to transmission and will then receive a result,
@@ -17,6 +19,7 @@ public abstract class Command {
 	 *
 	 * @return JSON representation of this command.
 	 */
+	@NotNull
 	protected abstract String toJson();
 
 	/**
@@ -26,7 +29,7 @@ public abstract class Command {
 	 *
 	 * @param result The result received from QEMU.
 	 */
-	void receiveResult(Object result) {
+	void receiveResult(@NotNull Object result) {
 		if (executed) throw new IllegalStateException("This command was already executed");
 		else {
 			executed = true;
@@ -39,5 +42,5 @@ public abstract class Command {
 	 *
 	 * @param result The result to parse.
 	 */
-	protected abstract void processResult(Object result);
+	protected abstract void processResult(@NotNull Object result);
 }

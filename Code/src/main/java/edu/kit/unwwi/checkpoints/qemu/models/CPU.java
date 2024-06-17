@@ -3,6 +3,7 @@ package edu.kit.unwwi.checkpoints.qemu.models;
 import edu.kit.unwwi.checkpoints.qemu.models.registers.Register;
 import edu.kit.unwwi.checkpoints.qmp.commands.QueryCPU;
 import edu.kit.unwwi.checkpoints.qmp.commands.QueryRegisters;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -59,7 +60,7 @@ public class CPU implements Serializable {
 	 * @param registers The result of the "Query Registers" command.
 	 * @return The CPU object constructed from the given data.
 	 */
-	public static CPU createFromQueries(int id, QueryCPU cpu, QueryRegisters registers) {
+	public static CPU createFromQueries(int id, @NotNull QueryCPU cpu, @NotNull QueryRegisters registers) {
 		JSONObject jsonCPU = cpu.getResult().getJSONObject(id);
 		String architecture = jsonCPU.getString("target");
 		int hostId = jsonCPU.getInt("thread-id");

@@ -1,5 +1,6 @@
 package edu.kit.unwwi.checkpoints.qmp;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -49,7 +50,7 @@ public class QMPInterface {
 	 * @param port The port the host listens on.
 	 * @throws IOException When the connection couldn't be established.
 	 */
-	public QMPInterface(String host, int port) throws IOException {
+	public QMPInterface(@NotNull String host, int port) throws IOException {
 		socket = new Socket(host, port);
 		out = socket.getOutputStream();
 		out.write("{ \"execute\": \"qmp_capabilities\" }".getBytes(StandardCharsets.UTF_8));
@@ -66,7 +67,7 @@ public class QMPInterface {
 	 * @param command The command to execute.
 	 * @throws IOException When something went wrong during transmission.
 	 */
-	public void executeCommand(Command command) throws IOException {
+	public void executeCommand(@NotNull Command command) throws IOException {
 		byte[] request = command.toJson().getBytes(StandardCharsets.UTF_8);
 		lock.lock();
 		out.write(request);
@@ -103,7 +104,7 @@ public class QMPInterface {
 		 *
 		 * @param in The InputStream to read from.
 		 */
-		Reader(InputStream in) {
+		Reader(@NotNull InputStream in) {
 			this.in = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 		}
 

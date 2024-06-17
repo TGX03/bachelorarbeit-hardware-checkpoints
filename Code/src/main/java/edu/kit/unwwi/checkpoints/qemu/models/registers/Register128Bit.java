@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A class representing a 128-bit register.
  */
@@ -21,7 +23,7 @@ public class Register128Bit extends Register {
 	 * @param name   The name of the register.
 	 * @param values The 2 longs representing the value.
 	 */
-	public Register128Bit(String name, long... values) {
+	public Register128Bit(@NotNull String name, long @NotNull ... values) {
 		super(name);
 		this.upper = values[0];
 		this.lower = values[1];
@@ -35,7 +37,7 @@ public class Register128Bit extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		byte[] out = new byte[16];
 		for (int i = 0; i < 8; i++) {
 			out[i] = (byte) (upper >>> (i * 8));
@@ -62,6 +64,7 @@ public class Register128Bit extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		return String.format("0x%1$016x%2$016x", upper, lower);
 	}

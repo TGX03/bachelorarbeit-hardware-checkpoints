@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -30,7 +32,7 @@ public class Register256Bit extends Register {
 	 * @param name   The name of the register.
 	 * @param values The longs representing the contents of the register.
 	 */
-	public Register256Bit(String name, long... values) {
+	public Register256Bit(@NotNull String name, long @NotNull ... values) {
 		super(name);
 		assert values.length == 4;
 		upper = values[0];
@@ -46,7 +48,7 @@ public class Register256Bit extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		ByteBuffer buf = ByteBuffer.allocate(32);
 		buf.putLong(upper);
 		buf.putLong(middleUpper);
@@ -71,6 +73,7 @@ public class Register256Bit extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		return String.format("0x%1$016x%2$016x%3$016x%4$016x", upper, middleUpper, middleLower, lower);
 	}

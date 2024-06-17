@@ -2,6 +2,7 @@ package edu.kit.unwwi.checkpoints.qmp.commands;
 
 import edu.kit.unwwi.checkpoints.qemu.models.registers.*;
 import edu.kit.unwwi.checkpoints.qmp.Command;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public class QueryRegisters extends Command {
 	 * @param input The string to parse.
 	 * @return The created Register object.
 	 */
+	@NotNull
 	private static Register parseRegister(String input, int registerNumber) {
 		String[] split = input.split("=");
 		String name = split[0];
@@ -99,7 +101,7 @@ public class QueryRegisters extends Command {
 	 *
 	 * @return The registers.
 	 */
-	public Register[] getResult() {
+	public @NotNull Register @NotNull [] getResult() {
 		if (executed) return registers;
 		else throw new IllegalStateException("Command hasn't been queried");
 	}
@@ -120,7 +122,7 @@ public class QueryRegisters extends Command {
 	 * @return The flags of this register if set.
 	 * @throws IllegalStateException When no flags were found for this CPU.
 	 */
-	public char[] flags() throws IllegalStateException {
+	public char @NotNull [] flags() throws IllegalStateException {
 		if (hasFlags()) return Arrays.copyOf(this.flags, this.flags.length);
 		else throw new IllegalStateException("This CPU has no flags.");
 	}
@@ -131,7 +133,7 @@ public class QueryRegisters extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected String toJson() {
+	protected @NotNull String toJson() {
 		return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"info registers\", \"cpu-index\": " + id + " } }";
 	}
 
@@ -141,7 +143,7 @@ public class QueryRegisters extends Command {
 	 * @param result The result to parse.
 	 */
 	@Override
-	protected void processResult(Object result) {
+	protected void processResult(@NotNull Object result) {
 		assert result instanceof String;
 		String input = (String) result;
 		input = input.replaceAll(System.lineSeparator(), " ");

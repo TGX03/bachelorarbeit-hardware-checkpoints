@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -26,7 +28,7 @@ public class Register80Bit extends Register {
 	 * @param base      The first 64 bit of the register.
 	 * @param extension The latter 16 bit of the register.
 	 */
-	public Register80Bit(String name, long base, short extension) {
+	public Register80Bit(@NotNull String name, long base, short extension) {
 		super(name);
 		this.base = base;
 		this.extension = extension;
@@ -38,7 +40,7 @@ public class Register80Bit extends Register {
 	 * @param name    The name of the register.
 	 * @param content The bytes of this array. Length must be 10.
 	 */
-	public Register80Bit(String name, byte[] content) {
+	public Register80Bit(@NotNull String name, byte[] content) {
 		super(name);
 		assert content.length == 10;
 		ByteBuffer buffer = ByteBuffer.wrap(content);
@@ -55,7 +57,7 @@ public class Register80Bit extends Register {
 	 * @param extension The last 16 bit of the register as an int.
 	 * @throws IllegalArgumentException When the int is out of bounds.
 	 */
-	public Register80Bit(String name, long base, int extension) throws IllegalArgumentException {
+	public Register80Bit(@NotNull String name, long base, int extension) throws IllegalArgumentException {
 		super(name);
 		this.base = base;
 		if (extension >= (1 << 17)) throw new IllegalArgumentException("Extension is too big for this register");
@@ -69,7 +71,7 @@ public class Register80Bit extends Register {
 	 * @return The contents of this register.
 	 */
 	@Override
-	public byte[] contents() {
+	public byte @NotNull [] contents() {
 		ByteBuffer buffer = ByteBuffer.allocate(10);
 		buffer.putLong(base);
 		buffer.putShort(extension);
@@ -92,6 +94,7 @@ public class Register80Bit extends Register {
 	 * @return The contents of this register as hex.
 	 */
 	@Override
+	@NotNull
 	public String toHexString() {
 		return String.format("0x%1$016x%2$04x", base, extension);
 	}

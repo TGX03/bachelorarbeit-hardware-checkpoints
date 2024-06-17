@@ -1,6 +1,7 @@
 package edu.kit.unwwi.checkpoints.qmp.commands;
 
 import edu.kit.unwwi.checkpoints.qmp.Command;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 /**
@@ -59,7 +60,7 @@ public class Status extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected String toJson() {
+	protected @NotNull String toJson() {
 		return "{ \"execute\": \"query-status\" }";
 	}
 
@@ -71,7 +72,7 @@ public class Status extends Command {
 	 * @param result The result received from QEMU.
 	 */
 	@Override
-	protected void processResult(Object result) {
+	protected void processResult(@NotNull Object result) {
 		assert result instanceof JSONObject;
 		JSONObject json = (JSONObject) result;
 		state = State.fromString(json.getString("status"));

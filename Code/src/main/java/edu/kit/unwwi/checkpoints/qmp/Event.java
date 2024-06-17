@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qmp;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 
 /**
@@ -32,7 +34,7 @@ public class Event {
 	 * @param timestampSeconds      The timestamp in seconds when the event occurred.
 	 * @param timestampMicroseconds Microseconds for additional precision.
 	 */
-	Event(String name, JSONObject data, long timestampSeconds, int timestampMicroseconds) {
+	Event(@NotNull String name, @Nullable JSONObject data, long timestampSeconds, int timestampMicroseconds) {
 		this.name = name;
 		this.data = data;
 		this.timestampSeconds = timestampSeconds;
@@ -47,6 +49,7 @@ public class Event {
 	/**
 	 * @return The internal Name of QEMU for this event.
 	 */
+	@NotNull
 	public String getName() {
 		return this.name;
 	}
@@ -57,6 +60,7 @@ public class Event {
 	 *
 	 * @return The data included with this event.
 	 */
+	@Nullable
 	public JSONObject getData() {
 		return this.data;
 	}

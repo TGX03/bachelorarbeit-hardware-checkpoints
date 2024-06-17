@@ -36,11 +36,11 @@ public class Blockdevice {
 	/**
 	 * Create a new Blockdevice.
 	 *
-	 * @param device The QEMU-name of the device.
-	 * @param qdev The qdev-ID or QOM-path, depending on QEMU internal assignment.
-	 * @param path The path to the file backing the device if available.
+	 * @param device      The QEMU-name of the device.
+	 * @param qdev        The qdev-ID or QOM-path, depending on QEMU internal assignment.
+	 * @param path        The path to the file backing the device if available.
 	 * @param virtualSize The size of the device shown to the guest.
-	 * @param actualSize The size currently taken up on the host disk.
+	 * @param actualSize  The size currently taken up on the host disk.
 	 */
 	public Blockdevice(@NotNull String device, @NotNull String qdev, @Nullable Path path, long virtualSize, long actualSize) {
 		this.device = device;
@@ -52,6 +52,7 @@ public class Blockdevice {
 
 	/**
 	 * Returns the name of this blockdevice.
+	 *
 	 * @return The name of this blockdevice.
 	 */
 	@NotNull
@@ -61,6 +62,7 @@ public class Blockdevice {
 
 	/**
 	 * Returns the qdev-ID or QOM-path of this device.
+	 *
 	 * @return The qdev-ID or QOM-path of this device.
 	 */
 	@NotNull
@@ -71,6 +73,7 @@ public class Blockdevice {
 	/**
 	 * Returns the path of the file backing this device,
 	 * if available.
+	 *
 	 * @return The path of the file backing this device.
 	 */
 	@Nullable
@@ -80,6 +83,7 @@ public class Blockdevice {
 
 	/**
 	 * The total size of this device shown to the guest system.
+	 *
 	 * @return The size shown to the guest.
 	 */
 	public long getVirtualSize() {
@@ -88,6 +92,7 @@ public class Blockdevice {
 
 	/**
 	 * The size the backing file is taking up on the host's disks.
+	 *
 	 * @return The size on the host.
 	 */
 	public long getActualSize() {
@@ -95,7 +100,8 @@ public class Blockdevice {
 	}
 
 
-	@Override @NotNull
+	@Override
+	@NotNull
 	public String toString() {
 		return device;
 	}
