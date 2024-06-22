@@ -32,8 +32,8 @@ public abstract class Command {
 	void receiveResult(@NotNull Object result) {
 		if (executed) throw new IllegalStateException("This command was already executed");
 		else {
-			executed = true;
 			processResult(result);
+			executed = true;
 		}
 	}
 
