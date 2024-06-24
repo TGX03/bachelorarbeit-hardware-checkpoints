@@ -1,6 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.tlb;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -37,5 +38,16 @@ public class TLB implements Serializable {
 			shifted = address & shifter;
 		}
 		return mappings.get(shifted).translateAddress(address);
+	}
+
+	/**
+	 * Returns the current mappings of the TLB as an array.
+	 *
+	 * @return The current TLB mappings.
+	 */
+	public MemoryMapping[] getMappings() {
+		MemoryMapping[] result = mappings.values().toArray(new MemoryMapping[0]);
+		Arrays.sort(result);
+		return result;
 	}
 }
