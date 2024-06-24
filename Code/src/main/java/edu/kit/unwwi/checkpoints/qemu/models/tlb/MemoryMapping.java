@@ -98,7 +98,7 @@ public class MemoryMapping implements Comparable<MemoryMapping>, Serializable {
 
 	@Override
 	public String toString() {
-		return virtualAddress + ": " + physicalAddress + "[" + new String(flags).replaceAll("\0", "-") + "]";
+		return Long.toUnsignedString(virtualAddress, 16) + ": " + Long.toUnsignedString(physicalAddress, 16) + "[" + new String(flags).replaceAll("\0", "-") + "]";
 	}
 
 	@Override
