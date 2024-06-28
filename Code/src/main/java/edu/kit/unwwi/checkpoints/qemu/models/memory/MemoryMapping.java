@@ -1,4 +1,4 @@
-package edu.kit.unwwi.checkpoints.qemu.models.tlb;
+package edu.kit.unwwi.checkpoints.qemu.models.memory;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,4 +1,4 @@
-package edu.kit.unwwi.checkpoints.qemu.models.tlb;
+package edu.kit.unwwi.checkpoints.qemu.models.memory;
 
 import java.io.Serializable;
 import java.util.Arrays;

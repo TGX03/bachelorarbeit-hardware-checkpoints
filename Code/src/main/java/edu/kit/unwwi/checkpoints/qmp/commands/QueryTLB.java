@@ -1,7 +1,7 @@
 package edu.kit.unwwi.checkpoints.qmp.commands;
 
-import edu.kit.unwwi.checkpoints.qemu.models.tlb.MemoryMapping;
-import edu.kit.unwwi.checkpoints.qemu.models.tlb.TLB;
+import edu.kit.unwwi.checkpoints.qemu.models.memory.MemoryMapping;
+import edu.kit.unwwi.checkpoints.qemu.models.memory.TLB;
 import edu.kit.unwwi.checkpoints.qmp.Command;
 import org.jetbrains.annotations.NotNull;
 
