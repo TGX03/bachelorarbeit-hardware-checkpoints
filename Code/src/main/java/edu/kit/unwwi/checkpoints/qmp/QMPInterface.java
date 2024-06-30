@@ -55,7 +55,9 @@ public class QMPInterface {
 		out = socket.getOutputStream();
 		out.write("{ \"execute\": \"qmp_capabilities\" }".getBytes(StandardCharsets.UTF_8));
 		lock.lock();
-		new Thread(new Reader(socket.getInputStream())).start();
+		Thread listener = new Thread(new Reader(socket.getInputStream()));
+		listener.setDaemon(true);
+		listener.start();
 		awaitResult.awaitUninterruptibly();
 		lock.unlock();
 	}
