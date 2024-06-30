@@ -38,7 +38,7 @@ class MemoryInputStream extends InputStream {
 
 	@Override
 	public int read() {
-		if (memory.size() >= currentAddress) return -1;
+		if (currentAddress >= this.memory.size()) return -1;
 		else {
 			int result = memory.getByte(currentAddress);
 			this.currentAddress++;
