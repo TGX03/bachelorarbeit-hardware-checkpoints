@@ -63,7 +63,8 @@ class MemoryInputStream extends InputStream {
 	@Override
 	public int read(byte @NotNull [] buffer, int offset, int length) {
 		long size = memory.size() - currentAddress;
-		if (length > size) {
+		if (size == 0) return -1;
+		else if (length > size) {
 			this.memory.read(currentAddress, buffer, offset, (int) size);
 			this.currentAddress += size;
 			return (int) size;
