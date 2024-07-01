@@ -10,57 +10,54 @@
 %%
 %% Version 1.5, 2024-02-12
 
-\chapter{First Content Chapter}
-\label{ch:FirstContent}
+\chapter{The QEMU API}
+As the goal of this paper is to extract data without having to change code of QEMU,
+it is neccessary to take a look at the data QEMU offers by itself.
+QEMU offers 3 kinds of semi-external APIs: The QEMU Human Monitor (QHM),
+the QEMU Machine Protocol (QMP) and so-called "Internal QEMU APIs"\cite{internal}.
 
-%% -------------------
-%% | Example content |
-%% -------------------
-The content chapters of your thesis should of course be renamed. How many
-chapters you need to write depends on your thesis and cannot be said in general.
+As the name suggests, the internal QEMU APIs are not useful for external use by themselves.
+Instead, they can be used when modifying QEMU-code and then extracting data by the means of GDB or directly by the QEMU process.
+As the goal is to use any standard QEMU implementation, these internal APIs will not be regarded further in this paper.
 
-Check out the examples theses in the SDQ Wiki:
+In the two following sections, both QMP and QHM are further explored. Both the basic functionality,
+as well as the commands used for this paper get explained in detail.
+Also the differences of both protocols, especially in regards to their capabilities,
+get discussed.
 
-\url{https://sdq.kastel.kit.edu/wiki/Abschlussarbeit/Studienarbeit}
+\section{QEMU Machine Protocol (QMP)} \label{sec:QMP}
+"The QEMU Machine Protocol (QMP) is a JSON-based protocol which allows applications to control a QEMU instance"\cite{qmp-description}, as described by the QEMU-Wiki itself.
+The protocol was merged into the main branch of QEMU in version 0.13 in 2010, however to this day its status remains as "experimental"\cite{qmp-merge}.
+The goal was, and still is, to provide the same data QHM provides, but in a format more accessible for machines.
+However, this process is far from complete. To give an example, the patch to add the ability of reading Register contents was only introduced in 2021,
+but to this day it wasn't merged into the mainline branch.
+Also, this patch doesn't actually provide a valid JSON-object, but just passes the return of the QHM-command "info registers" into the "result"-string\cite{qmp-registers-patch}.
 
-Of course, you can split this .tex file into several files if you prefer. 
+This makes QMP the preferred protocol, as the data is in an easily parseable format, which makes extraction very easy.
+Also the returned data is generally consistent across architectures, and the documentation is very detailed.
+But, as mentioned, QMP is the less powerful protocol when used by itself.
+This however directly leads to the most important command\cite{qmp-commands}:
 
+\paragraph{human-monitor-command}
+This command is perhaps the most important one in all of this, as it allows to execute QHM-commands in a QMP-environment.
+The QEMU reference explicitly marks this command as a "stop-gap" until all QHM-commands have their counterpart in QMP,
+but, as mentioned before, that currently isn't necessary a priority.
+Still, it's currently the only way to access certain data like register contents, even if in an ugly fashion.
+Further details on how this command is used are described later on in \autoref{sec:QHM}.
 
-\section{First Section}
-\label{sec:FirstContent:FirstSection}
+\paragraph{qmp_capabilities}
+This command must be sent at the beginning of any QMP session to activate the session.
+On an unmodified QEMU instance, it returns an empty JSON-object.
+The command is intended to show the client additional features of a modified QEMU-instance,
+however in this paper this command serves no purpose except unlocking QMP.
 
-\Blindtext
+\paragraph{query-cpus-fast}
+Gives information about all available CPUs, namely their architecture,
+their count, and the ID of the host thread simulating the CPU.
+The commmand is a replacement for \emph{query-cpus}, which was removed and returned slightly different data.
+The main purpose for this paper is to get the CPU count, as registers need to be queried individually for each CPU.
 
-\subsection{A Subsection}
-\label{sec:FirstContent:FirstSubSection}
-
-\Blindtext
-
-\subsubsection{A Subsubsection}
-
-\Blindtext[1]
-
-\section{Second Section}
-\label{sec:FirstContent:SecondSection}
-
-\Blindtext
-
-
-\chapter{Second Content Chapter}
-\label{ch:SecondContent}
-
-\Blindtext
-
-\section{First Section}
-\label{sec:SecondContent:FirstSection}
-
-\Blindtext
-
-\section{Second Section}
-\label{sec:SecondContent:SecondSection}
-
-\Blindtext
-
-%% ---------------------
-%% | / Example content |
-%% ---------------------
+\paragraph{query-block}
+Queries for all kinds of drives. Gives information about attached storage mediums and where their content is stored.
+This of course gets used to back up the neccessary files later on.
+Also shows empty devices like optical drives which currently don't contain any media.
