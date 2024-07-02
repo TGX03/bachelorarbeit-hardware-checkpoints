@@ -15,7 +15,16 @@
 %% Available page modes: oneside, twoside
 %% Available languages: english, ngerman
 %% Available modes: draft, final (see README)
-\documentclass[twoside, english]{sdqthesis}
+\documentclass[twoside, english, draft]{sdqthesis}
+
+\ifdraft{
+\usepackage{draftwatermark}
+\SetWatermarkAngle{50}
+\SetWatermarkLightness{0.9}
+\SetWatermarkScale{1}
+\usepackage{todonotes}
+}{}
+
 
 %% ---------------------------------
 %% | Information about the thesis  |
@@ -72,6 +81,11 @@
 %% ====================================
 %% ====================================
 \begin{document}
+
+\ifdraft{
+\newcommand{\todonote}[1]{\ifdraft{
+\todo{#1}
+}{}}}
 
 %% Set PDF metadata
 \setpdf
