@@ -79,9 +79,6 @@ This makes detailed exploration into their workings neccessary, and the results 
 \subsection{info mem}
 \blindtext
 
-\subsection{info mtree}
-\blindtext
-
 \subsection{info tlb}
 "info tlb" gets described as "Show virtual to physical memory mappings"\cite{qhm-documentation}.
 There seems to be no further documentation as to what this command does or the format of the output.
@@ -115,3 +112,84 @@ To correctly extract the guest RAM, one would now need to find the base address 
 and then combine it with the virtual address translation to store memory in the format the guest OS sees it.
 This throws up the question in which format the RAM should be stored. In the order it is actually on the hardware, meaning the physical addresses,
 or in the order the guest OS sees it, meaning the virtual addresses.
+
+\subsection{info mtree}
+This command shows all memory regions which are currently allocated for the guest.
+This includes main memory, as well as memory for emulated devices like graphic cards.
+These regions are given individual names and are separated by blank lines.
+To given an example of an ARM64 guest running on x86:
+
+\begin{ffcode}
+    address-space: I/O
+    0000000000000000-000000000000ffff (prio 0, i/o): io
+
+  address-space: gpex-root
+    0000000000000000-ffffffffffffffff (prio 0, i/o): bus master container
+
+  address-space: virtio-gpu-pci
+    0000000000000000-ffffffffffffffff (prio 0, i/o): bus master container
+
+  address-space: cpu-memory-0
+  address-space: memory
+    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+      0000000000000000-0000000003ffffff (prio 0, romd): virt.flash0
+      0000000004000000-0000000007ffffff (prio 0, romd): virt.flash1
+      0000000008000000-0000000008000fff (prio 0, i/o): gic_dist
+      0000000008010000-0000000008011fff (prio 0, i/o): gic_cpu
+      0000000008020000-0000000008020fff (prio 0, i/o): gicv2m
+      0000000009000000-0000000009000fff (prio 0, i/o): pl011
+      0000000009010000-0000000009010fff (prio 0, i/o): pl031
+      0000000009020000-0000000009020007 (prio 0, i/o): fwcfg.data
+      0000000009020008-0000000009020009 (prio 0, i/o): fwcfg.ctl
+      0000000009020010-0000000009020017 (prio 0, i/o): fwcfg.dma
+      0000000009070000-0000000009070017 (prio 0, i/o): memhp container
+      0000000009080000-0000000009080003 (prio 0, i/o): acpi-ged
+      000000000a000000-000000000a0001ff (prio 0, i/o): virtio-mmio
+      000000000a000200-000000000a0003ff (prio 0, i/o): virtio-mmio
+      000000000a000400-000000000a0005ff (prio 0, i/o): virtio-mmio
+      ...
+\end{ffcode}
+
+In this example we see memory for basic I/O functionality, the GPEX-host bridge, the emulated GPU and "cpu-memory-0".
+cpu-memory-0 is special, as the name suggests this may be memory used to emulate the CPU. That however is not the case.
+Not only is it much larger than the registers of a single-core CPU could be, but also it's actually a duplicate.
+Further down the output is the following data:
+
+\begin{ffcode}
+    memory-region: system
+    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+      0000000000000000-0000000003ffffff (prio 0, romd): virt.flash0
+      0000000004000000-0000000007ffffff (prio 0, romd): virt.flash1
+      0000000008000000-0000000008000fff (prio 0, i/o): gic_dist
+      0000000008010000-0000000008011fff (prio 0, i/o): gic_cpu
+      0000000008020000-0000000008020fff (prio 0, i/o): gicv2m
+      0000000009000000-0000000009000fff (prio 0, i/o): pl011
+      0000000009010000-0000000009010fff (prio 0, i/o): pl031
+      0000000009020000-0000000009020007 (prio 0, i/o): fwcfg.data
+      0000000009020008-0000000009020009 (prio 0, i/o): fwcfg.ctl
+      0000000009020010-0000000009020017 (prio 0, i/o): fwcfg.dma
+      0000000009070000-0000000009070017 (prio 0, i/o): memhp container
+      0000000009080000-0000000009080003 (prio 0, i/o): acpi-ged
+      000000000a000000-000000000a0001ff (prio 0, i/o): virtio-mmio
+      000000000a000200-000000000a0003ff (prio 0, i/o): virtio-mmio
+      000000000a000400-000000000a0005ff (prio 0, i/o): virtio-mmio
+      ...
+\end{ffcode}
+
+This shows that the output above is actually normal system memory accessible to the emulated CPU.
+Hence the name "cpu-memory-0", as on multi-socket-systems sometimes not all memory is avaliable to all CPUs.
+
+The size of each memory region is shown by the minimum and maximum address of each region.
+As this is a 64bit guest, ffffffffffffffff represents 64bits, which results in a memory size of $2^{64}$Bytes.
+
+Most regions are specialized and the name of the region gives an indication of where to look,
+but it isn't actually relevant in most cases.
+Because of this, only certain regions will be explained:
+
+\paragraph{virt.flash}
+There are 2 regions with this name. \emph{virt.flash0} is the basic EFI, which under aarch64 is not included by default.
+\emph{virt.flash1} stores EFI-variables like boot order.
+The reason these regions are split is \emph{virt.flash1} is writeable, while \emph{virt.flash0} isn't.
+The main reason these are interesting is them being backed by files on disk.
+This means any changes made to these regions made by the guest can be easily read externally by opening those files.
+Of course that comes with a massive performance penalty if many accesses to such regions are made.
