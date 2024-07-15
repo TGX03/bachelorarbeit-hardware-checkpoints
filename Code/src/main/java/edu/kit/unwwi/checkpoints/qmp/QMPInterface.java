@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Vector;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,6 +37,10 @@ public class QMPInterface {
 	 * Condition used for waiting on server replies.
 	 */
 	private final Condition awaitResult = lock.newCondition();
+	/**
+	 * All handlers currently registered to listen for events.
+	 */
+	private final Collection<EventHandler> handlers = new Vector<>();
 
 	/**
 	 * The last result which was received.
@@ -92,6 +98,22 @@ public class QMPInterface {
 	}
 
 	/**
+	 * Add a handler which receives specific asynchronous events from the QEMU-instance.
+	 * @param handler The receiving handler.
+	 */
+	public void registerEventHandler(@NotNull EventHandler handler) {
+		this.handlers.add(handler);
+	}
+
+	/**
+	 * Remove a previously added handler from this QEMU-instance.
+	 * @param handler The handler to remove.
+	 */
+	public void unregisterEventHandler(@NotNull EventHandler handler) {
+		this.handlers.remove(handler);
+	}
+
+	/**
 	 * Reads the input asynchronously to receive asynchronous events sent by QEMU.
 	 */
 	private class Reader implements Runnable {
@@ -139,7 +161,7 @@ public class QMPInterface {
 		}
 
 		private void handleEvent(Event event) {
-			//TODO: No idea what to do here
+			handlers.parallelStream().filter(x -> x.eventName().equals(event.getName())).forEach(handler -> handler.handleEvent(event));
 		}
 	}
 }
