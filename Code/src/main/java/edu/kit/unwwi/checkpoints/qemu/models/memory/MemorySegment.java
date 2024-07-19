@@ -1,97 +1,120 @@
 package edu.kit.unwwi.checkpoints.qemu.models.memory;
 
-import com.sun.jna.Memory;
+import edu.kit.unwwi.collections.big.BigByteArrayInputStream;
+import it.unimi.dsi.fastutil.BigArrays;
+import it.unimi.dsi.fastutil.bytes.ByteBigArrays;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.ReferenceQueue;
+import java.io.Serializable;
 
 /**
- * This class represents a segment of memory.
- * This is the generic class, for specific platforms further implementations are required.
+ * A class representing a memory segment read from an ELF dump
  */
-public abstract class MemorySegment implements AutoCloseable {
+public class MemorySegment implements Serializable {
 
 	/**
-	 * The queue for phantom references that went out of scope,
-	 * to make sure no Memory objects stay behind and cause a memory leak.
+	 * The start address of the contents in this segment in actual memory.
 	 */
-	private static final ReferenceQueue<MemorySegment> memoryQueue = new ReferenceQueue<>();
+	private final long startAddress;
+	/**
+	 * The size of this segment.
+	 */
+	private final long size;
+	/**
+	 * The actual content of this segment.
+	 * 2D-array because ints.
+	 */
+	private final byte[][] content;
 
-	static {
-		Thread collector = new Thread(() -> {
-			while (true) {
-				try {
-					MemoryReference<?> current = (MemoryReference<?>) memoryQueue.remove();
-					current.free();
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+	/**
+	 * Create a new memory segment from an already existing 2D array.
+	 *
+	 * @param startAddress The start address of the segment in actual memory.
+	 * @param size         The size of this segment.
+	 * @param content      The contents to copy to this segment.
+	 */
+	public MemorySegment(long startAddress, long size, byte[][] content) {
+		this.startAddress = startAddress;
+		this.size = size;
+		this.content = BigArrays.copy(content, 0, size);
+	}
+
+	/**
+	 * Create a new segment which reads data from an Input Stream.
+	 *
+	 * @param startAddress The start address of this segment in actual memory.
+	 * @param size         The size of this segment.
+	 * @param input        The stream to write to this segment.
+	 * @throws IOException If any read error occurs while reading.
+	 */
+	public MemorySegment(long startAddress, long size, InputStream input) throws IOException {
+		this.startAddress = startAddress;
+		this.size = size;
+		this.content = ByteBigArrays.newBigArray(size);
+		int bufferSize = Integer.MAX_VALUE;
+		if (size < bufferSize) bufferSize = (int) size;
+		byte[] buffer = new byte[bufferSize];
+		int read;
+		long position = 0;
+		do {
+			read = input.read(buffer);
+			if (read != -1) {
+				BigArrays.copyToBig(buffer, 0, this.content, position, read);
 			}
-		});
-		collector.setDaemon(true);
-		collector.start();
+			position = position + read;
+		} while (read != -1);
 	}
 
 	/**
-	 * The memory region used to read the data into.
-	 */
-	public final Memory resultBuffer;
-	/**
-	 * The process ID of the process to read from.
-	 */
-	protected final int process;
-	/**
-	 * The address of the other process to read from.
-	 */
-	protected final long address;
-
-	/**
-	 * Create a new Memory segment. Its memory gets allocated directly in the constructor.
+	 * Returns the address where this segment starts in physical memory.
 	 *
-	 * @param processID The process ID to read from.
-	 * @param offset    The address to read from.
-	 * @param size      The number of bytes to read from the other process.
+	 * @return The address where this segment starts.
 	 */
-	public MemorySegment(int processID, long offset, long size) {
-		resultBuffer = new Memory(size);
-		this.process = processID;
-		this.address = offset;
-		new MemoryReference<>(resultBuffer, this, memoryQueue);
+	public long getStartAddress() {
+		return startAddress;
 	}
 
 	/**
-	 * Start the reading process.
-	 */
-	public abstract void read();
-
-	/**
-	 * Create an InputStream from this memory object to read from.
-	 * As the max size of a byte array is ~2GB, this is probably a better way.
-	 * Make sure to actually read memory beforehand, as this method does not check.
+	 * The size of this segment.
 	 *
-	 * @return The input stream from read memory.
+	 * @return The size of this segment.
 	 */
-	public InputStream getInputStream() {
-		return new MemoryInputStream(resultBuffer);
+	public long getSize() {
+		return size;
 	}
 
 	/**
-	 * Reads a single byte from the memory backing this object.
-	 * Make sure to actually read memory beforehand, as this method does not check.
-	 * The address gets treated as a global address,
-	 * meaning it subtracts the start address from this object from the provided address.
+	 * Returns a copy of the contents of this segment.
+	 * Changes to the returned array are isolated from this object.
+	 *
+	 * @return The contents of this array as a 2D-array.
+	 */
+	public byte[][] getContent() {
+		return BigArrays.copy(this.content);
+	}
+
+	/**
+	 * Returns a byte from an actual given address.
 	 *
 	 * @param address The address to read from.
-	 * @return The byte read from the specified address.
+	 * @return The byte at given position.
 	 */
-	public byte getByte(long address) {
-		return resultBuffer.getByte(address - this.address);
+	public byte getByAddress(long address) {
+		return BigArrays.get(this.content, address - this.startAddress);
 	}
 
 	/**
-	 * Close the memory behind this object.
+	 * Returns a byte from an offset relative to the start of this segment.
+	 *
+	 * @param offset The offset in this segment to read from.
+	 * @return The byte from the given offset.
 	 */
-	public void close() {
-		resultBuffer.close();
+	public byte getByOffset(long offset) {
+		return BigArrays.get(this.content, offset);
+	}
+
+	public InputStream getInputStream() {
+		return new BigByteArrayInputStream(this.content);
 	}
 }

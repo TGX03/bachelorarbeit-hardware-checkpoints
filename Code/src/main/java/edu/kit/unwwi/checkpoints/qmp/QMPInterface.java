@@ -147,11 +147,14 @@ public class QMPInterface {
 						awaitResult.signalAll();
 					} else if (json.has("event")) {
 						String name = json.getString("event");
-						JSONObject data = json.getJSONObject("data");
+						JSONObject data = null;
+						if (json.has("data")) data = json.getJSONObject("data");
 						long seconds = json.getJSONObject("timestamp").getLong("seconds");
 						int microseconds = json.getJSONObject("timestamp").getInt("microseconds");
 						Event event = new Event(name, data, seconds, microseconds);
 						new Thread(() -> handleEvent(event)).start();
+					} else if (json.has("error")) {
+						System.err.println(json.get("error"));
 					}
 					lock.unlock();
 				} catch (IOException e) {
@@ -161,7 +164,7 @@ public class QMPInterface {
 		}
 
 		private void handleEvent(Event event) {
-			handlers.parallelStream().filter(x -> x.eventName().equals(event.getName())).forEach(handler -> handler.handleEvent(event));
+			handlers.stream().filter(x -> x.eventName().equals(event.getName())).forEach(handler -> Thread.ofVirtual().start(() -> handler.handleEvent(event)));
 		}
 	}
 }
