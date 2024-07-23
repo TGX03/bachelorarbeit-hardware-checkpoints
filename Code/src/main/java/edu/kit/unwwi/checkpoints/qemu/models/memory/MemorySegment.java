@@ -14,9 +14,13 @@ import java.io.Serializable;
 public class MemorySegment implements Serializable {
 
 	/**
-	 * The start address of the contents in this segment in actual memory.
+	 * The start address of the contents in this segment in physical  memory.
 	 */
-	private final long startAddress;
+	private final long startPhysicalAddress;
+	/**
+	 * The start address of the contents in this segment in virtual memory.
+	 */
+	private final long startVirtualAddress;
 	/**
 	 * The size of this segment.
 	 */
@@ -30,12 +34,14 @@ public class MemorySegment implements Serializable {
 	/**
 	 * Create a new memory segment from an already existing 2D array.
 	 *
-	 * @param startAddress The start address of the segment in actual memory.
-	 * @param size         The size of this segment.
-	 * @param content      The contents to copy to this segment.
+	 * @param startPhysicalAddress The start address of the segment in physical memory.
+	 * @param startVirtualAddress  The start address of the segment in virtual memory.
+	 * @param size                 The size of this segment.
+	 * @param content              The contents to copy to this segment.
 	 */
-	public MemorySegment(long startAddress, long size, byte[][] content) {
-		this.startAddress = startAddress;
+	public MemorySegment(long startPhysicalAddress, long startVirtualAddress, long size, byte[][] content) {
+		this.startPhysicalAddress = startPhysicalAddress;
+		this.startVirtualAddress = startVirtualAddress;
 		this.size = size;
 		this.content = BigArrays.copy(content, 0, size);
 	}
@@ -43,13 +49,15 @@ public class MemorySegment implements Serializable {
 	/**
 	 * Create a new segment which reads data from an Input Stream.
 	 *
-	 * @param startAddress The start address of this segment in actual memory.
-	 * @param size         The size of this segment.
-	 * @param input        The stream to write to this segment.
+	 * @param startPhysicalAddress The start address of this segment in actual memory.
+	 * @param startVirtualAddress  The start address of the segment in virtual memory.
+	 * @param size                 The size of this segment.
+	 * @param input                The stream to write to this segment.
 	 * @throws IOException If any read error occurs while reading.
 	 */
-	public MemorySegment(long startAddress, long size, InputStream input) throws IOException {
-		this.startAddress = startAddress;
+	public MemorySegment(long startPhysicalAddress, long startVirtualAddress, long size, InputStream input) throws IOException {
+		this.startPhysicalAddress = startPhysicalAddress;
+		this.startVirtualAddress = startVirtualAddress;
 		this.size = size;
 		this.content = ByteBigArrays.newBigArray(size);
 		int bufferSize = Integer.MAX_VALUE;
@@ -59,11 +67,9 @@ public class MemorySegment implements Serializable {
 		long position = 0;
 		do {
 			read = input.read(buffer);
-			if (read != -1) {
-				BigArrays.copyToBig(buffer, 0, this.content, position, read);
-			}
+			BigArrays.copyToBig(buffer, 0, this.content, position, read);
 			position = position + read;
-		} while (read != -1);
+		} while (read != -1 && position < size);
 	}
 
 	/**
@@ -71,8 +77,8 @@ public class MemorySegment implements Serializable {
 	 *
 	 * @return The address where this segment starts.
 	 */
-	public long getStartAddress() {
-		return startAddress;
+	public long getStartPhysicalAddress() {
+		return startPhysicalAddress;
 	}
 
 	/**
@@ -101,7 +107,7 @@ public class MemorySegment implements Serializable {
 	 * @return The byte at given position.
 	 */
 	public byte getByAddress(long address) {
-		return BigArrays.get(this.content, address - this.startAddress);
+		return BigArrays.get(this.content, address - this.startPhysicalAddress);
 	}
 
 	/**
@@ -114,6 +120,12 @@ public class MemorySegment implements Serializable {
 		return BigArrays.get(this.content, offset);
 	}
 
+	/**
+	 * Returns an input stream to the contents of this segment.
+	 * The returned input stream is not guaranteed to be thread-safe.
+	 *
+	 * @return InputStream to the contents of this segment.
+	 */
 	public InputStream getInputStream() {
 		return new BigByteArrayInputStream(this.content);
 	}
