@@ -130,7 +130,7 @@ public class ELFDump extends Command implements EventHandler {
 	@Override
 	protected @NotNull String toJson() {
 		instance.registerEventHandler(this);
-		return "{ \"execute\": \"dump-guest-memory\", \"arguments\": { \"paging\": false, \"protocol\": \"file:" + StringEscapeUtils.escapeJson(target.toAbsolutePath().toString()) + "\", \"format\": \"elf\" } }";
+		return "{ \"execute\": \"dump-guest-memory\", \"arguments\": { \"paging\": true, \"protocol\": \"file:" + StringEscapeUtils.escapeJson(target.toAbsolutePath().toString()) + "\", \"format\": \"elf\" } }";
 	}
 
 	@Override
