@@ -19,6 +19,7 @@ public class QueryTLB extends Command {
 
 	/**
 	 * Return the TLB that was created from querying QEMU.
+	 *
 	 * @return The created TLB.
 	 */
 	@NotNull

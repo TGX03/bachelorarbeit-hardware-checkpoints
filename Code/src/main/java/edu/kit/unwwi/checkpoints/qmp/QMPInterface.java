@@ -99,6 +99,7 @@ public class QMPInterface {
 
 	/**
 	 * Add a handler which receives specific asynchronous events from the QEMU-instance.
+	 *
 	 * @param handler The receiving handler.
 	 */
 	public void registerEventHandler(@NotNull EventHandler handler) {
@@ -107,6 +108,7 @@ public class QMPInterface {
 
 	/**
 	 * Remove a previously added handler from this QEMU-instance.
+	 *
 	 * @param handler The handler to remove.
 	 */
 	public void unregisterEventHandler(@NotNull EventHandler handler) {

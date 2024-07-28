@@ -69,15 +69,6 @@ public class ELFDump extends Command implements EventHandler {
 	private MemorySegment[] result;
 
 	/**
-	 * This sets the path where to store the temporary dump files.
-	 * Keep in mind they may get very large depending on the virtual machine.
-	 * @param temp The Path to use for temporary files.
-	 */
-	public static void setTemp(@NotNull Path temp) {
-		TEMPORARY_PATH = temp;
-	}
-
-	/**
 	 * Creates a new ELFDump object which can be executed later.
 	 * Needs the QMPInterface because this is an asynchronous request,
 	 * which means the object needs to receive information from the Interface at some point.
@@ -88,6 +79,16 @@ public class ELFDump extends Command implements EventHandler {
 		String filename = NAME_GENERATOR.nextLong() + ".dmp";
 		this.target = TEMPORARY_PATH.resolve(filename);
 		this.instance = instance;
+	}
+
+	/**
+	 * This sets the path where to store the temporary dump files.
+	 * Keep in mind they may get very large depending on the virtual machine.
+	 *
+	 * @param temp The Path to use for temporary files.
+	 */
+	public static void setTemp(@NotNull Path temp) {
+		TEMPORARY_PATH = temp;
 	}
 
 	/**

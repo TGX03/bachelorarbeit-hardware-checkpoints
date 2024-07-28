@@ -64,7 +64,7 @@ public class QueryBlock extends Command {
 	 * @throws IllegalStateException If the command was not yet executed.
 	 */
 	@NotNull
-	public Blockdevice @NotNull[] getResult() throws IllegalStateException {
+	public Blockdevice @NotNull [] getResult() throws IllegalStateException {
 		if (executed) return Arrays.copyOf(result, result.length);
 		else throw new IllegalStateException("Command has not yet been queried");
 	}

@@ -16,7 +16,8 @@ public class Stop extends Command {
 	/**
 	 * Private because singleton.
 	 */
-	private Stop() {}
+	private Stop() {
+	}
 
 	@Override
 	protected @NotNull String toJson() {

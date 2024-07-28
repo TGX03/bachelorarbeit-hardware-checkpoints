@@ -4,8 +4,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface EventHandler {
 
-    void handleEvent(@NotNull Event event);
+	void handleEvent(@NotNull Event event);
 
-    @NotNull
-    String eventName();
+	@NotNull
+	String eventName();
 }

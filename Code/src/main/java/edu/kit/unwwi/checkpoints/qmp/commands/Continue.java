@@ -16,7 +16,8 @@ public class Continue extends Command {
 	/**
 	 * Private constructor because singleton.
 	 */
-	private Continue() {}
+	private Continue() {
+	}
 
 	@Override
 	protected @NotNull String toJson() {
