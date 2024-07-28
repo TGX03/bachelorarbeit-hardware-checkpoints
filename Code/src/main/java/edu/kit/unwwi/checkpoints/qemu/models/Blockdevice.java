@@ -196,6 +196,7 @@ public class Blockdevice implements Serializable, JSONable {
 		String hash = Base64.getEncoder().encodeToString(this.hash);
 		JSONObject result = new JSONObject();
 		result.put("deviceName", this.device);
+		result.put("originalPath", this.path.toAbsolutePath().toString());
 		result.put("qdevID", this.qdev);
 		result.put("virtualSize", this.virtualSize);
 		result.put("actualSize", this.actualSize);
