@@ -62,30 +62,7 @@ public class Checkpoint {
 	 */
 	public static Checkpoint createCheckpoint(Path location, QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
 		assert Files.isDirectory(location);
-
-		// This block just stops the VM synchronously.
-		Lock stopLock = new ReentrantLock();
-		final LongContainer container = new LongContainer();
-		stopLock.lock();
-		Condition stopCondition = stopLock.newCondition();
-		qmpInterface.registerEventHandler(new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				stopLock.lock();
-				container.value = event.getTimestamp() * 1000000 + event.getTimestampMicroseconds();
-				stopCondition.signalAll();
-				stopLock.unlock();
-			}
-
-			@Override
-			public String eventName() {
-				return "STOP";
-			}
-		});
-		qmpInterface.executeCommand(Stop.INSTANCE);
-		stopCondition.awaitUninterruptibly();
-		stopLock.unlock();
-		long timestamp = container.value;
+		long timestamp = stopExecution(qmpInterface);
 
 		// Parse the registers
 		FutureTask<JSONArray> futureCPUs = new FutureTask<>(() -> parseCPU(qmpInterface));
@@ -114,6 +91,38 @@ public class Checkpoint {
 		qmpInterface.executeCommand(Continue.INSTANCE);
 		Files.writeString(descriptorFile, fullJSON.toString());
 		return new Checkpoint(subfolder, descriptorFile, timestamp, fullJSON);
+	}
+
+	/**
+	 * This method stops the execution of the provided QEMU-instance and returns the timestamp provided by QEMU.
+	 *
+	 * @param inter The QEMU-instance to stop.
+	 * @return The timestamp returned by QEMU.
+	 * @throws IOException Something went wrong while communicating with QEMU.
+	 */
+	private static long stopExecution(QMPInterface inter) throws IOException {
+		Lock stopLock = new ReentrantLock();
+		final LongContainer container = new LongContainer();
+		stopLock.lock();
+		Condition stopCondition = stopLock.newCondition();
+		inter.registerEventHandler(new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				stopLock.lock();
+				container.value = event.getTimestamp() * 1000000 + event.getTimestampMicroseconds();
+				stopCondition.signalAll();
+				stopLock.unlock();
+			}
+
+			@Override
+			public String eventName() {
+				return "STOP";
+			}
+		});
+		inter.executeCommand(Stop.INSTANCE);
+		stopCondition.awaitUninterruptibly();
+		stopLock.unlock();
+		return container.value;
 	}
 
 	/**
