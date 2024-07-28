@@ -86,6 +86,11 @@ public class Blockdevice {
 		this.actualSize = actualSize;
 	}
 
+	/**
+	 * Set the hash algorithm to use for segment comparison.
+	 *
+	 * @param digest The digest to use.
+	 */
 	public static void setHashAlgorithm(@NotNull MessageDigest digest) {
 		DIGEST = digest;
 	}
