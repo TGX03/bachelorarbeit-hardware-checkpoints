@@ -18,7 +18,7 @@ public class FlagRegister extends Register {
 	 * @param name    The name of the register.
 	 * @param content The value of this register as a boolean.
 	 */
-	public FlagRegister(String name, boolean content, int registerNumber) {
+	public FlagRegister(@NotNull String name, boolean content, int registerNumber) {
 		super(name, registerNumber);
 		this.flag = content;
 	}
@@ -31,7 +31,7 @@ public class FlagRegister extends Register {
 	 * @param content The content of the register.
 	 * @throws IllegalArgumentException When the value is out of bounds.
 	 */
-	public FlagRegister(String name, int content) throws IllegalArgumentException {
+	public FlagRegister(@NotNull String name, int content) throws IllegalArgumentException {
 		super(name);
 		if (content == 0) flag = false;
 		else if (content == 1) flag = true;

@@ -1,5 +1,7 @@
 package edu.kit.unwwi.checkpoints.qemu.models.memory;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,7 +21,7 @@ public class TLB implements Serializable {
 	 *
 	 * @param mappings The mappings.
 	 */
-	public TLB(MemoryMapping... mappings) {
+	public TLB(@NotNull MemoryMapping... mappings) {
 		for (MemoryMapping mapping : mappings) this.mappings.put(mapping.virtualAddress, mapping);
 	}
 
@@ -45,7 +47,8 @@ public class TLB implements Serializable {
 	 *
 	 * @return The current TLB mappings.
 	 */
-	public MemoryMapping[] getMappings() {
+	@NotNull
+	public MemoryMapping @NotNull [] getMappings() {
 		MemoryMapping[] result = mappings.values().toArray(new MemoryMapping[0]);
 		Arrays.sort(result);
 		return result;

@@ -90,7 +90,7 @@ public abstract class Register implements Serializable, Comparable<Register>, JS
 	}
 
 	@Override
-	public JSONObject toJSON() {
+	public @NotNull JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		json.put("name", name);
 		json.put("registerNumber", registerNumber);

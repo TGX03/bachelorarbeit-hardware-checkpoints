@@ -192,7 +192,7 @@ public class Blockdevice implements Serializable, JSONable {
 	}
 
 	@Override
-	public JSONObject toJSON() {
+	public @NotNull JSONObject toJSON() {
 		String hash = Base64.getEncoder().encodeToString(this.hash);
 		JSONObject result = new JSONObject();
 		result.put("deviceName", this.device);

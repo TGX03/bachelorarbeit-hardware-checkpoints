@@ -139,7 +139,7 @@ public class ELFDump extends Command implements EventHandler {
 	}
 
 	@Override
-	public void handleEvent(Event event) {
+	public void handleEvent(@NotNull Event event) {
 		instance.unregisterEventHandler(this);
 		JSONObject data = event.getData().getJSONObject("result");
 		if (data.getString("status").equals("completed")) {
@@ -174,7 +174,7 @@ public class ELFDump extends Command implements EventHandler {
 	}
 
 	@Override
-	public String eventName() {
+	public @NotNull String eventName() {
 		return "DUMP_COMPLETED";
 	}
 

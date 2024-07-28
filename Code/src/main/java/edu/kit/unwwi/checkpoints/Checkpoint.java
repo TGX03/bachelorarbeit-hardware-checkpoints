@@ -7,6 +7,7 @@ import edu.kit.unwwi.checkpoints.qmp.Event;
 import edu.kit.unwwi.checkpoints.qmp.EventHandler;
 import edu.kit.unwwi.checkpoints.qmp.QMPInterface;
 import edu.kit.unwwi.checkpoints.qmp.commands.*;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -54,7 +55,15 @@ public class Checkpoint {
 	 */
 	private final Map<String, Path> segmentHashes = new HashMap<>();
 
-	private Checkpoint(Path location, Path config, long timestamp, JSONObject json) {
+	/**
+	 * Internal constructor to create a new checkpoint after necessary actions were completed.
+	 *
+	 * @param location  The folder where this checkpoint gets stored.
+	 * @param config    The path to the json-file containing metadata about this checkpoint.
+	 * @param timestamp The timestamp QEMU reported when this checkpoint was created.
+	 * @param json      The json structure contained in the file.
+	 */
+	private Checkpoint(@NotNull Path location, @NotNull Path config, long timestamp, @NotNull JSONObject json) {
 		this.location = location;
 		this.config = config;
 		this.timestamp = timestamp;
@@ -83,7 +92,7 @@ public class Checkpoint {
 	 * @throws InterruptedException A thread was interrupted while waiting for data from QEMU.
 	 * @throws ExecutionException   An exception occurred while waiting for data from QEMU.
 	 */
-	public static Checkpoint createCheckpoint(Path location, QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
+	public static Checkpoint createCheckpoint(@NotNull Path location, @NotNull QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
 		assert Files.isDirectory(location);
 		long timestamp = stopExecution(qmpInterface);
 
@@ -123,14 +132,14 @@ public class Checkpoint {
 	 * @return The timestamp returned by QEMU.
 	 * @throws IOException Something went wrong while communicating with QEMU.
 	 */
-	private static long stopExecution(QMPInterface inter) throws IOException {
+	private static long stopExecution(@NotNull QMPInterface inter) throws IOException {
 		Lock stopLock = new ReentrantLock();
 		final LongContainer container = new LongContainer();
 		stopLock.lock();
 		Condition stopCondition = stopLock.newCondition();
 		inter.registerEventHandler(new EventHandler() {
 			@Override
-			public void handleEvent(Event event) {
+			public void handleEvent(@NotNull Event event) {
 				stopLock.lock();
 				container.value = event.getTimestamp() * 1000000 + event.getTimestampMicroseconds();
 				stopCondition.signalAll();
@@ -138,7 +147,7 @@ public class Checkpoint {
 			}
 
 			@Override
-			public String eventName() {
+			public @NotNull String eventName() {
 				return "STOP";
 			}
 		});
@@ -155,7 +164,7 @@ public class Checkpoint {
 	 * @return All collected information about the CPU.
 	 * @throws IOException An error while reading from QEMU occurred.
 	 */
-	private static JSONArray parseCPU(QMPInterface inter) throws IOException {
+	private static JSONArray parseCPU(@NotNull QMPInterface inter) throws IOException {
 		CPU[] cpus = getCPUs(inter);
 
 		// Write CPU information to the JSON file
@@ -173,7 +182,7 @@ public class Checkpoint {
 	 * @return The CPU cores that were found.
 	 * @throws IOException An error occurred while communicating with QEMU.
 	 */
-	private static CPU[] getCPUs(QMPInterface inter) throws IOException {
+	private static CPU[] getCPUs(@NotNull QMPInterface inter) throws IOException {
 		QueryCPU query = new QueryCPU();
 		inter.executeCommand(query);
 		JSONArray cpus = query.getResult();
@@ -201,7 +210,7 @@ public class Checkpoint {
 	 * @return The JSON array containing the information about the blockdevices.
 	 * @throws IOException An error occurred while communicating with QEMU.
 	 */
-	private static JSONArray parseAndCopyBlock(QMPInterface inter, Path directory) throws IOException {
+	private static JSONArray parseAndCopyBlock(@NotNull QMPInterface inter, @NotNull Path directory) throws IOException {
 		JSONArray result = new JSONArray();
 		Path subfolder = directory.resolve("blocks");
 		Files.createDirectory(subfolder);
@@ -225,7 +234,7 @@ public class Checkpoint {
 	 * @param inter The interface to query on.
 	 * @return The blockdevices which were found.
 	 */
-	private static Blockdevice[] getBlockdevices(QMPInterface inter) {
+	private static Blockdevice[] getBlockdevices(@NotNull QMPInterface inter) {
 		QueryBlock blocks = new QueryBlock();
 		try {
 			inter.executeCommand(blocks);
@@ -244,7 +253,7 @@ public class Checkpoint {
 	 * @throws IOException          An error occurred while communicating with QEMU.
 	 * @throws InterruptedException This thread was interrupted while waiting for the QEMU-dump to finish.
 	 */
-	private static JSONArray parseMemory(QMPInterface inter, Path directory) throws IOException, InterruptedException {
+	private static JSONArray parseMemory(@NotNull QMPInterface inter, @NotNull Path directory) throws IOException, InterruptedException {
 		JSONArray segments = new JSONArray();
 		ELFDump elf = new ELFDump(inter);
 		inter.executeCommand(elf);
@@ -266,6 +275,7 @@ public class Checkpoint {
 	 *
 	 * @return Where this checkpoint is stored.
 	 */
+	@NotNull
 	public Path getContainingPath() {
 		return this.location;
 	}
@@ -275,6 +285,7 @@ public class Checkpoint {
 	 *
 	 * @return The path of the JSON-file of this checkpoint.
 	 */
+	@NotNull
 	public Path getJsonFile() {
 		return this.config;
 	}
@@ -293,6 +304,7 @@ public class Checkpoint {
 	 *
 	 * @return All data included in this checkpoint as JSON.
 	 */
+	@NotNull
 	public JSONObject getJson() {
 		return this.json;
 	}
@@ -308,7 +320,7 @@ public class Checkpoint {
 	 * @throws InterruptedException If this thread got interrupted for some reason.
 	 * @throws ExecutionException   When an exception occurred in another thread affecting this thread.
 	 */
-	public Checkpoint createFollowUp(QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
+	public Checkpoint createFollowUp(@NotNull QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
 		long timestamp = stopExecution(qmpInterface);
 
 		// Parse the registers
@@ -347,7 +359,8 @@ public class Checkpoint {
 	 * @return A JSON Array containing the metadata about the block devices.
 	 * @throws IOException When something went wrong during IO or while communicating with QEMU.
 	 */
-	private JSONArray parseBlocksCheckDuplicates(QMPInterface inter, Path directory) throws IOException {
+	@NotNull
+	private JSONArray parseBlocksCheckDuplicates(@NotNull QMPInterface inter, @NotNull Path directory) throws IOException {
 		JSONArray result = new JSONArray();
 		Path subfolder = directory.resolve("blocks");
 		Files.createDirectory(subfolder);
@@ -378,7 +391,8 @@ public class Checkpoint {
 	 * @return A JSON Array containing the metadata about the memory segments.
 	 * @throws IOException When something went wrong during IO or while communicating with QEMU.
 	 */
-	private JSONArray parseMemoryCheckDuplicates(QMPInterface inter, Path directory) throws IOException, InterruptedException {
+	@NotNull
+	private JSONArray parseMemoryCheckDuplicates(@NotNull QMPInterface inter, @NotNull Path directory) throws IOException, InterruptedException {
 		JSONArray segments = new JSONArray();
 		ELFDump elf = new ELFDump(inter);
 		inter.executeCommand(elf);

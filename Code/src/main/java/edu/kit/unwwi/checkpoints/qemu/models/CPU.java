@@ -70,7 +70,7 @@ public class CPU implements Serializable, JSONable {
 	}
 
 	@Override
-	public JSONObject toJSON() {
+	public @NotNull JSONObject toJSON() {
 		JSONArray registers = new JSONArray();
 		for (Register current : this.registers) {
 			registers.put(current.toJSON());

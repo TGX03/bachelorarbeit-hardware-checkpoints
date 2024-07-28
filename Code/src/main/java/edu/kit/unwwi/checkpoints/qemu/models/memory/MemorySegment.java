@@ -79,7 +79,7 @@ public class MemorySegment implements Serializable, JSONable {
 	 * @param input                The stream to write to this segment.
 	 * @throws IOException If any read error occurs while reading.
 	 */
-	public MemorySegment(long startPhysicalAddress, long startVirtualAddress, long size, InputStream input) throws IOException {
+	public MemorySegment(long startPhysicalAddress, long startVirtualAddress, long size, @NotNull InputStream input) throws IOException {
 		this.startPhysicalAddress = startPhysicalAddress;
 		this.startVirtualAddress = startVirtualAddress;
 		this.size = size;
@@ -147,7 +147,7 @@ public class MemorySegment implements Serializable, JSONable {
 	 *
 	 * @return The contents of this array as a 2D-array.
 	 */
-	public byte[][] getContent() {
+	public byte @NotNull [] @NotNull [] getContent() {
 		return BigArrays.copy(this.content);
 	}
 
@@ -186,12 +186,13 @@ public class MemorySegment implements Serializable, JSONable {
 	 *
 	 * @return InputStream to the contents of this segment.
 	 */
+	@NotNull
 	public InputStream getInputStream() {
 		return new BigByteArrayInputStream(this.content);
 	}
 
 	@Override
-	public JSONObject toJSON() {
+	public @NotNull JSONObject toJSON() {
 		String hash = Base64.getEncoder().encodeToString(this.hash);
 		JSONObject result = new JSONObject();
 		result.put("startPhysicalAddress", startPhysicalAddress);
