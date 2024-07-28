@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -26,14 +26,16 @@ public class Checkpoint {
 	private final Path location;
 	private final Path config;
 	private final long timestamp;
+	private final JSONObject json;
 
-	private Checkpoint(Path location, Path config, long timestamp) {
+	private Checkpoint(Path location, Path config, long timestamp, JSONObject json) {
 		this.location = location;
 		this.config = config;
 		this.timestamp = timestamp;
+		this.json = json;
 	}
 
-	public static Checkpoint createCheckpoint(Path location, QMPInterface qmpInterface) throws IOException, InterruptedException {
+	public static Checkpoint createCheckpoint(Path location, QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
 		assert Files.isDirectory(location);
 
 		// This block just stops the VM synchronously.
@@ -60,102 +62,81 @@ public class Checkpoint {
 		stopLock.unlock();
 		long timestamp = container.value;
 
-		// Create a thread for parsing blockdevices
-		final AtomicReference<Blockdevice[]> blockdevices = new AtomicReference<>();
-		final Thread blockParser = Thread.ofVirtual().start(() -> blockdevices.set(getBlockdevices(qmpInterface)));
-
-		// Create a thread for dumping memory
-		ELFDump elf = new ELFDump(qmpInterface);
-		qmpInterface.executeCommand(elf);
-
-		// Create a thread for parsing CPU information
-		final AtomicReference<CPU[]> cpus = new AtomicReference<>();
-		Thread cpuParser = Thread.ofVirtual().start(() -> cpus.set(getCPUs(qmpInterface)));
+		// Parse the registers
+		FutureTask<JSONArray> futureCPUs = new FutureTask<>(() -> parseCPU(qmpInterface));
+		Thread.ofPlatform().start(futureCPUs);
 
 		// Create the subfolder for storing all checkpoint data
 		Path subfolder = location.resolve(Long.toUnsignedString(timestamp));
 		Files.createDirectory(subfolder);
+
+		// Parse memory and blockdevices. Not yet sure whether virtual Threads are really a good idea here.
+		FutureTask<JSONArray> futureBlocks = new FutureTask<>(() -> parseBlock(qmpInterface, subfolder));
+		FutureTask<JSONArray> futureMemory = new FutureTask<>(() -> parseMemory(qmpInterface, subfolder));
+		Thread.ofVirtual().start(futureBlocks);
+		Thread.ofVirtual().start(futureMemory);
 
 		// Create the descriptor file
 		Path descriptorFile = subfolder.resolve("descriptor.json");
 		JSONObject fullJSON = new JSONObject();
 		fullJSON.put("timestamp", timestamp);
 
-		// Write CPU information to the JSON file
-		JSONArray cpuArray = new JSONArray();
-		cpuParser.join();
-		for (CPU cpu : cpus.get()) {
-			cpuArray.put(cpu.toJSON());
-		}
-		fullJSON.put("CPUs", cpuArray);
+		fullJSON.put("cpu", futureCPUs.get());
+		fullJSON.put("memory", futureMemory.get());
+		fullJSON.put("blockdevice", futureBlocks.get());
 
-		// Create directory for storing copies of the blockdevices
-		final Path blockStorage = subfolder.resolve("blocks");
-		Files.createDirectory(blockStorage);
-
-		// Copy the blockdevices
-		Thread fileCopier = Thread.ofVirtual().start(() -> {
-			try {
-				blockParser.join();
-			} catch (InterruptedException _) {}
-
-			Blockdevice[] devices = blockdevices.get();
-			for (Blockdevice device : devices) {
-				JSONObject deviceJSON = device.toJSON();
-				if (device.hasMedia()) {
-					assert device.getPath() != null;
-					Path target = subfolder.resolve(device.getPath().getFileName());
-					deviceJSON.put("storageLocation", target.toAbsolutePath().toString());
-					try {
-						Files.copy(device.getPath(), target);
-					} catch (IOException e) {
-						throw new UncheckedIOException(e);
-					}
-				}
-			}
-		});
-
-		// Write the memory regions to disk
-		elf.awaitCompletion();
-		JSONArray segments = new JSONArray();
-		Path segmentStorage = subfolder.resolve("memory");
-		Files.createDirectory(segmentStorage);
-		for (MemorySegment segment : elf.getSegments()) {
-			JSONObject segmentJSON = segment.toJSON();
-			Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + ".dmp");
-			segmentJSON.put("location", segmentLocation.toAbsolutePath().toString());
-			segment.getInputStream().transferTo(Files.newOutputStream(segmentLocation));
-			segments.put(segmentJSON);
-		}
-		fullJSON.put("memory", segments);
-
-		fileCopier.join();
 		qmpInterface.executeCommand(Continue.INSTANCE);
 		Files.writeString(descriptorFile, fullJSON.toString());
-		return new Checkpoint(subfolder, descriptorFile, timestamp);
+		return new Checkpoint(subfolder, descriptorFile, timestamp, fullJSON);
 	}
 
-	private static CPU[] getCPUs(QMPInterface inter) {
-		QueryCPU query = new QueryCPU();
-		try {
-			inter.executeCommand(query);
-			JSONArray cpus = query.getResult();
-			final CPU[] result = new CPU[cpus.length()];
-			IntStream.range(0, cpus.length()).parallel().forEach(i -> {
-				JSONObject cpu = cpus.getJSONObject(i);
-				int index = cpu.getInt("cpu-index");
-				QueryRegisters registers = new QueryRegisters(index);
-				try {
-					inter.executeCommand(registers);
-					result[i] = new CPU(index, cpu.getString("target"), cpu.getInt("thread-id"), registers.getResult(), registers.flags());
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			});
-			return result;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+	private static JSONArray parseCPU(QMPInterface inter) throws IOException {
+		CPU[] cpus = getCPUs(inter);
+
+		// Write CPU information to the JSON file
+		JSONArray cpuArray = new JSONArray();
+		for (CPU cpu : cpus) {
+			cpuArray.put(cpu.toJSON());
 		}
+		return cpuArray;
+	}
+
+	private static CPU[] getCPUs(QMPInterface inter) throws IOException {
+		QueryCPU query = new QueryCPU();
+		inter.executeCommand(query);
+		JSONArray cpus = query.getResult();
+		final CPU[] result = new CPU[cpus.length()];
+		IntStream.range(0, cpus.length()).parallel().forEach(i -> {
+			JSONObject cpu = cpus.getJSONObject(i);
+			int index = cpu.getInt("cpu-index");
+			QueryRegisters registers = new QueryRegisters(index);
+			try {
+				inter.executeCommand(registers);
+				result[i] = new CPU(index, cpu.getString("target"), cpu.getInt("thread-id"), registers.getResult(), registers.flags());
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		});
+		return result;
+
+	}
+
+	private static JSONArray parseBlock(QMPInterface inter, Path directory) throws IOException {
+		JSONArray result = new JSONArray();
+		Path subfolder = directory.resolve("blocks");
+		Files.createDirectory(subfolder);
+		Blockdevice[] devices = getBlockdevices(inter);
+		for (Blockdevice device : devices) {
+			JSONObject deviceJSON = device.toJSON();
+			if (device.hasMedia()) {
+				assert device.getPath() != null;
+				Path target = subfolder.resolve(device.getPath().getFileName());
+				deviceJSON.put("storageLocation", target.toAbsolutePath().toString());
+				Files.copy(device.getPath(), target);
+				result.put(deviceJSON);
+			}
+		}
+		return result;
 	}
 
 	private static Blockdevice[] getBlockdevices(QMPInterface inter) {
@@ -166,6 +147,23 @@ public class Checkpoint {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	private static JSONArray parseMemory(QMPInterface inter, Path directory) throws IOException, InterruptedException {
+		JSONArray segments = new JSONArray();
+		ELFDump elf = new ELFDump(inter);
+		inter.executeCommand(elf);
+		elf.awaitCompletion();
+		Path segmentStorage = directory.resolve("memory");
+		Files.createDirectory(segmentStorage);
+		for (MemorySegment segment : elf.getSegments()) {
+			JSONObject segmentJSON = segment.toJSON();
+			Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + ".dmp");
+			segmentJSON.put("location", segmentLocation.toAbsolutePath().toString());
+			segment.getInputStream().transferTo(Files.newOutputStream(segmentLocation));
+			segments.put(segmentJSON);
+		}
+		return segments;
 	}
 
 	private static final class LongContainer {
