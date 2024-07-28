@@ -230,6 +230,42 @@ public class Checkpoint {
 	}
 
 	/**
+	 * Returns the directory containing all data from this checkpoint.
+	 *
+	 * @return Where this checkpoint is stored.
+	 */
+	public Path getContainingPath() {
+		return this.location;
+	}
+
+	/**
+	 * The path of the JSON-File containing all the data equivalent to getJson().
+	 *
+	 * @return The path of the JSON-file of this checkpoint.
+	 */
+	public Path getJsonFile() {
+		return this.config;
+	}
+
+	/**
+	 * The timestamp from QEMU of when this checkpoint was created.
+	 *
+	 * @return When this checkpoint was created.
+	 */
+	public long getTimestamp() {
+		return this.timestamp;
+	}
+
+	/**
+	 * All data included in this checkpoint as JSON.
+	 *
+	 * @return All data included in this checkpoint as JSON.
+	 */
+	public JSONObject getJson() {
+		return this.json;
+	}
+
+	/**
 	 * Simply stores a long that can be updated at will.
 	 */
 	private static final class LongContainer {
