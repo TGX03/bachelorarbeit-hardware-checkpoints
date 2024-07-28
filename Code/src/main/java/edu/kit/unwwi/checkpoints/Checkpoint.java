@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Condition;
@@ -42,12 +45,32 @@ public class Checkpoint {
 	 * The JSON in memory of this checkpoint.
 	 */
 	private final JSONObject json;
+	/**
+	 * Stores hashes and paths of all the blockdevices in this checkpoint for later use.
+	 */
+	private final Map<String, Path> blockHashes = new HashMap<>();
+	/**
+	 * Stores hashes and paths of all the memory segments in this checkpoint for later use.
+	 */
+	private final Map<String, Path> segmentHashes = new HashMap<>();
 
 	private Checkpoint(Path location, Path config, long timestamp, JSONObject json) {
 		this.location = location;
 		this.config = config;
 		this.timestamp = timestamp;
 		this.json = json;
+		JSONArray blockdevices = json.getJSONArray("blockdevice");
+		for (Object current : blockdevices) {
+			JSONObject device = (JSONObject) current;
+			if (device.has("storageLocation")) {
+				blockHashes.put(device.getString("hash"), Paths.get(device.getString("storageLocation")));
+			}
+		}
+		JSONArray segments = json.getJSONArray("segment");
+		for (Object current : segments) {
+			JSONObject segment = (JSONObject) current;
+			segmentHashes.put(segment.getString("hash"), Paths.get(segment.getString("storageLocation")));
+		}
 	}
 
 	/**
@@ -73,7 +96,7 @@ public class Checkpoint {
 		Files.createDirectory(subfolder);
 
 		// Parse memory and blockdevices. Not yet sure whether virtual Threads are really a good idea here.
-		FutureTask<JSONArray> futureBlocks = new FutureTask<>(() -> parseBlock(qmpInterface, subfolder));
+		FutureTask<JSONArray> futureBlocks = new FutureTask<>(() -> parseAndCopyBlock(qmpInterface, subfolder));
 		FutureTask<JSONArray> futureMemory = new FutureTask<>(() -> parseMemory(qmpInterface, subfolder));
 		Thread.ofVirtual().start(futureBlocks);
 		Thread.ofVirtual().start(futureMemory);
@@ -178,7 +201,7 @@ public class Checkpoint {
 	 * @return The JSON array containing the information about the blockdevices.
 	 * @throws IOException An error occurred while communicating with QEMU.
 	 */
-	private static JSONArray parseBlock(QMPInterface inter, Path directory) throws IOException {
+	private static JSONArray parseAndCopyBlock(QMPInterface inter, Path directory) throws IOException {
 		JSONArray result = new JSONArray();
 		Path subfolder = directory.resolve("blocks");
 		Files.createDirectory(subfolder);
@@ -231,7 +254,7 @@ public class Checkpoint {
 		for (MemorySegment segment : elf.getSegments()) {
 			JSONObject segmentJSON = segment.toJSON();
 			Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + ".dmp");
-			segmentJSON.put("location", segmentLocation.toAbsolutePath().toString());
+			segmentJSON.put("storageLocation", segmentLocation.toAbsolutePath().toString());
 			segment.getInputStream().transferTo(Files.newOutputStream(segmentLocation));
 			segments.put(segmentJSON);
 		}
@@ -272,6 +295,108 @@ public class Checkpoint {
 	 */
 	public JSONObject getJson() {
 		return this.json;
+	}
+
+	/**
+	 * Create a new Checkpoint that is a successor to this checkpoint.
+	 * It checks whether memory regions or blockdevices are still identical to preserve space,
+	 * however for this it only tracks the full file, so if a single bit changes, the complete file gets saved again.
+	 *
+	 * @param qmpInterface The interface to query the current VM on.
+	 * @return The newly created checkpoint.
+	 * @throws IOException          When something went wrong during IO or while communicating with QEMU.
+	 * @throws InterruptedException If this thread got interrupted for some reason.
+	 * @throws ExecutionException   When an exception occurred in another thread affecting this thread.
+	 */
+	public Checkpoint createFollowUp(QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
+		long timestamp = stopExecution(qmpInterface);
+
+		// Parse the registers
+		FutureTask<JSONArray> futureCPUs = new FutureTask<>(() -> parseCPU(qmpInterface));
+		Thread.ofPlatform().start(futureCPUs);
+
+		Path subfolder = location.getParent().resolve(Long.toUnsignedString(timestamp));
+
+		// Parse memory and blockdevices. Not yet sure whether virtual Threads are really a good idea here.
+		FutureTask<JSONArray> futureBlocks = new FutureTask<>(() -> parseBlocksCheckDuplicates(qmpInterface, subfolder));
+		FutureTask<JSONArray> futureMemory = new FutureTask<>(() -> parseMemoryCheckDuplicates(qmpInterface, subfolder));
+		Thread.ofVirtual().start(futureBlocks);
+		Thread.ofVirtual().start(futureMemory);
+
+		// Create the descriptor file
+		Path descriptorFile = subfolder.resolve("descriptor.json");
+		JSONObject fullJSON = new JSONObject();
+		fullJSON.put("timestamp", timestamp);
+
+		// Put the results into JSON
+		fullJSON.put("cpu", futureCPUs.get());
+		fullJSON.put("memory", futureMemory.get());
+		fullJSON.put("blockdevice", futureBlocks.get());
+
+		qmpInterface.executeCommand(Continue.INSTANCE);
+		Files.writeString(descriptorFile, fullJSON.toString());
+		return new Checkpoint(subfolder, descriptorFile, timestamp, fullJSON);
+	}
+
+	/**
+	 * Parses block devices and checks whether those have changed. If no changes were detected,
+	 * the reference points to the already existing file.
+	 *
+	 * @param inter     The interface to query QEMU on.
+	 * @param directory Where this checkpoint gets stored.
+	 * @return A JSON Array containing the metadata about the block devices.
+	 * @throws IOException When something went wrong during IO or while communicating with QEMU.
+	 */
+	private JSONArray parseBlocksCheckDuplicates(QMPInterface inter, Path directory) throws IOException {
+		JSONArray result = new JSONArray();
+		Path subfolder = directory.resolve("blocks");
+		Files.createDirectory(subfolder);
+		Blockdevice[] devices = getBlockdevices(inter);
+		for (Blockdevice device : devices) {
+			JSONObject deviceJSON = device.toJSON();
+			if (device.hasMedia()) {
+				assert device.getPath() != null;
+				if (blockHashes.containsKey(deviceJSON.getString("hash"))) {
+					deviceJSON.put("storageLocation", blockHashes.get(deviceJSON.getString("hash")).toAbsolutePath().toString());
+				} else {
+					Path target = subfolder.resolve(device.getPath().getFileName());
+					deviceJSON.put("storageLocation", target.toAbsolutePath().toString());
+					Files.copy(device.getPath(), target);
+				}
+				result.put(deviceJSON);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Parses memory and checks whether its segments have changed. If no changes are detected,
+	 * the reference points to the already existing files.
+	 *
+	 * @param inter     The interface to query QEMU on.
+	 * @param directory Where this checkpoint gets stored.
+	 * @return A JSON Array containing the metadata about the memory segments.
+	 * @throws IOException When something went wrong during IO or while communicating with QEMU.
+	 */
+	private JSONArray parseMemoryCheckDuplicates(QMPInterface inter, Path directory) throws IOException, InterruptedException {
+		JSONArray segments = new JSONArray();
+		ELFDump elf = new ELFDump(inter);
+		inter.executeCommand(elf);
+		elf.awaitCompletion();
+		Path segmentStorage = directory.resolve("memory");
+		Files.createDirectory(segmentStorage);
+		for (MemorySegment segment : elf.getSegments()) {
+			JSONObject segmentJSON = segment.toJSON();
+			if (segmentHashes.containsKey(segmentJSON.getString("hash"))) {
+				segmentJSON.put("storageLocation", segmentHashes.get(segmentJSON.getString("hash")).toAbsolutePath().toString());
+			} else {
+				Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + ".dmp");
+				segmentJSON.put("storageLocation", segmentLocation.toAbsolutePath().toString());
+				segment.getInputStream().transferTo(Files.newOutputStream(segmentLocation));
+			}
+			segments.put(segmentJSON);
+		}
+		return segments;
 	}
 
 	/**
