@@ -3,15 +3,26 @@ package edu.kit.unwwi.checkpoints.qemu.models.memory;
 import edu.kit.unwwi.collections.big.BigByteArrayInputStream;
 import it.unimi.dsi.fastutil.BigArrays;
 import it.unimi.dsi.fastutil.bytes.ByteBigArrays;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UncheckedIOException;
+import java.security.MessageDigest;
+import java.util.Arrays;
 
 /**
  * A class representing a memory segment read from an ELF dump
  */
 public class MemorySegment implements Serializable {
+
+	/**
+	 * The digest to use when computing the hash of a memory segment.
+	 * SHA256 by default, can be changed using static method.
+	 */
+	private static MessageDigest DIGEST = DigestUtils.getSha256Digest();
 
 	/**
 	 * The start address of the contents in this segment in physical  memory.
@@ -30,6 +41,7 @@ public class MemorySegment implements Serializable {
 	 * 2D-array because ints.
 	 */
 	private final byte[][] content;
+	private final byte[] hash;
 
 	/**
 	 * Create a new memory segment from an already existing 2D array.
@@ -44,6 +56,11 @@ public class MemorySegment implements Serializable {
 		this.startVirtualAddress = startVirtualAddress;
 		this.size = size;
 		this.content = BigArrays.copy(content, 0, size);
+		try {
+			this.hash = DigestUtils.digest(DIGEST, this.getInputStream());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**
@@ -70,6 +87,20 @@ public class MemorySegment implements Serializable {
 			BigArrays.copyToBig(buffer, 0, this.content, position, read);
 			position = position + read;
 		} while (read != -1 && position < size);
+		try {
+			this.hash = DigestUtils.digest(DIGEST, this.getInputStream());
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Set the hash algorithm to use for segment comparison.
+	 *
+	 * @param digest The digest to use.
+	 */
+	public static void setHashAlgorithm(@NotNull MessageDigest digest) {
+		DIGEST = digest;
 	}
 
 	/**
@@ -131,6 +162,15 @@ public class MemorySegment implements Serializable {
 	 */
 	public byte getByOffset(long offset) {
 		return BigArrays.get(this.content, offset);
+	}
+
+	/**
+	 * Return the hash of this memory region according to the provided digest.
+	 *
+	 * @return The hash of this segment.
+	 */
+	public byte[] getHash() {
+		return Arrays.copyOf(hash, hash.length);
 	}
 
 	/**
