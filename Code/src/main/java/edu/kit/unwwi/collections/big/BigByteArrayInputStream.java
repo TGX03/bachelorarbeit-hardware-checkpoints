@@ -42,8 +42,13 @@ public class BigByteArrayInputStream extends InputStream {
 	}
 
 	@Override
-	public int read() throws IOException {
-		return 0;
+	public int read() {
+		if (position == BigArrays.length(array) - 1) return -1;
+		else {
+			int result = BigArrays.get(array, position);
+			position++;
+			return result;
+		}
 	}
 
 	@Override
