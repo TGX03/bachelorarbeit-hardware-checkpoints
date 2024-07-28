@@ -74,11 +74,24 @@ public class MemorySegment implements Serializable {
 
 	/**
 	 * Returns the address where this segment starts in physical memory.
+	 * If this is the same as the virtual address,
+	 * this means QEMU does not resolve virtual addresses for the used architecture and this is not actually the physical address.
 	 *
 	 * @return The address where this segment starts.
 	 */
 	public long getStartPhysicalAddress() {
 		return startPhysicalAddress;
+	}
+
+	/**
+	 * Returns the supposed virtual address.
+	 * If this is the same value as the physical address,
+	 * it means QEMU does not resolve virtual into physical addresses.
+	 *
+	 * @return The first virtual address of this segment.
+	 */
+	public long getStartVirtualAddress() {
+		return startVirtualAddress;
 	}
 
 	/**
