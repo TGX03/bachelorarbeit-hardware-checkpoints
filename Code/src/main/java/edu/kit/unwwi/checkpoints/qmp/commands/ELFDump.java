@@ -142,6 +142,7 @@ public class ELFDump extends Command implements EventHandler {
 	@Override
 	public void handleEvent(@NotNull Event event) {
 		instance.unregisterEventHandler(this);
+		assert event.getData() != null;
 		JSONObject data = event.getData().getJSONObject("result");
 		if (data.getString("status").equals("completed")) {
 			this.size = data.getLong("total");
