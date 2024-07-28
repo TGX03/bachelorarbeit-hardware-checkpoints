@@ -1,9 +1,11 @@
 package edu.kit.unwwi.checkpoints.qemu.models;
 
+import edu.kit.unwwi.JSONable;
 import edu.kit.unwwi.checkpoints.qemu.models.registers.Register;
 import edu.kit.unwwi.checkpoints.qmp.commands.QueryCPU;
 import edu.kit.unwwi.checkpoints.qmp.commands.QueryRegisters;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
@@ -12,7 +14,7 @@ import java.util.Arrays;
 /**
  * A class representing a CPU core of a QEMU instance.
  */
-public class CPU implements Serializable {
+public class CPU implements Serializable, JSONable {
 
 	/**
 	 * The ID of this CPU/core.
@@ -65,5 +67,20 @@ public class CPU implements Serializable {
 		String architecture = jsonCPU.getString("target");
 		int hostId = jsonCPU.getInt("thread-id");
 		return new CPU(id, architecture, hostId, registers.getResult(), registers.flags());
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		JSONArray registers = new JSONArray();
+		for (Register current : this.registers) {
+			registers.put(current.toJSON());
+		}
+		JSONObject result = new JSONObject();
+		result.put("id", id);
+		result.put("architecture", architecture);
+		result.put("hostId", hostId);
+		result.put("registers", registers);
+		if (flags != null) result.put("flags", new String(flags).replaceAll("\0", "-"));
+		return result;
 	}
 }

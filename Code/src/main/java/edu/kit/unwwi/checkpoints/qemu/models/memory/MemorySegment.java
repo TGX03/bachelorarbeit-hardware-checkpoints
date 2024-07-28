@@ -1,22 +1,26 @@
 package edu.kit.unwwi.checkpoints.qemu.models.memory;
 
+import edu.kit.unwwi.JSONable;
 import edu.kit.unwwi.collections.big.BigByteArrayInputStream;
 import it.unimi.dsi.fastutil.BigArrays;
 import it.unimi.dsi.fastutil.bytes.ByteBigArrays;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Base64;
 
 /**
  * A class representing a memory segment read from an ELF dump
  */
-public class MemorySegment implements Serializable {
+public class MemorySegment implements Serializable, JSONable {
 
 	/**
 	 * The digest to use when computing the hash of a memory segment.
@@ -41,6 +45,9 @@ public class MemorySegment implements Serializable {
 	 * 2D-array because ints.
 	 */
 	private final byte[][] content;
+	/**
+	 * The hash of this segment.
+	 */
 	private final byte[] hash;
 
 	/**
@@ -181,5 +188,16 @@ public class MemorySegment implements Serializable {
 	 */
 	public InputStream getInputStream() {
 		return new BigByteArrayInputStream(this.content);
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		String hash = Base64.getEncoder().encodeToString(this.hash);
+		JSONObject result = new JSONObject();
+		result.put("startPhysicalAddress", startPhysicalAddress);
+		result.put("startVirtualAddress", startVirtualAddress);
+		result.put("size", size);
+		result.put("hash", hash);
+		return result;
 	}
 }

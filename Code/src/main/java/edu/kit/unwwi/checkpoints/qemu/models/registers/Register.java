@@ -1,18 +1,24 @@
 package edu.kit.unwwi.checkpoints.qemu.models.registers;
 
+import edu.kit.unwwi.JSONable;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 
 /**
  * A class representing a register, which's contents can be queried.
  */
-public abstract class Register implements Serializable, Comparable<Register> {
+public abstract class Register implements Serializable, Comparable<Register>, JSONable {
 
 	/**
 	 * The name of this register.
 	 */
 	protected final String name;
+	/**
+	 * The number of this register.
+	 * Gets used to differentiate multiple registers with the same name.
+	 */
 	private final int registerNumber;
 
 	/**
@@ -81,5 +87,15 @@ public abstract class Register implements Serializable, Comparable<Register> {
 		else if (this.registerNumber == -1 || register.registerNumber == -1)
 			throw new IllegalStateException("One of the registers was not assigned an order");
 		else return this.registerNumber - register.registerNumber;
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		JSONObject json = new JSONObject();
+		json.put("name", name);
+		json.put("registerNumber", registerNumber);
+		json.put("contents", toHexString());
+		json.put("size", size());
+		return json;
 	}
 }

@@ -1,15 +1,19 @@
 package edu.kit.unwwi.checkpoints.qemu.models;
 
+import edu.kit.unwwi.JSONable;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -18,7 +22,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * A class representing any kind of blockdevice,
  * which usually are any form of drive backed by a file on the host.
  */
-public class Blockdevice {
+public class Blockdevice implements Serializable, JSONable {
 
 	/**
 	 * The digest to use when computing the hash of the backing file.
@@ -47,8 +51,17 @@ public class Blockdevice {
 	 * The size currently taken up on disk.
 	 */
 	private final long actualSize;
+	/**
+	 * Whether any media is inserted in this device.
+	 */
 	private final boolean hasMedia;
+	/**
+	 * The lock used to wait for the hash to be created.
+	 */
 	private final Lock hashLock;
+	/**
+	 * The hash of the media in this device.
+	 */
 	private byte[] hash;
 
 	/**
@@ -176,5 +189,18 @@ public class Blockdevice {
 	@NotNull
 	public String toString() {
 		return device;
+	}
+
+	@Override
+	public JSONObject toJSON() {
+		String hash = Base64.getEncoder().encodeToString(this.hash);
+		JSONObject result = new JSONObject();
+		result.put("deviceName", this.device);
+		result.put("qdevID", this.qdev);
+		result.put("virtualSize", this.virtualSize);
+		result.put("actualSize", this.actualSize);
+		result.put("hasMedia", this.hasMedia);
+		result.put("hash", hash);
+		return result;
 	}
 }
