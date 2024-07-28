@@ -21,11 +21,26 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
+/**
+ * A class representing a checkpoint of a running QEMU-instance.
+ */
 public class Checkpoint {
 
+	/**
+	 * The location where this checkpoint is stored.
+	 */
 	private final Path location;
+	/**
+	 * The location where the JSON holding all information is stored.
+	 */
 	private final Path config;
+	/**
+	 * The timestamp from QEMU when this was created.
+	 */
 	private final long timestamp;
+	/**
+	 * The JSON in memory of this checkpoint.
+	 */
 	private final JSONObject json;
 
 	private Checkpoint(Path location, Path config, long timestamp, JSONObject json) {
@@ -35,6 +50,16 @@ public class Checkpoint {
 		this.json = json;
 	}
 
+	/**
+	 * Create a new checkpoint at the given location containing all data that could be queried on the given interface.
+	 *
+	 * @param location     Where to store the data to.
+	 * @param qmpInterface The interface connected to QEMU to query.
+	 * @return A checkpoint object representing all the data found.
+	 * @throws IOException          An IO-error occurred while writing to disk or while communicating with QEMU.
+	 * @throws InterruptedException A thread was interrupted while waiting for data from QEMU.
+	 * @throws ExecutionException   An exception occurred while waiting for data from QEMU.
+	 */
 	public static Checkpoint createCheckpoint(Path location, QMPInterface qmpInterface) throws IOException, InterruptedException, ExecutionException {
 		assert Files.isDirectory(location);
 
@@ -81,6 +106,7 @@ public class Checkpoint {
 		JSONObject fullJSON = new JSONObject();
 		fullJSON.put("timestamp", timestamp);
 
+		// Put the results into JSON
 		fullJSON.put("cpu", futureCPUs.get());
 		fullJSON.put("memory", futureMemory.get());
 		fullJSON.put("blockdevice", futureBlocks.get());
@@ -90,6 +116,13 @@ public class Checkpoint {
 		return new Checkpoint(subfolder, descriptorFile, timestamp, fullJSON);
 	}
 
+	/**
+	 * Parses all information about the CPU on the given QMP instance.
+	 *
+	 * @param inter The QMP interface to parse.
+	 * @return All collected information about the CPU.
+	 * @throws IOException An error while reading from QEMU occurred.
+	 */
 	private static JSONArray parseCPU(QMPInterface inter) throws IOException {
 		CPU[] cpus = getCPUs(inter);
 
@@ -101,6 +134,13 @@ public class Checkpoint {
 		return cpuArray;
 	}
 
+	/**
+	 * Queries all existing CPU cores and their registers.
+	 *
+	 * @param inter The interface to query on.
+	 * @return The CPU cores that were found.
+	 * @throws IOException An error occurred while communicating with QEMU.
+	 */
 	private static CPU[] getCPUs(QMPInterface inter) throws IOException {
 		QueryCPU query = new QueryCPU();
 		inter.executeCommand(query);
@@ -118,9 +158,17 @@ public class Checkpoint {
 			}
 		});
 		return result;
-
 	}
 
+	/**
+	 * Parse all blockdevices connected to the running QEMU-instance and return a JSON Array containing their data.
+	 * Also copies the images behind the blockdevices to the checkpoint folder.
+	 *
+	 * @param inter     The interface to query on.
+	 * @param directory The directory where data about the running instance gets stored.
+	 * @return The JSON array containing the information about the blockdevices.
+	 * @throws IOException An error occurred while communicating with QEMU.
+	 */
 	private static JSONArray parseBlock(QMPInterface inter, Path directory) throws IOException {
 		JSONArray result = new JSONArray();
 		Path subfolder = directory.resolve("blocks");
@@ -139,6 +187,12 @@ public class Checkpoint {
 		return result;
 	}
 
+	/**
+	 * Requests all blockdevices currently registered with QEMU.
+	 *
+	 * @param inter The interface to query on.
+	 * @return The blockdevices which were found.
+	 */
 	private static Blockdevice[] getBlockdevices(QMPInterface inter) {
 		QueryBlock blocks = new QueryBlock();
 		try {
@@ -149,6 +203,15 @@ public class Checkpoint {
 		}
 	}
 
+	/**
+	 * Parse the memory contents of the VM and write them to disk.
+	 *
+	 * @param inter     The interface to query on.
+	 * @param directory The directory to store the dumps to.
+	 * @return A JSON array holding information about the queried data.
+	 * @throws IOException          An error occurred while communicating with QEMU.
+	 * @throws InterruptedException This thread was interrupted while waiting for the QEMU-dump to finish.
+	 */
 	private static JSONArray parseMemory(QMPInterface inter, Path directory) throws IOException, InterruptedException {
 		JSONArray segments = new JSONArray();
 		ELFDump elf = new ELFDump(inter);
@@ -166,7 +229,13 @@ public class Checkpoint {
 		return segments;
 	}
 
+	/**
+	 * Simply stores a long that can be updated at will.
+	 */
 	private static final class LongContainer {
+		/**
+		 * The stored long.
+		 */
 		public long value;
 	}
 }
