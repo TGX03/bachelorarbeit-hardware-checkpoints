@@ -15,7 +15,7 @@ public class QueryTLB extends Command {
 	/**
 	 * Storage for the result after the execution of the command.
 	 */
-	private TLB result;
+	private TLB tlb;
 
 	/**
 	 * Return the TLB that was created from querying QEMU.
@@ -24,7 +24,7 @@ public class QueryTLB extends Command {
 	 */
 	@NotNull
 	public TLB getResult() {
-		if (executed) return result;
+		if (executed) return tlb;
 		else throw new IllegalStateException("Command has not been executed");
 	}
 
@@ -47,7 +47,7 @@ public class QueryTLB extends Command {
 	protected void processResult(@NotNull Object result) {
 		assert result instanceof String;
 		String[] mappings = ((String) result).split(System.lineSeparator());
-		this.result = new TLB(IntStream.range(0, mappings.length).parallel().mapToObj(x -> {
+		this.tlb = new TLB(IntStream.range(0, mappings.length).parallel().mapToObj(x -> {
 			String[] split = mappings[x].split(" ");
 			long virtualAddress = Long.parseUnsignedLong(split[0].replace(":", ""), 16);
 			long physicalAddress = Long.parseUnsignedLong(split[1], 16);
