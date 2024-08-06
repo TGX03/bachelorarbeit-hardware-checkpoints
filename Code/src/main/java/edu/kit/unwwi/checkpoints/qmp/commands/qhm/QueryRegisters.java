@@ -1,18 +1,19 @@
-package edu.kit.unwwi.checkpoints.qmp.commands;
+package edu.kit.unwwi.checkpoints.qmp.commands.qhm;
 
 import edu.kit.unwwi.checkpoints.qemu.models.registers.*;
-import edu.kit.unwwi.checkpoints.qmp.Command;
+import edu.kit.unwwi.checkpoints.qmp.commands.QHMCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
  * This command uses the "info registers" command from the human-monitor-interface to read the data from the registers
  * and returns them as the objects.
  */
-public class QueryRegisters extends StatefulCommand {
+public class QueryRegisters extends QHMCommand {
 
 	/**
 	 * The ID of the CPU to query.
@@ -22,6 +23,9 @@ public class QueryRegisters extends StatefulCommand {
 	 * The registers after querying.
 	 */
 	private Register[] registers;
+	/**
+	 * The flags returned from this register, if they exist.
+	 */
 	private char[] flags;
 
 	/**
@@ -127,14 +131,14 @@ public class QueryRegisters extends StatefulCommand {
 		else throw new IllegalStateException("This CPU has no flags.");
 	}
 
-	/**
-	 * Turn this command into JSON which can then directly be sent to a running QMP server.
-	 *
-	 * @return JSON representation of this command.
-	 */
 	@Override
-	public @NotNull String toJson() {
-		return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"info registers\", \"cpu-index\": " + id + " } }";
+	public @NotNull String commandName() {
+		return "info registers";
+	}
+
+	@Override
+	protected @NotNull Map<String, String> additionalArguments() {
+		return Map.of("cpu index", String.valueOf(id));
 	}
 
 	/**
@@ -143,9 +147,8 @@ public class QueryRegisters extends StatefulCommand {
 	 * @param result The result to parse.
 	 */
 	@Override
-	protected void processResult(@NotNull Object result) {
-		assert result instanceof String;
-		String input = (String) result;
+	protected void receiveResult(@NotNull String result) {
+		String input = result;
 		input = input.replaceAll(System.lineSeparator(), " ");
 		input = input.replaceFirst("CPU#\\d", "");
 		input = input.replaceAll("\\s+", " ");

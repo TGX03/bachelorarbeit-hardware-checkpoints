@@ -1,8 +1,8 @@
-package edu.kit.unwwi.checkpoints.qmp.commands;
+package edu.kit.unwwi.checkpoints.qmp.commands.qhm;
 
 import edu.kit.unwwi.checkpoints.qemu.models.memory.MemoryMapping;
 import edu.kit.unwwi.checkpoints.qemu.models.memory.TLB;
-import edu.kit.unwwi.checkpoints.qmp.Command;
+import edu.kit.unwwi.checkpoints.qmp.commands.QHMCommand;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.IntStream;
@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 /**
  * The command to query the QEMU-TLB and allow for finding of memory regions.
  */
-public class QueryTLB extends StatefulCommand {
+public class QueryTLB extends QHMCommand {
 
 	/**
 	 * Storage for the result after the execution of the command.
@@ -28,14 +28,9 @@ public class QueryTLB extends StatefulCommand {
 		else throw new IllegalStateException("Command has not been executed");
 	}
 
-	/**
-	 * Turn this command into JSON which can then directly be sent to a running QMP server.
-	 *
-	 * @return JSON representation of this command.
-	 */
 	@Override
-	public @NotNull String toJson() {
-		return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"info tlb\" }}";
+	protected @NotNull String commandName() {
+		return "info tlb";
 	}
 
 	/**
@@ -44,8 +39,7 @@ public class QueryTLB extends StatefulCommand {
 	 * @param result The result to parse.
 	 */
 	@Override
-	protected void processResult(@NotNull Object result) {
-		assert result instanceof String;
+	protected void receiveResult(@NotNull String result) {
 		String[] mappings = ((String) result).split(System.lineSeparator());
 		this.tlb = new TLB(IntStream.range(0, mappings.length).parallel().mapToObj(x -> {
 			String[] split = mappings[x].split(" ");

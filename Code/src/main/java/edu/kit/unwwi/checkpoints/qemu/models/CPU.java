@@ -3,7 +3,7 @@ package edu.kit.unwwi.checkpoints.qemu.models;
 import edu.kit.unwwi.JSONable;
 import edu.kit.unwwi.checkpoints.qemu.models.registers.Register;
 import edu.kit.unwwi.checkpoints.qmp.commands.QueryCPU;
-import edu.kit.unwwi.checkpoints.qmp.commands.QueryRegisters;
+import edu.kit.unwwi.checkpoints.qmp.commands.qhm.QueryRegisters;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
