@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The command telling QEMU to continue execution.
  */
-public class Continue extends Command {
+public class Continue implements Command {
 
 	/**
 	 * The instance to be used, as there is no reason to have multiple instances of this class.
@@ -20,12 +20,7 @@ public class Continue extends Command {
 	}
 
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"cont\" }";
-	}
-
-	@Override
-	protected void processResult(@NotNull Object result) {
-		assert "{}".equals(result);
 	}
 }

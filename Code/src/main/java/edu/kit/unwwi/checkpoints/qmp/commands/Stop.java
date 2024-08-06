@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The command telling QEMU to pause execution.
  */
-public class Stop extends Command {
+public class Stop implements Command {
 
 	/**
 	 * The instance to use as there is no reason to use multiple instances of this class.
@@ -20,12 +20,7 @@ public class Stop extends Command {
 	}
 
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"stop\" }";
-	}
-
-	@Override
-	protected void processResult(@NotNull Object result) {
-		assert "{}".equals(result);
 	}
 }

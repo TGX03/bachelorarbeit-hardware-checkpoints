@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
 /**
  * This class dumps the current memory data from a QEMU-instance to disk in ELF format.
  */
-public class ELFDump extends Command implements EventHandler {
+public class ELFDump implements EventHandler, Command {
 
 	/**
 	 * This gets used to generate names for the temporary files.
@@ -129,14 +129,9 @@ public class ELFDump extends Command implements EventHandler {
 	}
 
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		instance.registerEventHandler(this);
 		return "{ \"execute\": \"dump-guest-memory\", \"arguments\": { \"paging\": true, \"protocol\": \"file:" + StringEscapeUtils.escapeJson(target.toAbsolutePath().toString()) + "\", \"format\": \"elf\" } }";
-	}
-
-	@Override
-	protected void processResult(@NotNull Object result) {
-		assert "{}".equals(result); // This should just be an empty JSON-object
 	}
 
 	@Override

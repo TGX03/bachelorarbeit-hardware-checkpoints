@@ -7,7 +7,7 @@ import org.json.JSONObject;
 /**
  * The command to query basic status information about the running VM.
  */
-public class Status extends Command {
+public class Status extends StatefulCommand {
 
 	/**
 	 * The current state of the VM.
@@ -60,7 +60,7 @@ public class Status extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"query-status\" }";
 	}
 

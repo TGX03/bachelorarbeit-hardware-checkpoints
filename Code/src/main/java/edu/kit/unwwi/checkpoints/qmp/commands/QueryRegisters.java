@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
  * This command uses the "info registers" command from the human-monitor-interface to read the data from the registers
  * and returns them as the objects.
  */
-public class QueryRegisters extends Command {
+public class QueryRegisters extends StatefulCommand {
 
 	/**
 	 * The ID of the CPU to query.
@@ -133,7 +133,7 @@ public class QueryRegisters extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"info registers\", \"cpu-index\": " + id + " } }";
 	}
 

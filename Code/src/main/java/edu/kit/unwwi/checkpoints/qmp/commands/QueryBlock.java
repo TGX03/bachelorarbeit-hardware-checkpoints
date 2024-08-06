@@ -1,7 +1,6 @@
 package edu.kit.unwwi.checkpoints.qmp.commands;
 
 import edu.kit.unwwi.checkpoints.qemu.models.Blockdevice;
-import edu.kit.unwwi.checkpoints.qmp.Command;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,12 +13,12 @@ import java.util.stream.IntStream;
 /**
  * A command used to query QEMU for all available block devices.
  */
-public class QueryBlock extends Command {
+public class QueryBlock extends StatefulCommand {
 
 	/**
 	 * The block devices found after execution.
 	 */
-	private Blockdevice[] result;
+	private Blockdevice[] blockdevices;
 
 	/**
 	 * Turn this command into JSON which can then directly be sent to a running QMP server.
@@ -27,7 +26,7 @@ public class QueryBlock extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"query-block\" }";
 	}
 
@@ -40,7 +39,7 @@ public class QueryBlock extends Command {
 	protected void processResult(@NotNull Object result) {
 		assert result instanceof JSONArray;
 		JSONArray array = (JSONArray) result;
-		this.result = new Blockdevice[array.length()];
+		this.blockdevices = new Blockdevice[array.length()];
 		IntStream.range(0, array.length()).parallel().forEach(i -> {
 			JSONObject current = array.getJSONObject(i);
 			String name = current.getString("device");
@@ -50,9 +49,9 @@ public class QueryBlock extends Command {
 				long virtualSize = insert.getLong("virtual-size");
 				long actualSize = insert.getLong("actual-size");
 				Path path = Paths.get(insert.getString("filename"));
-				this.result[i] = new Blockdevice(name, qdev, path, virtualSize, actualSize);
+				this.blockdevices[i] = new Blockdevice(name, qdev, path, virtualSize, actualSize);
 			} else {
-				this.result[i] = new Blockdevice(name, qdev, null, 0L, 0L);
+				this.blockdevices[i] = new Blockdevice(name, qdev, null, 0L, 0L);
 			}
 		});
 	}
@@ -65,7 +64,7 @@ public class QueryBlock extends Command {
 	 */
 	@NotNull
 	public Blockdevice @NotNull [] getResult() throws IllegalStateException {
-		if (executed) return Arrays.copyOf(result, result.length);
+		if (executed) return Arrays.copyOf(blockdevices, blockdevices.length);
 		else throw new IllegalStateException("Command has not yet been queried");
 	}
 }

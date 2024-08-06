@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 /**
  * The command to query the QEMU-TLB and allow for finding of memory regions.
  */
-public class QueryTLB extends Command {
+public class QueryTLB extends StatefulCommand {
 
 	/**
 	 * Storage for the result after the execution of the command.
@@ -34,7 +34,7 @@ public class QueryTLB extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"info tlb\" }}";
 	}
 

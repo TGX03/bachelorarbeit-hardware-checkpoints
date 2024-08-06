@@ -8,7 +8,7 @@ import org.json.JSONArray;
  * This command queries basic CPU information, like core count or architecture.
  * For more details see <a href="URL#https://qemu-project.gitlab.io/qemu/interop/qemu-qmp-ref.html#qapidoc-2533">the command documentation.</a>
  */
-public class QueryCPU extends Command {
+public class QueryCPU extends StatefulCommand {
 
 	/**
 	 * The result of the query.
@@ -42,7 +42,7 @@ public class QueryCPU extends Command {
 	 * @return JSON representation of this command.
 	 */
 	@Override
-	protected @NotNull String toJson() {
+	public @NotNull String toJson() {
 		return "{ \"execute\": \"query-cpus-fast\"}";   // For some reason they removed the normal "query-cpus"-command and didn't tell anyone
 	}
 
