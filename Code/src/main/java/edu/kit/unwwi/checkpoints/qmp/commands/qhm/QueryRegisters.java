@@ -148,13 +148,20 @@ public class QueryRegisters extends QHMCommand {
 	 */
 	@Override
 	protected void receiveResult(@NotNull String input) {
+
+		/*
+		The goal of this block is to reformat the data of all registers into a uniform way, as QEMU formats all the registers rather randomly.
+		The desired target is to have an array of strings, in which all string match the format %a=%b, with %a being the name of the register
+		and %b being the data stored in said register.
+		This works for ARM and x86, other architectures may need further testing (and perhaps changes).
+		 */
 		input = input.replaceAll(System.lineSeparator(), " ");
-		input = input.replaceFirst("CPU#\\d", "");
-		input = input.replaceAll("\\s+", " ");
-		input = input.replaceAll("\\s*=\\s*", "=");
-		input = input.replaceAll("\\b([0-9a-f]+)\\s+(?=[0-9a-f])", "$1");
+		input = input.replaceFirst("CPU#\\d", "");  // Remove the CPU identifier
+		input = input.replaceAll("\\s+", " ");  // Turn any kind and amount of whitespace into a single whitespace
+		input = input.replaceAll("\\s*=\\s*", "="); // Place data around equals-sign directly next to it.
+		input = input.replaceAll("\\b([0-9a-f]+)\\s+(?=[0-9a-f])", "$1");   // Remove whitespace inside hex-numbers
 		input = input.trim();
-		String[] registers = input.split(" ");
+		String[] registers = input.split(" ");  // Split the input so each datapoint is its own string.
 
 		Thread flagger = new Thread(() -> {
 			for (String current : registers) {
