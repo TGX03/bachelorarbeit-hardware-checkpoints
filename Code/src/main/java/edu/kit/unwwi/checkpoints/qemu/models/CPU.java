@@ -2,9 +2,8 @@ package edu.kit.unwwi.checkpoints.qemu.models;
 
 import edu.kit.unwwi.JSONable;
 import edu.kit.unwwi.checkpoints.qemu.models.registers.Register;
-import edu.kit.unwwi.checkpoints.qmp.commands.QueryCPU;
-import edu.kit.unwwi.checkpoints.qmp.commands.qhm.QueryRegisters;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,27 +45,13 @@ public class CPU implements Serializable, JSONable {
 	 * @param registers    The registers present in this CPU.
 	 * @param flags        The flags set in this CPU
 	 */
-	public CPU(int id, String architecture, int hostId, Register[] registers, char[] flags) {
+	public CPU(int id, String architecture, int hostId, @NotNull Register @Nullable [] registers, char @Nullable [] flags) {
 		this.id = id;
 		this.architecture = architecture;
 		this.hostId = hostId;
-		this.registers = Arrays.copyOf(registers, registers.length);
+		if (registers == null) this.registers = new Register[0];
+		else this.registers = Arrays.copyOf(registers, registers.length);
 		this.flags = Arrays.copyOf(flags, flags.length);
-	}
-
-	/**
-	 * A factory method for turning QMP queries into CPU-objects.
-	 *
-	 * @param id        The ID of this CPU.
-	 * @param cpu       The result of the "query CPU" command.
-	 * @param registers The result of the "Query Registers" command.
-	 * @return The CPU object constructed from the given data.
-	 */
-	public static CPU createFromQueries(int id, @NotNull QueryCPU cpu, @NotNull QueryRegisters registers) {
-		JSONObject jsonCPU = cpu.getResult().getJSONObject(id);
-		String architecture = jsonCPU.getString("target");
-		int hostId = jsonCPU.getInt("thread-id");
-		return new CPU(id, architecture, hostId, registers.getResult(), registers.flags());
 	}
 
 	@Override
@@ -82,5 +67,55 @@ public class CPU implements Serializable, JSONable {
 		result.put("registers", registers);
 		if (flags != null) result.put("flags", new String(flags).replaceAll("\0", "-"));
 		return result;
+	}
+
+	/**
+	 * Returns the ID of this CPU.
+	 *
+	 * @return ID of this CPU.
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * Returns the ID of the host thread emulating this CPU.
+	 *
+	 * @return The thread emulating this CPU.
+	 */
+	public int getHostThreadId() {
+		return hostId;
+	}
+
+	/**
+	 * Returns the name of the architecture of this CPU.
+	 * Must be done for each core because modern CPUs sometimes carry multiple architectures.
+	 *
+	 * @return The architecture of this CPU.
+	 */
+	public String getArchitecture() {
+		return architecture;
+	}
+
+	/**
+	 * The registers of this CPU.
+	 * Returns an empty array if registers were not queried for this CPU.
+	 *
+	 * @return The registers of this CPU.
+	 */
+	public @NotNull Register @NotNull [] getRegisters() {
+		if (this.registers == null) return new Register[0];
+		else return Arrays.copyOf(this.registers, this.registers.length);
+	}
+
+	/**
+	 * The flags associated with this CPU.
+	 * Returns an empty array if flags were not queried
+	 * or flags are not supported on this architecture.
+	 * @return Flags set for this CPU.
+	 */
+	public char @NotNull [] getFlags() {
+		if (this.flags == null) return new char[0];
+		else return Arrays.copyOf(this.flags, this.flags.length);
 	}
 }

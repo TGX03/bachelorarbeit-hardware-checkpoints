@@ -217,22 +217,9 @@ public class Checkpoint {
 	 * @throws IOException An error occurred while communicating with QEMU.
 	 */
 	private static CPU[] getCPUs(@NotNull QMPInterface inter) throws IOException {
-		QueryCPU query = new QueryCPU();
+		QueryCPURegisters query = new QueryCPURegisters(inter);
 		inter.executeCommand(query);
-		JSONArray cpus = query.getResult();
-		final CPU[] result = new CPU[cpus.length()];
-		IntStream.range(0, cpus.length()).parallel().forEach(i -> {
-			JSONObject cpu = cpus.getJSONObject(i);
-			int index = cpu.getInt("cpu-index");
-			QueryRegisters registers = new QueryRegisters(index);
-			try {
-				inter.executeCommand(registers);
-				result[i] = new CPU(index, cpu.getString("target"), cpu.getInt("thread-id"), registers.getResult(), registers.flags());
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		});
-		return result;
+		return query.getResult();
 	}
 
 	/**
