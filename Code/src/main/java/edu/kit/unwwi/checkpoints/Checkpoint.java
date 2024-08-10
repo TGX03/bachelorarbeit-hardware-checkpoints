@@ -32,6 +32,39 @@ import java.util.stream.IntStream;
 public class Checkpoint {
 
 	/**
+	 * The JSON key for the hash of a given object.
+	 */
+	private static final String HASH = "hash";
+	/**
+	 * The JSON key for the location of files related to a given object.
+	 */
+	private static final String STORAGE_LOCATION = "storageLocation";
+	/**
+	 * The JSON key for CPU data.
+	 */
+	private static final String CPU = "cpu";
+	/**
+	 * The JSON key and directory name for blockdevices.
+	 */
+	private static final String BLOCK = "blockdevice";
+	/**
+	 * The JSON key and directory name for memory segments.
+	 */
+	private static final String MEMORY = "memory";
+	/**
+	 * The file ending used for memory files.
+	 */
+	private static final String MEMORY_FILE_TYPE = ".dmp";
+	/**
+	 * The JSON key used for the timestamp of a checkpoint.
+	 */
+	private static final String TIMESTAMP = "timestamp";
+	/**
+	 * The filename of the main JSON file.
+	 */
+	private static final String JSON_FILE = "checkpoint.json";
+
+	/**
 	 * The location where this checkpoint is stored.
 	 */
 	private final Path location;
@@ -69,17 +102,17 @@ public class Checkpoint {
 		this.config = config;
 		this.timestamp = timestamp;
 		this.json = json;
-		JSONArray blockdevices = json.getJSONArray("blockdevice");
+		JSONArray blockdevices = json.getJSONArray(BLOCK);
 		for (Object current : blockdevices) {
 			JSONObject device = (JSONObject) current;
-			if (device.has("storageLocation")) {
-				blockHashes.put(device.getString("hash"), Paths.get(device.getString("storageLocation")));
+			if (device.has(STORAGE_LOCATION)) {
+				blockHashes.put(device.getString(HASH), Paths.get(device.getString(STORAGE_LOCATION)));
 			}
 		}
-		JSONArray segments = json.getJSONArray("segment");
+		JSONArray segments = json.getJSONArray(MEMORY);
 		for (Object current : segments) {
 			JSONObject segment = (JSONObject) current;
-			segmentHashes.put(segment.getString("hash"), Paths.get(segment.getString("storageLocation")));
+			segmentHashes.put(segment.getString(HASH), Paths.get(segment.getString(STORAGE_LOCATION)));
 		}
 	}
 
@@ -112,14 +145,14 @@ public class Checkpoint {
 		Thread.ofVirtual().start(futureMemory);
 
 		// Create the descriptor file
-		Path descriptorFile = subfolder.resolve("descriptor.json");
+		Path descriptorFile = subfolder.resolve(JSON_FILE);
 		JSONObject fullJSON = new JSONObject();
-		fullJSON.put("timestamp", timestamp);
+		fullJSON.put(TIMESTAMP, timestamp);
 
 		// Put the results into JSON
-		fullJSON.put("cpu", futureCPUs.get());
-		fullJSON.put("memory", futureMemory.get());
-		fullJSON.put("blockdevice", futureBlocks.get());
+		fullJSON.put(CPU, futureCPUs.get());
+		fullJSON.put(MEMORY, futureMemory.get());
+		fullJSON.put(BLOCK, futureBlocks.get());
 
 		qmpInterface.executeCommand(Continue.INSTANCE);
 		Files.writeString(descriptorFile, fullJSON.toString());
@@ -213,7 +246,7 @@ public class Checkpoint {
 	 */
 	private static JSONArray parseAndCopyBlock(@NotNull QMPInterface inter, @NotNull Path directory) throws IOException {
 		JSONArray result = new JSONArray();
-		Path subfolder = directory.resolve("blocks");
+		Path subfolder = directory.resolve(BLOCK);
 		Files.createDirectory(subfolder);
 		Blockdevice[] devices = getBlockdevices(inter);
 		for (Blockdevice device : devices) {
@@ -221,7 +254,7 @@ public class Checkpoint {
 			if (device.hasMedia()) {
 				assert device.getPath() != null;
 				Path target = subfolder.resolve(device.getPath().getFileName());
-				deviceJSON.put("storageLocation", target.toAbsolutePath().toString());
+				deviceJSON.put(STORAGE_LOCATION, target.toAbsolutePath().toString());
 				Files.copy(device.getPath(), target);
 				result.put(deviceJSON);
 			}
@@ -259,12 +292,12 @@ public class Checkpoint {
 		ELFDump elf = new ELFDump(inter);
 		inter.executeCommand(elf);
 		elf.awaitCompletion();
-		Path segmentStorage = directory.resolve("memory");
+		Path segmentStorage = directory.resolve(MEMORY);
 		Files.createDirectory(segmentStorage);
 		for (MemorySegment segment : elf.getSegments()) {
 			JSONObject segmentJSON = segment.toJSON();
-			Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + ".dmp");
-			segmentJSON.put("storageLocation", segmentLocation.toAbsolutePath().toString());
+			Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + MEMORY_FILE_TYPE);
+			segmentJSON.put(STORAGE_LOCATION, segmentLocation.toAbsolutePath().toString());
 			segment.getInputStream().transferTo(Files.newOutputStream(segmentLocation));
 			segments.put(segmentJSON);
 		}
@@ -337,14 +370,14 @@ public class Checkpoint {
 		Thread.ofVirtual().start(futureMemory);
 
 		// Create the descriptor file
-		Path descriptorFile = subfolder.resolve("descriptor.json");
+		Path descriptorFile = subfolder.resolve(JSON_FILE);
 		JSONObject fullJSON = new JSONObject();
-		fullJSON.put("timestamp", timestamp);
+		fullJSON.put(TIMESTAMP, timestamp);
 
 		// Put the results into JSON
-		fullJSON.put("cpu", futureCPUs.get());
-		fullJSON.put("memory", futureMemory.get());
-		fullJSON.put("blockdevice", futureBlocks.get());
+		fullJSON.put(CPU, futureCPUs.get());
+		fullJSON.put(MEMORY, futureMemory.get());
+		fullJSON.put(BLOCK, futureBlocks.get());
 
 		qmpInterface.executeCommand(Continue.INSTANCE);
 		Files.writeString(descriptorFile, fullJSON.toString());
@@ -363,18 +396,18 @@ public class Checkpoint {
 	@NotNull
 	private JSONArray parseBlocksCheckDuplicates(@NotNull QMPInterface inter, @NotNull Path directory) throws IOException {
 		JSONArray result = new JSONArray();
-		Path subfolder = directory.resolve("blocks");
+		Path subfolder = directory.resolve(BLOCK);
 		Files.createDirectory(subfolder);
 		Blockdevice[] devices = getBlockdevices(inter);
 		for (Blockdevice device : devices) {
 			JSONObject deviceJSON = device.toJSON();
 			if (device.hasMedia()) {
 				assert device.getPath() != null;
-				if (blockHashes.containsKey(deviceJSON.getString("hash"))) {
-					deviceJSON.put("storageLocation", blockHashes.get(deviceJSON.getString("hash")).toAbsolutePath().toString());
+				if (blockHashes.containsKey(deviceJSON.getString(HASH))) {
+					deviceJSON.put(STORAGE_LOCATION, blockHashes.get(deviceJSON.getString(HASH)).toAbsolutePath().toString());
 				} else {
 					Path target = subfolder.resolve(device.getPath().getFileName());
-					deviceJSON.put("storageLocation", target.toAbsolutePath().toString());
+					deviceJSON.put(STORAGE_LOCATION, target.toAbsolutePath().toString());
 					Files.copy(device.getPath(), target);
 				}
 				result.put(deviceJSON);
@@ -398,15 +431,15 @@ public class Checkpoint {
 		ELFDump elf = new ELFDump(inter);
 		inter.executeCommand(elf);
 		elf.awaitCompletion();
-		Path segmentStorage = directory.resolve("memory");
+		Path segmentStorage = directory.resolve(MEMORY);
 		Files.createDirectory(segmentStorage);
 		for (MemorySegment segment : elf.getSegments()) {
 			JSONObject segmentJSON = segment.toJSON();
-			if (segmentHashes.containsKey(segmentJSON.getString("hash"))) {
-				segmentJSON.put("storageLocation", segmentHashes.get(segmentJSON.getString("hash")).toAbsolutePath().toString());
+			if (segmentHashes.containsKey(segmentJSON.getString(HASH))) {
+				segmentJSON.put(STORAGE_LOCATION, segmentHashes.get(segmentJSON.getString(HASH)).toAbsolutePath().toString());
 			} else {
-				Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + ".dmp");
-				segmentJSON.put("storageLocation", segmentLocation.toAbsolutePath().toString());
+				Path segmentLocation = segmentStorage.resolve(Long.toUnsignedString(segment.getStartPhysicalAddress()) + MEMORY_FILE_TYPE);
+				segmentJSON.put(STORAGE_LOCATION, segmentLocation.toAbsolutePath().toString());
 				segment.getInputStream().transferTo(Files.newOutputStream(segmentLocation));
 			}
 			segments.put(segmentJSON);
