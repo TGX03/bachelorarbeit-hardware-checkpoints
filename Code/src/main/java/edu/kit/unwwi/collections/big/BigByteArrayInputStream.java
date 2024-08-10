@@ -62,7 +62,8 @@ public class BigByteArrayInputStream extends InputStream {
 			copy = (int) (BigArrays.length(this.array) - position);
 		BigArrays.copyFromBig(this.array, position, buffer, offset, copy);
 		position += copy;
-		return copy;
+		if (copy == 0) return -1;
+		else return copy;
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class BigByteArrayInputStream extends InputStream {
 
 	@Override
 	public byte[] readNBytes(int length) {
-		if (length > position - BigArrays.length(array) - 1) length = (int) (position - BigArrays.length(array) - 1);
+		if (length > BigArrays.length(this.array) - position) length = (int) (BigArrays.length(this.array) - position);
 		byte[] result = new byte[length];
 		read(result, 0, length);
 		return result;
