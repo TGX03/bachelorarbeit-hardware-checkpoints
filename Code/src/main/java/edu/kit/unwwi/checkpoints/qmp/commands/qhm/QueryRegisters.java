@@ -144,11 +144,10 @@ public class QueryRegisters extends QHMCommand {
 	/**
 	 * Used by subclasses to parse the received result.
 	 *
-	 * @param result The result to parse.
+	 * @param input The result to parse.
 	 */
 	@Override
-	protected void receiveResult(@NotNull String result) {
-		String input = result;
+	protected void receiveResult(@NotNull String input) {
 		input = input.replaceAll(System.lineSeparator(), " ");
 		input = input.replaceFirst("CPU#\\d", "");
 		input = input.replaceAll("\\s+", " ");
