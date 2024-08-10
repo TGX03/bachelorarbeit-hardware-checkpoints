@@ -29,14 +29,18 @@ public class QMPInterface {
 	 */
 	private final OutputStream out;
 	/**
+	 * The lock used to make sure only one command accesses the OutputStream at a time.
+	 */
+	private final Lock accessLock = new ReentrantLock();
+	/**
 	 * A lock for ensuring synchronized access. Locks preferred as they allow Virtual Threads
 	 * and also no need for catching InterruptedExceptions everywhere.
 	 */
-	private final Lock lock = new ReentrantLock();
+	private final Lock answerLock = new ReentrantLock();
 	/**
 	 * Condition used for waiting on server replies.
 	 */
-	private final Condition awaitResult = lock.newCondition();
+	private final Condition awaitAnswer = answerLock.newCondition();
 	/**
 	 * All handlers currently registered to listen for events.
 	 */
@@ -60,12 +64,12 @@ public class QMPInterface {
 		socket = new Socket(host, port);
 		out = socket.getOutputStream();
 		out.write("{ \"execute\": \"qmp_capabilities\" }".getBytes(StandardCharsets.UTF_8));
-		lock.lock();
+		answerLock.lock();
 		Thread listener = new Thread(new Reader(socket.getInputStream()));
 		listener.setDaemon(true);
 		listener.start();
-		awaitResult.awaitUninterruptibly();
-		lock.unlock();
+		awaitAnswer.awaitUninterruptibly();
+		answerLock.unlock();
 	}
 
 	/**
@@ -77,11 +81,13 @@ public class QMPInterface {
 	 */
 	public void executeCommand(@NotNull Command command) throws IOException {
 		byte[] request = command.toJson().getBytes(StandardCharsets.UTF_8);
-		lock.lock();
+		accessLock.lock();
+		answerLock.lock();
 		out.write(request);
-		awaitResult.awaitUninterruptibly(); //TODO: This isn't thread-safe as another command may enter and send their own command before the result was received
+		awaitAnswer.awaitUninterruptibly();
 		Object result = lastResult;
-		lock.unlock();
+		answerLock.unlock();
+		accessLock.unlock();
 		command.receiveResult(result);
 	}
 
@@ -142,11 +148,11 @@ public class QMPInterface {
 			while (!exit) {
 				try {
 					String response = in.readLine();
-					lock.lock();
+					answerLock.lock();
 					JSONObject json = new JSONObject(response);
 					if (json.has("return")) {
 						lastResult = json.get("return");
-						awaitResult.signalAll();
+						awaitAnswer.signalAll();
 					} else if (json.has("event")) {
 						String name = json.getString("event");
 						JSONObject data = null;
@@ -158,7 +164,7 @@ public class QMPInterface {
 					} else if (json.has("error")) {
 						System.err.println(json.get("error"));
 					}
-					lock.unlock();
+					answerLock.unlock();
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
