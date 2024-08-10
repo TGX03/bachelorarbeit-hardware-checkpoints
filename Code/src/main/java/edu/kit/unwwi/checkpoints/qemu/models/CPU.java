@@ -51,7 +51,8 @@ public class CPU implements Serializable, JSONable {
 		this.hostId = hostId;
 		if (registers == null) this.registers = new Register[0];
 		else this.registers = Arrays.copyOf(registers, registers.length);
-		this.flags = Arrays.copyOf(flags, flags.length);
+		if (flags == null ) this.flags = null;
+		else this.flags = Arrays.copyOf(flags, flags.length);
 	}
 
 	@Override
