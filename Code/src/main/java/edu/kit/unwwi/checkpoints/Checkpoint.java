@@ -167,28 +167,34 @@ public class Checkpoint {
 	 * @throws IOException Something went wrong while communicating with QEMU.
 	 */
 	private static long stopExecution(@NotNull QMPInterface inter) throws IOException {
-		Lock stopLock = new ReentrantLock();
-		final LongContainer container = new LongContainer();
-		stopLock.lock();
-		Condition stopCondition = stopLock.newCondition();
-		inter.registerEventHandler(new EventHandler() {
-			@Override
-			public void handleEvent(@NotNull Event event) {
-				stopLock.lock();
-				container.value = event.getTimestamp() * 1000000 + event.getTimestampMicroseconds();
-				stopCondition.signalAll();
-				stopLock.unlock();
-			}
 
-			@Override
-			public @NotNull String eventName() {
-				return "STOP";
-			}
-		});
-		inter.executeCommand(Stop.INSTANCE);
-		stopCondition.awaitUninterruptibly();
-		stopLock.unlock();
-		return container.value;
+		Status status = new Status();
+		inter.executeCommand(status);
+
+		if (status.isRunning()) {
+			Lock stopLock = new ReentrantLock();
+			final LongContainer container = new LongContainer();
+			stopLock.lock();
+			Condition stopCondition = stopLock.newCondition();
+			inter.registerEventHandler(new EventHandler() {
+				@Override
+				public void handleEvent(@NotNull Event event) {
+					stopLock.lock();
+					container.value = event.getTimestamp() * 1000000 + event.getTimestampMicroseconds();
+					stopCondition.signalAll();
+					stopLock.unlock();
+				}
+
+				@Override
+				public @NotNull String eventName() {
+					return "STOP";
+				}
+			});
+			inter.executeCommand(Stop.INSTANCE);
+			stopCondition.awaitUninterruptibly();
+			stopLock.unlock();
+			return container.value;
+		} else return -1L;
 	}
 
 	/**
