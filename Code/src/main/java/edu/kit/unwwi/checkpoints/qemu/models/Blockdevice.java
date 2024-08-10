@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -56,10 +55,6 @@ public class Blockdevice implements Serializable, JSONable {
 	 */
 	private final boolean hasMedia;
 	/**
-	 * The lock used to wait for the hash to be created.
-	 */
-	private final Lock hashLock;
-	/**
 	 * The hash of the media in this device.
 	 */
 	private byte[] hash;
@@ -74,22 +69,14 @@ public class Blockdevice implements Serializable, JSONable {
 	 * @param actualSize  The size currently taken up on the host disk.
 	 */
 	public Blockdevice(@NotNull String device, @NotNull String qdev, @Nullable Path path, long virtualSize, long actualSize) {
-
-		//TODO: Is it really a good idea to always compute the hash?
 		this.hasMedia = path != null && Files.exists(path);
-		ReadWriteLock lock = new ReentrantReadWriteLock();
-		this.hashLock = lock.readLock();
 		if (this.hasMedia) {
-			new Thread(() -> {
-				lock.writeLock().lock();
-				try {
-					this.hash = DigestUtils.digest(DIGEST, Files.newInputStream(path));
-				} catch (IOException e) {
-					throw new UncheckedIOException(e);
-				} finally {
-					lock.writeLock().unlock();
-				}
-			}).start();
+			try {
+				this.hash = DigestUtils.digest(DIGEST, Files.newInputStream(path));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+
+			}
 		}
 
 		this.device = device;
@@ -177,12 +164,8 @@ public class Blockdevice implements Serializable, JSONable {
 	 * @throws IllegalStateException Gets thrown if this device doesn't have any medium associated with it, and therefore doesn't have a hash.
 	 */
 	public byte[] getHash() throws IllegalStateException {
-		if (this.hasMedia) {
-			hashLock.lock();
-			byte[] result = Arrays.copyOf(this.hash, this.hash.length);
-			hashLock.unlock();
-			return result;
-		} else throw new IllegalStateException("This blockdevice has no media, and therefore no associated hash");
+		if (this.hasMedia) return Arrays.copyOf(this.hash, this.hash.length);
+		else throw new IllegalStateException("This blockdevice has no media, and therefore no associated hash");
 	}
 
 	@Override
@@ -193,7 +176,6 @@ public class Blockdevice implements Serializable, JSONable {
 
 	@Override
 	public @NotNull JSONObject toJSON() {
-		String hash = Base64.getEncoder().encodeToString(this.hash);
 		JSONObject result = new JSONObject();
 		result.put("deviceName", this.device);
 		result.put("qdevID", this.qdev);
@@ -201,6 +183,7 @@ public class Blockdevice implements Serializable, JSONable {
 		result.put("actualSize", this.actualSize);
 		result.put("hasMedia", this.hasMedia);
 		if (hasMedia) {
+			String hash = Base64.getEncoder().encodeToString(this.hash);
 			result.put("originalPath", this.path.toAbsolutePath().toString());
 			result.put("hash", hash);
 		}
