@@ -353,6 +353,7 @@ public class Checkpoint {
 		Thread.ofPlatform().start(futureCPUs);
 
 		Path subfolder = location.getParent().resolve(Long.toUnsignedString(timestamp));
+		Files.createDirectory(subfolder);
 
 		// Parse memory and blockdevices. Not yet sure whether virtual Threads are really a good idea here.
 		FutureTask<JSONArray> futureBlocks = new FutureTask<>(() -> parseBlocksCheckDuplicates(qmpInterface, subfolder));
