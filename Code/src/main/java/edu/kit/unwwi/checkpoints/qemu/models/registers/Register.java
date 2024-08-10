@@ -93,7 +93,7 @@ public abstract class Register implements Serializable, Comparable<Register>, JS
 	public @NotNull JSONObject toJSON() {
 		JSONObject json = new JSONObject();
 		json.put("name", name);
-		json.put("registerNumber", registerNumber);
+		if (registerNumber != -1) json.put("registerNumber", registerNumber);
 		json.put("contents", toHexString());
 		json.put("size", size());
 		return json;
