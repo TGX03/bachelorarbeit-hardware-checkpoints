@@ -350,7 +350,7 @@ public class Checkpoint {
 
 		// Parse the registers
 		FutureTask<JSONArray> futureCPUs = new FutureTask<>(() -> parseCPU(qmpInterface));
-		Thread.ofPlatform().start(futureCPUs);
+		Thread.ofPlatform().name(CPU).start(futureCPUs);
 
 		Path subfolder = location.getParent().resolve(Long.toUnsignedString(timestamp));
 		Files.createDirectory(subfolder);
@@ -358,8 +358,8 @@ public class Checkpoint {
 		// Parse memory and blockdevices. Not yet sure whether virtual Threads are really a good idea here.
 		FutureTask<JSONArray> futureBlocks = new FutureTask<>(() -> parseBlocksCheckDuplicates(qmpInterface, subfolder));
 		FutureTask<JSONArray> futureMemory = new FutureTask<>(() -> parseMemoryCheckDuplicates(qmpInterface, subfolder));
-		Thread.ofVirtual().start(futureBlocks);
-		Thread.ofVirtual().start(futureMemory);
+		Thread.ofPlatform().name(MEMORY).start(futureMemory);
+		Thread.ofVirtual().name(BLOCK).start(futureBlocks);
 
 		// Create the descriptor file
 		Path descriptorFile = subfolder.resolve(JSON_FILE);
