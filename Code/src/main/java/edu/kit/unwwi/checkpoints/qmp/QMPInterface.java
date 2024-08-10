@@ -33,8 +33,7 @@ public class QMPInterface {
 	 */
 	private final Lock accessLock = new ReentrantLock();
 	/**
-	 * A lock for ensuring synchronized access. Locks preferred as they allow Virtual Threads
-	 * and also no need for catching InterruptedExceptions everywhere.
+	 * The lock used to wait for an answer from QEMU.
 	 */
 	private final Lock answerLock = new ReentrantLock();
 	/**
