@@ -7,7 +7,6 @@ import edu.kit.unwwi.checkpoints.qmp.Event;
 import edu.kit.unwwi.checkpoints.qmp.EventHandler;
 import edu.kit.unwwi.checkpoints.qmp.QMPInterface;
 import edu.kit.unwwi.checkpoints.qmp.commands.*;
-import edu.kit.unwwi.checkpoints.qmp.commands.qhm.QueryRegisters;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,7 +23,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.IntStream;
 
 /**
  * A class representing a checkpoint of a running QEMU-instance.
