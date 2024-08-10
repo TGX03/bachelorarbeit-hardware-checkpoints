@@ -137,8 +137,8 @@ public class QueryRegisters extends QHMCommand {
 	}
 
 	@Override
-	protected @NotNull Map<String, String> additionalArguments() {
-		return Map.of("cpu index", String.valueOf(id));
+	protected @NotNull Map<String, Object> additionalArguments() {
+		return Map.of("cpu-index", id);
 	}
 
 	/**

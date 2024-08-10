@@ -20,12 +20,13 @@ public abstract class QHMCommand extends StatefulCommand {
 	public @NotNull String toJson() {
 		//return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"" + commandName() +"\" }}";
 		StringBuilder command = new StringBuilder();
-		command.append("{ \"execute\": \"human-monitor-command\", \"arguments\\\": { \"command-line\": \"");
-		command.append(commandName());
-		for (Map.Entry<String, String> set : additionalArguments().entrySet()) {
-			command.append(String.format(", \"%s\": \"%s\"", set.getKey(), set.getValue()));
+		command.append("{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"");
+		command.append(commandName()).append('"');
+		for (Map.Entry<String, Object> set : additionalArguments().entrySet()) {
+			if (set.getValue() instanceof Number) command.append(String.format(", \"%s\": %s", set.getKey(), set.getValue()));
+			else command.append(String.format(", \"%s\": \"%s\"", set.getKey(), set.getValue()));
 		}
-		command.append("\" }}");
+		command.append(" }}");
 		return command.toString();
 	}
 
@@ -46,7 +47,7 @@ public abstract class QHMCommand extends StatefulCommand {
 	 * @return A map of additional arguments to attach to the request.
 	 */
 	@NotNull
-	protected Map<String, String> additionalArguments() {
+	protected Map<String, Object> additionalArguments() {
 		return Map.of();
 	}
 
