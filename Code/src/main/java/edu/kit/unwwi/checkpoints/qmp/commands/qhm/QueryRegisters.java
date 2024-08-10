@@ -175,7 +175,7 @@ public class QueryRegisters extends QHMCommand {
 			}
 		});
 		flagger.start();
-		this.registers = IntStream.range(0, registers.length).parallel().mapToObj(x -> parseRegister(registers[x], x)).toArray(Register[]::new);
+		this.registers = IntStream.range(0, registers.length).parallel().filter(x -> registers[x].matches(".*=[0-9,a-f]+")).mapToObj(x -> parseRegister(registers[x], x)).toArray(Register[]::new);
 		try {
 			flagger.join();
 		} catch (InterruptedException _) {
