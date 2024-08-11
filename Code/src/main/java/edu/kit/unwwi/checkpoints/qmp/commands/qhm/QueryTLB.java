@@ -40,7 +40,7 @@ public class QueryTLB extends QHMCommand {
 	 */
 	@Override
 	protected void receiveResult(@NotNull String result) {
-		String[] mappings = ((String) result).split(System.lineSeparator());
+		String[] mappings = result.split(System.lineSeparator());
 		this.tlb = new TLB(IntStream.range(0, mappings.length).parallel().mapToObj(x -> {
 			String[] split = mappings[x].split(" ");
 			long virtualAddress = Long.parseUnsignedLong(split[0].replace(":", ""), 16);

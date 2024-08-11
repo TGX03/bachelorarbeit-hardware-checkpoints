@@ -51,7 +51,7 @@ public class CPU implements Serializable, JSONable {
 		this.hostId = hostId;
 		if (registers == null) this.registers = new Register[0];
 		else this.registers = Arrays.copyOf(registers, registers.length);
-		if (flags == null ) this.flags = null;
+		if (flags == null) this.flags = null;
 		else this.flags = Arrays.copyOf(flags, flags.length);
 	}
 
@@ -113,6 +113,7 @@ public class CPU implements Serializable, JSONable {
 	 * The flags associated with this CPU.
 	 * Returns an empty array if flags were not queried
 	 * or flags are not supported on this architecture.
+	 *
 	 * @return Flags set for this CPU.
 	 */
 	public char @NotNull [] getFlags() {

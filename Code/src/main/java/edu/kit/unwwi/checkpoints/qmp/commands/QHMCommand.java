@@ -23,7 +23,8 @@ public abstract class QHMCommand extends StatefulCommand {
 		command.append("{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"");
 		command.append(commandName()).append('"');
 		for (Map.Entry<String, Object> set : additionalArguments().entrySet()) {
-			if (set.getValue() instanceof Number) command.append(String.format(", \"%s\": %s", set.getKey(), set.getValue()));
+			if (set.getValue() instanceof Number)
+				command.append(String.format(", \"%s\": %s", set.getKey(), set.getValue()));
 			else command.append(String.format(", \"%s\": \"%s\"", set.getKey(), set.getValue()));
 		}
 		command.append(" }}");

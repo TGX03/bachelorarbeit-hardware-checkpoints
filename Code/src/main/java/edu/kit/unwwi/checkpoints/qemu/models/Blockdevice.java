@@ -14,8 +14,6 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A class representing any kind of blockdevice,

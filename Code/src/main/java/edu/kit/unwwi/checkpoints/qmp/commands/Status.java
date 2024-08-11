@@ -1,6 +1,5 @@
 package edu.kit.unwwi.checkpoints.qmp.commands;
 
-import edu.kit.unwwi.checkpoints.qmp.Command;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
