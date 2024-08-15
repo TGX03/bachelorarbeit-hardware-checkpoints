@@ -62,6 +62,12 @@ Queries for all kinds of drives. Gives information about attached storage medium
 This of course gets used to back up the neccessary files later on.
 Also shows empty devices like optical drives which currently don't contain any media.
 
+\paragraph{dump-guest-memory}
+This command dumps the contents of the guests memory to disk.
+The command itself offers many options, however most of these don't work.
+In the used implementation, the only output format working is ELF, and paging is only possible on x86 guests.
+Still, it's the only straigforward option to access the guest memory.
+
 \paragraph{stop}
 Suspends the emulation of the current system. Is neccessary to keep the data extracted consistent.
 
