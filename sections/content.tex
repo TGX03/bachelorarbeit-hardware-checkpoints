@@ -208,3 +208,98 @@ The reason these regions are split is \emph{virt.flash1} is writeable, while \em
 The main reason these are interesting is them being backed by files on disk.
 This means any changes made to these regions made by the guest can be easily read externally by opening those files.
 Of course that comes with a massive performance penalty if many accesses to such regions are made.
+
+\subsection{info registers}
+This command returns the contents of all the registers for a given CPU.
+It gives a very detailed overview of the data, however it is pretty clear it heavily prefers x86.
+To further illustrate this, in \autoref{fig:registers_x86} and \autoref{fig:registers_ARM} example outputs for this command are provided.
+
+\begin{figure}[H]
+  \begin{ffcode}
+    CPU#0
+    EAX=fd000140 EBX=80035bdc ECX=fd601300 EDX=00000000
+    ESI=80035a90 EDI=d0008bf8 EBP=80035c2c ESP=800395f0
+    EIP=8001b030 EFL=00000246 [---Z-P-] CPL=0 II=0 A20=1 SMM=0 HLT=0
+    ES =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+    CS =0008 00000000 bfffffff 00cb9b00 DPL=0 CS32 [-RA]
+    SS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+    DS =0010 00000000 ffffffff 00cf9300 DPL=0 DS   [-WA]
+    FS =0020 80035bdc 0027cfff 00c09300 DPL=0 DS   [-WA]
+    GS =0000 00000000 00000000 00000000
+    LDT=0000 00000000 0000ffff 00008200 DPL=0 LDT
+    TR =0018 8003b160 00000068 00008900 DPL=0 TSS32-avl
+    GDT=     8003b298 00000038
+    IDT=     80035e60 00000200
+    CR0=8001003b CR2=00000000 CR3=0000f000 CR4=00000610
+    DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
+    DR6=ffff0ff0 DR7=00000400
+    EFER=0000000000000000
+    FCW=027f FSW=0000 [ST=0] FTW=00 MXCSR=00001fa0
+    FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
+    FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
+    FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
+    FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
+    XMM00=0000000000000000 0000000041080000 XMM01=0000000000000000 000000004f000000
+    XMM02=0000000000000000 00000000cf000000 XMM03=0000000000000000 0000000043a00000
+    XMM04=0000000000000000 0000000000000000 XMM05=0000000000000000 0000000000000000
+    XMM06=0000000000000000 0000000000000000 XMM07=0000000000000000 0000000000000000
+  \end{ffcode}
+  \caption{Example Output of \emph{info registers} on an x86 guest}
+  \label{fig:registers_x86}
+\end{figure}
+
+\begin{figure}[H]
+  \missingfigure{ARM registers}
+  \caption{Example output of \emph{info registers} on an ARM guest}
+  \label{fig:registers_ARM}
+\end{figure}
+
+It is immediately apparent this output is not intended for further usage by computers,
+but instead used by humans debugging QEMU and does not follow any specified format.
+This of course is also stated by the QEMU team\cite{qhm-documentation}.
+However, because this is the only way to access registers through an external interface,
+this output needs to be made parseable by a computer, and for this,
+the following rules are presumed in hope they are valid for the majoritiy of architectures:
+
+\begin{itemize}
+  \item The CPU number is specified in the first line, even though the command only returns a single CPU which must be specified beforehand.
+  \item Registers are formatted in the scheme \$name=\$content.
+  \begin{itemize}
+    \item If the name of the register is shorter than 3 letters, the name gets padded with spaces between it and the equals-sign.
+    \item Longer names are allowed, however as the names of most standard registers are only 3 letters long, this only applies to more specialized registers.
+    \item The content is specified in hexadecimal.
+  \end{itemize}
+  \item The length of the content gets padded with zeroes at the beginning to indicate the length of the register.
+  Since this is in hex, each digit represents 4 bits of register length.
+  \begin{itemize}
+    \item This assumes all registers are of a length divisible by four.
+    However there are registers where this is not the case, for example $HLT$ or $A20$.
+  \end{itemize}
+  \item QEMU formats the contents into groups of \emph{some} multiple of 32 bits.
+  \begin{itemize}
+    \item When the amount of bits in a register is not a multiple of \emph{some} multiple of 32,
+    there is no standard whether the remaining bits get put at the back or the front.
+    See the floating-point and stack-pointer registers.
+  \end{itemize}
+  \item There are 2 ways to represent flags:
+  \begin{enumerate}
+    \item Some flags get put in []-brackets,
+    wherein their letter is written if they're set, otherwise a hyphen is shown.
+    \item Other flags, especially multibit flags, get represented like their own register.
+    \begin{itemize}
+      \item In this case, the amount of digits gives no indication of the length of the register and therefore its possible values.
+      For example, the $A20$-register is only a single bit, while $CPL$ is 2 bit.
+    \end{itemize}
+  \end{enumerate}
+  \item The targeted line length seems to be 50 symbols.
+  \item Inside a group of registers with the same or similar purpose, the formatting seems to be somewhat consistent.
+  \begin{itemize}
+    \item The general purpose and the control registers feature 4 registers per line,
+    the pointer registers one register per line, the floating point and SIMD registers show 2 registers per line.
+    \item The pointer registers feature a rather strange way to keep consistency for the $GDT$ and $IDT$ registers.
+    \item The flags associated with the general purpose registers are simply appended to the registers.
+    Instead, the registers for special CPU features like $EFER$ are written in their own lines.
+    The flags for pointer registers get written in the same line as the respective register,
+    which is also the only way of finding out which flag is associated to which register.
+  \end{itemize}
+\end{itemize}
