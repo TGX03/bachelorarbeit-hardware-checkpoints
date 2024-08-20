@@ -16,8 +16,8 @@ Afterwards, a new Checkpoint can be created by calling the static method `create
 with the `QMPInterface` created before as well as the `Path` where the checkpoints should be stored at. Each checkpoint gets its own folder in this directory,
 their names are generated from the timestamp of the creation.
 
-It may be neccessary to specify a `Path` for temporary files. The class `ElfDump` defaults to using the standard temp path of the system,
-however `/tmp` under Linux does not seem to like these larger files, so a call to the `setTemp(Path temp)`-method may be neccessary.
+It may be necessary to specify a `Path` for temporary files. The class `ElfDump` defaults to using the standard temp path of the system,
+however `/tmp` under Linux does not seem to like these larger files, so a call to the `setTemp(Path temp)`-method may be necessary.
 
 Each checkpoint directory contains a JSON-file with all gathered data as well as the locations of the stored memory and disk dumps.
 Using the `createFollowUp(@NotNull QMPInterface qmpInterface)`-method of `Checkpoint` it is possible to create a new Checkpoint
