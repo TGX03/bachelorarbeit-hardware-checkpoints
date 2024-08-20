@@ -17,5 +17,6 @@ which get stored in a generalised format to allow for further processing.
 To achieve this, the QEMU  machine protocol and the QEMU monitor get used to extract data from a running QEMU instance,
 while trying to avoid modifying QEMU-code to keep functionality across multiple QEMU versions.
 In addition, this paper gives insights into the internals of emulation and discusses issues with them.
-Also it talks about how one may re-inject such data into QEMU,
-as there currently exists no standard way to do this.
+Initially, this paper also aimed to include a way of reinjecting such gathered checkpoints into a running instance of QEMU,
+however this turned out to be too difficult for a project of this size,
+and instead only the basic outlines of such a process are discussed.
