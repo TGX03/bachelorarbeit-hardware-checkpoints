@@ -1,0 +1,47 @@
+\chapter{Foundations}
+The purpose of this chapter is to lay the groundwork for this thesis
+and to establish technical terms used in this writing.
+In addition, contradicting definitions get explored
+and the process of deciding which ones will be used explained.
+The basic technologies involved in this thesis are also adressed in this chapter.
+
+\section{Emulation \& Simulation}
+The core of a paper about extracting data from an emulation
+to process this data regarding a full system simulation is to fully define these terms,
+as they appear very similar.
+The importance of a strict definition inside this paper gets even more important
+once one starts to actually search for such a definition.
+When one starts looking for such a definition,
+one will very quickly find one of 2 posts on StackOverflow \cite{SO_link}\cite{SO}.
+StackOverflow of course is no reliable source for scientific work,
+the reason they are mentioned here is the first one linking to the second one
+with the words \enquote{Exactly the opposite answer here:}\cite{SO_link}.
+A small discussion, which stays rather civilized for StackOverflow's standards, follows,
+and people seem to generally agree these terms are heavily subjective and one should clearly define what exactly they're talking about.
+
+This is a small example of showing how there 2 terms are not cleanly defined,
+so for this thesis 2 approaches were looked into,
+from which a consistent definition inside this thesis is gathered.
+
+The Oxford English Dictionary defines the 2 terms as following:
+\begin{itemize}
+    \item \emph{Emulation:} The technique by which a
+    computer is enabled, by means of special
+    hardware or software, to execute programs
+    written for a different type of computer\cite[p. 196]{emulation_oxford}.
+    \item \emph{Simulation}: The technique of imitating the behaviour of
+    some situation or process (whether economic,
+    military, mechanical, etc.) by means of a
+    suitably analogous situation or apparatus, esp.
+    for the purpose of study or personnel training\cite[p.503]{simulation_oxford}.
+\end{itemize}
+From these definititions, one may deduce that emulation is a special case of simulation,
+in which an \enquote{apparatus for the purpose of study} is created to \enquote{imitate the behavior of some situation or process},
+namely the internal workings of a computer of a different type.\linebreak
+The term of \enquote{simulation} instead is easily scaled up or down to suit the current needs.
+It may describe a device imitating a large software infrastructure running across many different devices,
+perhaps by emulating computers involved in such a system,
+however it may also describe the process of imitating the L1-cache of a CPU inside an emulation.\linebreak
+This may be concluded by saying that emulation is a special type of simulation,
+which itself requires smaller systems of simulation to function,
+but can then be used to create bigger systems of simulation.
