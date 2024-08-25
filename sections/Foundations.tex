@@ -23,6 +23,7 @@ This is a small example of showing how there 2 terms are not cleanly defined,
 so for this thesis 2 approaches were looked into,
 from which a consistent definition inside this thesis is gathered.
 
+\subsection{Emulation \& Simulation according to the Oxford Dictionary}
 The Oxford English Dictionary defines the 2 terms as following:
 \begin{itemize}
     \item \emph{Emulation:} \enquote{The technique by which a
@@ -45,3 +46,75 @@ however it may also describe the process of imitating the L1-cache of a CPU insi
 This may be concluded by saying that emulation is a special type of simulation,
 which itself requires smaller systems of simulation to function,
 but can then be used to create bigger systems of simulation.
+
+\subsection{Emulation \& Simulation in scientific literature}
+In scientific literature, a search for such a definition does not yield many results.
+The closest to a definition in IT comes from \Citeauthor{definition_iot}
+while talking about the future chances of the Internet of Things for logistics\cite{definition_iot}.
+They explicitly define emulation as a special case of simulation,
+and the definitions are generally compatible with the one before.
+\begin{itemize}
+    \item \emph{Simulation}: A simulator only models and abstracts the system it is simulating.
+    This means, in its development decisions must be made as to how precise the simulator works.
+    For this, a model must be created and requirements for actual execution developed.
+    Later on the results of such a simulation must then be carefully evaluated to make sure
+    there are no errors that come from such abstraction
+    or are accounted for and get compensated.
+    The advantage of such a process is the high speed it carries,
+    as simplifications often take away lots of required computation time.
+    The disadvantage, as mentioned, however is the potentially high error rate for results,
+    and the simulation usually breaking down when trying to analyse small details of a larger system\cite{definition_iot}.
+    \item \emph{Emulation}: An emulator is heavily coupled to real components.
+    In addition, it's field of work is usually smaller and defined very precisely.
+    In return, the results of an emulator are very precise, in most cases exact.
+    Error states of the real hardware are also modeled, meaning when feeding it with incorrect data,
+    one can observe how the system will behave in abnormal states, which often isn't modeled in a Simulation.
+    The big disadvantage of emulation however is its massive cost,
+    both in development time and ressources,
+    as emulation usually requires a lot more computing power than the device it emulates\cite{definition_iot}.
+\end{itemize}
+
+\subsection{Conclusion}\todonote{Think of a better title}
+In this thesis therefore Emulation will be viewed as a special kind of simulation,
+which perfectly simulates a computing device of a specific architecture
+on another computing device, which may or may not be of another architecture.
+This especially distinguishes emulation from software like Wine, which is not an emulator\todonote{I really need to stop},
+as such software only provides other runtime software a program requires to function, but does not simulate another device in any way\cite{wine}.
+
+In contrast, the abilities of Simulation are much broader,
+especially as a simulator may leave out aspects of the real system
+its developers don't deem as neccessary for the experiment they want to conduct.
+An example of such software in software development is Mockito,
+which provides to other parts of a program certain APIs during testing,
+which however are not fully implemented yet,
+but still return plausible values that allow for testing.
+
+Most people have likely had contact with both these terms in the world of video games,
+where they however fulfill completely different jobs.\linebreak
+Simulators are usually a type of game,
+which allows the player to have an experience he usually does not have in real life.
+In a good game, such an experience makes the player feel the imitation is very realistic,
+even though it is often simplified heavily.
+An example are flight simulators, in which many players feel like they are getting a realistic experience,
+even though many features like navigation or communication with Air Traffic Controller are heavily simplified
+and can often be turned off.
+Which is also an important feature of simulators, the ability to tune the precision
+to the current needs to produce a result that is both precise enough for the current problem,
+while not wasting resources during uneccessary calculations.\linebreak
+Emulators on the other hand get used to allow playing games which were developed for systems which no longer exist.
+An example of such an emulator is xemu\cite{xemu},
+which we will encounter again later on.
+Such emulators perfectly \emph{simulate} the physical hardware of a specific game console,
+and allow games compiled for it to run on them.
+Xemu for example has to emulate the original Intel Coppermine CPU and Nvidia MCPX X3 GPU
+for the games to function, and it must emulate features that may not be needed at all.
+For example it always must emulate the SIMD-registers of the CPU, even though a game may not need them.
+An additional constraint is performance, the emulator must run at the same speed as the original device,
+and any potential performance benefit a modern computer offers is therefore void.
+This is because the games are especially developed for such a platofrm,
+and the speed of the games is tied to the Frames per Second displayed.
+Meaning more frames per second, which usually results in a better experience for the user,
+actually cause the game to run faster.
+
+\section{Full System Simulation}
+Lorem Ipsum
