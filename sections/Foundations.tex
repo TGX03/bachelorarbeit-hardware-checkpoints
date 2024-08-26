@@ -1,15 +1,15 @@
 \chapter{Foundations}
 The purpose of this chapter is to lay the groundwork for this thesis
-and to establish technical terms used in this writing.
-In addition, contradicting definitions get explored
-and the process of deciding which ones will be used explained.
-The basic technologies involved in this thesis are also adressed in this chapter.
+and to establish the technical terms used in this writing.
+In addition, contradicting definitions are explored
+and the process of deciding which ones will be used is explained.
+The basic technologies involved in this thesis are also addressed in this chapter.
 
 \section{Emulation \& Simulation}
 The core of a paper about extracting data from an emulation
 to process this data regarding a full system simulation is to fully define these terms,
 as they appear very similar.
-The importance of a strict definition inside this paper gets even more important
+The importance of a strict definition in this paper gets even more important
 once one starts to actually search for such a definition.
 When one starts looking for such a definition,
 one will very quickly find one of 2 posts on StackOverflow \cite{SO_link}\cite{SO}.
@@ -19,9 +19,9 @@ with the words \enquote{Exactly the opposite answer here:}\cite{SO_link}.
 A small discussion, which stays rather civilized for StackOverflow's standards\todonote{Das wieder rausnehmen}, follows,
 and people seem to generally agree these terms are heavily subjective and one should clearly define what exactly they're talking about.
 
-This is a small example of showing how there 2 terms are not cleanly defined,
-so for this thesis 2 approaches were looked into,
-from which a consistent definition inside this thesis is gathered.
+This is a small example of showing how these 2 terms are not clearly defined,
+so for this thesis, 2 approaches were looked into,
+from which a consistent definition for this thesis is gathered.
 
 \subsection{Emulation \& Simulation according to the Oxford Dictionary}
 The Oxford English Dictionary defines the 2 terms as following:
@@ -36,7 +36,7 @@ The Oxford English Dictionary defines the 2 terms as following:
     suitably analogous situation or apparatus, esp.
     for the purpose of study or personnel training}\cite[p.503]{simulation_oxford}.
 \end{itemize}
-From these definititions, one may deduce that emulation is a special case of simulation,
+From these definitions, one may deduce that emulation is a special case of simulation,
 in which an \enquote{apparatus for the purpose of study} is created to \enquote{imitate the behavior of some situation or process},
 namely the internal workings of a computer of a different type.\linebreak
 The term of \enquote{simulation} instead is easily scaled up or down to suit the current needs.
@@ -57,20 +57,20 @@ and the definitions are generally compatible with the one before.
     \item \emph{Simulation}: A simulator only models and abstracts the system it is simulating.
     This means, in its development decisions must be made as to how precise the simulator works.
     For this, a model must be created and requirements for actual execution developed.
-    Later on the results of such a simulation must then be carefully evaluated to make sure
+    Later on, the results of such a simulation must then be carefully evaluated to make sure
     there are no errors that come from such abstraction
     or are accounted for and get compensated.
     The advantage of such a process is the high speed it carries,
     as simplifications often take away lots of required computation time.
     The disadvantage, as mentioned, however is the potentially high error rate for results,
-    and the simulation usually breaking down when trying to analyse small details of a larger system\cite{definition_iot}.
+    and the simulation usually breaks down when trying to analyze small details of a larger system\cite{definition_iot}.
     \item \emph{Emulation}: An emulator is heavily coupled to real components.
-    In addition, it's field of work is usually smaller and defined very precisely.
+    In addition, its field of work is usually smaller and defined very precisely.
     In return, the results of an emulator are very precise, in most cases exact.
     Error states of the real hardware are also modeled, meaning when feeding it with incorrect data,
     one can observe how the system will behave in abnormal states, which often isn't modeled in a Simulation.
     The big disadvantage of emulation however is its massive cost,
-    both in development time and ressources,
+    both in development time and resources,
     as emulation usually requires a lot more computing power than the device it emulates\cite{definition_iot}.
 \end{itemize}
 
@@ -96,49 +96,53 @@ which allows the player to have an experience he usually does not have in real l
 In a good game, such an experience makes the player feel the imitation is very realistic,
 even though it is often simplified heavily.
 An example are flight simulators, in which many players feel like they are getting a realistic experience,
-even though many features like navigation or communication with Air Traffic Controller are heavily simplified
-and can often be turned off.
+even though many features like navigation or communication with Air Traffic Control are heavily simplified
+and can even be turned off.
 Which is also an important feature of simulators, the ability to tune the precision
 to the current needs to produce a result that is both precise enough for the current problem,
-while not wasting resources during uneccessary calculations.\linebreak
-Emulators on the other hand get used to allow playing games which were developed for systems which no longer exist.
+while not wasting resources during unnecessary calculations.\linebreak
+Emulators on the other hand get used to play games which were developed for systems that no longer exist.
 An example of such an emulator is xemu\cite{xemu},
 which we will encounter again later on.
 Such emulators perfectly \emph{simulate} the physical hardware of a specific game console,
 and allow games compiled for it to run on them.
 Xemu for example has to emulate the original Intel Coppermine CPU and Nvidia MCPX X3 GPU
 for the games to function, and it must emulate features that may not be needed at all.
-For example it always must emulate the SIMD-registers of the CPU, even though a game may not need them.
+For example, it always must emulate the SIMD registers of the CPU, even though a game may not need them.
 An additional constraint is performance, the emulator must run at the same speed as the original device,
 and any potential performance benefit a modern computer offers is therefore void.
-This is because the games are especially developed for such a platofrm,
+This is because the games are specially developed for such a platform,
 and the speed of the games is tied to the Frames per Second displayed.
-Meaning more frames per second, which usually results in a better experience for the user,
+Meaning more frames per second, which usually result in a better experience for the user,
 actually cause the game to run faster.
 
 \section{Full System Simulation}
-The purpose of this thesis is to produce data which can later on be used inside a \emph{Full System Simulation}.
-As however such a simulation is not part of this thesis, this section will only offer a short introduction,
-which was mostly lifted from \Citeauthor{kitcheckpoints}\cite{kitcheckpoints}.\todonote{Maybe rephrase this to not make it appear like plagiarism.}
+Another term for where the data in this thesis are to be extracted from is \emph{full system simulation}.
+The definition for this is mostly taken from \Citeauthor{kitcheckpoints}\cite{kitcheckpoints}.\todonote{Maybe rephrase this to not make it appear like plagiarism.}
 
 When developing a system, which also requires the development of an operating-system-like
 software, the actual hardware may not yet be available for testing
 as it often is still in development itself.
 Especially when developing embedded devices,
-the code develeoped for it often runs on a very low level
-and the kernel may take on additional tasks it doesn't on general purpose computers.
+the code developed for it often runs on a very low level
+and the kernel may take on additional tasks it doesn't on general-purpose computers.
 To allow for testing of any developed software,
 the devices it's supposed to run on must be simulated in its entirety,
-with its CPU, RAM, GPU and other external components behaving exactly as they would on the actual device.
+with its CPU, RAM, GPU, and other external components behaving exactly as they would on the actual device.
 
 Especially such special external components are an issue,
-as most emulators provide simplified APIs that are adapted to them being used by a general purpose computer.
-For example Hyper-V on Windows does not have the ability to provide a GPU to the guest,
+as most emulators provide simplified APIs that are adapted to them being used by a general-purpose computer.
+For example, Hyper-V on Windows does not have the ability to provide a GPU to the guest,
 instead Linux has to fallback to \emph{llvmpipe} which provides software rendering.
 Other software like VMware and VirtualBox provide heavily simplified GPUs to a guest system,
 which are often unable to process 3D rendering by default,
 and such a feature must be manually enabled if required.
 But even then, there is no option to emulate an actual GPU which may be used on a physical device.
+
+This definition seems very similar to actual emulation,
+however, full system emulation is a broader term, under which emulation is a specific technique to achieve it.
+Other full system simulations may approximate the internals of a CPU or other parts of a computer,
+which is something not allowed for emulation.
 
 \subsection{Anomalies in hardware}
 An important part of such full system simulation is the testing of the behavior of code on the actual hardware.
@@ -148,36 +152,36 @@ A very famous example of such an anomaly is bug 323\cite{323} in gcc,
 in which the results of a floating point comparison change depending on when it is executed
 and whether the compiler decides to write a result from the registers into system memory.
 
-Such bugs can only be caught by either testing on the real system
+Such bugs can only be caught by testing on the real system
 or by having a very detailed emulator running the code.
-In the case of bug 323, only an emulator that accurately simulates 80 bit floating point registers
-as well as the conversion to 64bit values once the value gets written to memory
+In the case of bug 323, only an emulator that accurately simulates 80-bit floating point registers
+as well as the conversion to 64-bit values once the value gets written to memory
 would be able to reproduce this bug.
-Any emulator using only 64 bit floats internally would not be able to reproduce this bug.
+Any emulator using only 64-bit floats for internal calculations would not be able to reproduce this bug.
 
 \section{Emulation Software}
-As mentioned in \autoref{sec:conclusion_emulation}, most people have heard from emulation in the world of video games.
+As mentioned in \autoref{sec:conclusion_emulation}, most people have heard about emulation in the world of video games.
 These highly specialized emulators get used to correctly simulate the internals of any given console
 which allows the enjoyment of older video games.
 However, such highly specialized emulators are rarely useful for actual research,
 as any kind of simulated hardware cannot be easily swapped for something else without modifying the code of the software.
 
-For such tasks, general purpose emulators are also available.
-Such software can be separated into 2 kinds of sofware:
+For such tasks, general-purpose emulators are also available.
+Such software can be separated into 2 kinds of software:
 
 \subsection{Virtualization \& Virtual machines}
 When not talking about video games, most people think of software like VMware, VirtualBox or Hyper-V
 as software for emulation.
 However, such tools usually do not fall under the definition of \emph{emulation},
 but instead they perform a task called \emph{virtualization}.
-The goal of such software is not to emulate a different architecture from the one the porgram is run on,
+The goal of such software is not to emulate a different architecture from the one the program is run on,
 but instead to create an isolated environment in which an operating system can be executed
 like it was running on bare metal on an already running system.
 To allow for an efficient execution of this task, modern CPUs also include specific hardware for virtualization,
 on Intel it is called VT-x and AMD calls it AMD-V.
-These technologies allow for the execution of such isolated code with near native speed,
+These technologies allow for the execution of such isolated code with near-native speed,
 meaning there is nearly no performance penalty while effectively having 2 systems running on the same machine.
-For example these technologies get employed in large datacenters,
+For example these technologies are employed in large data centers,
 where on a single physical server many different systems, usually from different clients,
 are hosted and completely isolated from one another.
 This brings with it a massive cost benefit, since not every client requires its own physical server,
@@ -199,14 +203,14 @@ KVM is the standard type 1 hypervisor included in Linux,
 while the type 1 hypervisor on Windows is called Hyper-V\cite{hypervisor}.
 
 \paragraph{Type 2 hypervisor} A type 2 hypervisor is executed inside a host operating system,
-only getting allocated ressources from said operating system.
-This even allows for virtual machines being run purely in user-mode,
+only getting allocated resources from said operating system.
+This even allows for virtual machines to be run purely in user mode,
 as well as portability between different operating systems,
 under the assumption that the software used is available for multiple operating systems.
 This makes type 2 hypervisors a lot more flexible,
 while not having direct access to system resources,
-which may bring with it a performane penalty.
-Examples of such sofware include VirtualBox and VMware Workstation\cite{hypervisor}.
+which may bring with it a performance penalty.
+Examples of such software include VirtualBox and VMware Workstation\cite{hypervisor}.
 In addition, all emulators emulating a different architecture always are a type 2 hypervisor.
 
 In addition, some virtualization also emulates other parts of the system,
@@ -214,10 +218,10 @@ for example graphics cards for 3D accelerations, sound cards, network cards
 and other PCI devices.
 As mentioned before, such emulation is usually not very detailed or capable,
 and instead only provides the basic functionality associated with such a device.
-VirtualBox for exampe has the option of emulating a device called \enquote{VMSVGA}
+VirtualBox for example has the option of emulating a device called \enquote{VMSVGA}
 for the guest system, which implements basic rendering as well as the APIs
 an operating system used to interact with it.
-However it in no way resembles any actual GPU from Nvdia, AMD or Intel,
+However it in no way resembles any actual GPU from Nvidia, AMD or Intel,
 and is very limited in functionality.
 As it is emulated by the host CPU, it is of course also a lot slower than a real dedicated GPU,
 and its video memory is limited to 256MB, while real GPUs are usually in the range of 10GB.
@@ -227,23 +231,23 @@ Still, such features make software that offers them a hybrid between virtualizat
 There are many different solutions available that offer emulation of specific architectures,
 however just like emulators for game consoles, they are very restricted and not useful in a flexible environment.
 To mention a single example, DOSBox emulates an Intel 286/386 processor on any hardware it is compiled for.
-This may at first rise the question why one would emulate an x86 CPU on an x86 CPU,
+This may at first raise the question of why one would emulate an x86 CPU on an x86 CPU,
 as this tool is mainly used on Windows,
 however a modern x86 CPU running modern Windows performs vastly differently than
-an x86 CPU running in realmode and at a speed of 8Mhz.
+an x86 CPU running in real mode and at a speed of 8Mhz.
 
 However, when it comes to "general purpose emulators",
-meaning an emulator which can add or remove ressources to suit the needs of the situation
+meaning an emulator which can add or remove resources to suit the needs of the situation
 and is even capable of emulating different architectures,
 there currently exists only a single tool capable of this,
 which is QEMU (Quick Emulator).
 For this reason, QEMU will be used as the emulator software in this thesis,
-as there are not other tools with the flexibility of QEMU available.
+as there are no other tools with the flexibility of QEMU available.
 This point is especially proven as many other tools which offer emulation
 use QEMU under the hood, for example Android Studio runs virtual devices using QEMU,
 and software like Lapidary\cite{lapidary} or Gem5\cite{gem5} also rely on it for their simulations.
-QEMU also offers many resources on its internal workings and is fully open source
-which allows for easy inspecting into its workings.
+QEMU also offers many resources on its internal workings and is fully open-source
+which allows for easy inspection of its workings.
 The research around it also offers many insights into its capabilities.
 
 Most internals of QEMU will be explicitly discussed in \autoref{chap:QEMU_API},
@@ -251,13 +255,13 @@ as these technical details are both very important for this paper
 but very inconsistent in their technical documentation.
 
 \section{Checkpoints}
-In this thesis checkpoints reference a copy of the complete internal state of a hardware architecture at a specified point of time.
-For the puroposes of this thesis this references all CPU registers, flags, system memory,
+In this thesis, checkpoints reference a copy of the complete internal state of a hardware architecture at a specified point of time.
+For the purposes of this thesis, this references all CPU registers, flags, system memory,
 storage devices and recursively the state of external devices of a computer.
 This thesis will later on also discuss possible approaches for reinjecting such a checkpoint
 into a running emulation, however implementing such a process is not the goal of this thesis.
 
-When modelling a full software infrastructure,
+When modeling a full software infrastructure,
 such checkpoints can be used to supplement a model of individual states of the system as a whole,
 from which detailed behavior of the system may be deduced
 as well as other issues like performance addressed.
@@ -266,7 +270,7 @@ Especially for error states, such checkpoints are very useful,
 as it may not always be possible to create an error state manually,
 or it wasn't yet understood how an error came to be.
 
-For completeness sake it is also mentioned some tools define a checkpoint only as a copy of the storage devices
+For completeness's sake it is also mentioned some tools define a checkpoint only as a copy of the storage devices
 which may be booted later to revert to such a state.
 This definition is not used here.
 
