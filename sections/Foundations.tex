@@ -117,4 +117,25 @@ Meaning more frames per second, which usually results in a better experience for
 actually cause the game to run faster.
 
 \section{Full System Simulation}
-Lorem Ipsum
+The purpose of this thesis is to produce data which can later on be used inside a \emph{Full System Simulation}.
+As however such a simulation is not part of this thesis, this section will only offer a short introduction,
+which was mostly lifted from \Citeauthor{kitcheckpoints}\cite{kitcheckpoints}.\todonote{Maybe rephrase this to not make it appear like plagiarism.}
+
+When developing a system, which also requires the development of an operating-system-like
+software, the actual hardware may not yet be available for testing
+as it often is still in development itself.
+Especially when developing embedded devices,
+the code develeoped for it often runs on a very low level
+and the kernel may take on additional tasks it doesn't on general purpose computers.
+To allow for testing of any developed software,
+the devices it's supposed to run on must be simulated in its entirety,
+with its CPU, RAM, GPU and other external components behaving exactly as they would on the actual device.
+
+Especially such special external components are an issue,
+as most emulators provide simplified APIs that are adapted to them being used by a general purpose computer.
+For example Hyper-V on Windows does not have the ability to provide a GPU to the guest,
+instead Linux has to fallback to \emph{llvmpipe} which provides software rendering.
+Other software like VMware and VirtualBox provide heavily simplified GPUs to a guest system,
+which are often unable to process 3D rendering by default,
+and such a feature must be manually enabled if required.
+But even then, there is no option to emulate an actual GPU which may be used on a physical device.
