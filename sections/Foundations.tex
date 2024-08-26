@@ -249,3 +249,34 @@ The research around it also offers many insights into its capabilities.
 Most internals of QEMU will be explicitly discussed in \autoref{chap:QEMU_API},
 as these technical details are both very important for this paper
 but very inconsistent in their technical documentation.
+
+\section{Checkpoints}
+In this thesis checkpoints reference a copy of the complete internal state of a hardware architecture at a specified point of time.
+For the puroposes of this thesis this references all CPU registers, flags, system memory,
+storage devices and recursively the state of external devices of a computer.
+This thesis will later on also discuss possible approaches for reinjecting such a checkpoint
+into a running emulation, however implementing such a process is not the goal of this thesis.
+
+When modelling a full software infrastructure,
+such checkpoints can be used to supplement a model of individual states of the system as a whole,
+from which detailed behavior of the system may be deduced
+as well as other issues like performance addressed.
+It may also be helpful to communicate with developers of other parts in the system.
+Especially for error states, such checkpoints are very useful,
+as it may not always be possible to create an error state manually,
+or it wasn't yet understood how an error came to be.
+
+For completeness sake it is also mentioned some tools define a checkpoint only as a copy of the storage devices
+which may be booted later to revert to such a state.
+This definition is not used here.
+
+\subsection{Checkpoints in QEMU}
+QEMU itself has a checkpoint mechanism called \emph{savevm}.
+These checkpoints are of the desired type, meaning they saves the entire state of an emulation,
+including CPU registers and memory contents.
+However, there are some limitations here, in particular the checkpoints are not stored externally in easily parsable files,
+but require a virtual disk for storage, although not all formats are supported here.
+This means that the checkpoints would first have to be laboriously extracted from these virtual disks for further use,
+and then they would have to be laboriously parsed to enable use outside of QEMU.
+These checkpoints also look different for other architectures, which would probably make it necessary
+to implement the parser completely individually for each architecture.
