@@ -74,7 +74,7 @@ and the definitions are generally compatible with the one before.
     as emulation usually requires a lot more computing power than the device it emulates\cite{definition_iot}.
 \end{itemize}
 
-\subsection{Conclusion}\todonote{Think of a better title}
+\subsection{Conclusion}\todonote{Think of a better title}\label{sec:conclusion_emulation}
 In this thesis therefore Emulation will be viewed as a special kind of simulation,
 which perfectly simulates a computing device of a specific architecture
 on another computing device, which may or may not be of another architecture.
@@ -139,3 +139,98 @@ Other software like VMware and VirtualBox provide heavily simplified GPUs to a g
 which are often unable to process 3D rendering by default,
 and such a feature must be manually enabled if required.
 But even then, there is no option to emulate an actual GPU which may be used on a physical device.
+
+\section{Emulation Software}
+As mentioned in \autoref{sec:conclusion_emulation}, most people have heard from emulation in the world of video games.
+These highly specialized emulators get used to correctly simulate the internals of any given console
+which allows the enjoyment of older video games.
+However, such highly specialized emulators are rarely useful for actual research,
+as any kind of simulated hardware cannot be easily swapped for something else without modifying the code of the software.
+
+For such tasks, general purpose emulators are also available.
+Such software can be separated into 2 kinds of sofware:
+
+\subsection{Virtualization \& Virtual machines}
+When not talking about video games, most people think of software like VMware, VirtualBox or Hyper-V
+as software for emulation.
+However, such tools usually do not fall under the definition of \emph{emulation},
+but instead they perform a task called \emph{virtualization}.
+The goal of such software is not to emulate a different architecture from the one the porgram is run on,
+but instead to create an isolated environment in which an operating system can be executed
+like it was running on bare metal.
+To allow for an efficient execution of this task, modern CPUs also include specific hardware for virtualization,
+on Intel it is called VT-x and AMD calls it AMD-V.
+These technologies allow for the execution of such isolated code with near native speed,
+meaning there is nearly no performance penalty while effectively having 2 systems running on the same machine.
+For example these technologies get employed in large datacenters,
+where on a single physical server many different systems, usually from different clients,
+are hosted and completely isolated from one another.
+This brings with it a massive cost benefit, since not every client requires its own physical server,
+especially if clients only have very small performance requirements and require only a single CPU core,
+and perhaps even then use only a small part of the available computing power.
+
+An important part of virtualization is the so-called \emph{hypervisor},
+which is responsible for isolating the guest systems from each other and the host system,
+while providing necessary resources to the guests\cite{hypervisor}.
+There are 2 different kinds of hypervisors which can be distinguished:
+
+\paragraph{Type 1 hypervisor} A type 1 hypervisor runs directly on the physical system
+and all other operating systems run on top of it.
+This includes the operating system the user experiences as the host OS,
+which only gets more rights and resources allocated to it from the hypervisor than other guests.
+The advantage of such a hypervisor is less overhead and higher speed,
+however it offers less flexibility as the hypervisor is directly tied to the operating system used.
+KVM is the standard type 1 hypervisor included in Linux,
+while the type 1 hypervisor on Windows is called Hyper-V\cite{hypervisor}.
+
+\paragraph{Type 2 hypervisor} A type 2 hypervisor is executed inside a host operating system,
+only getting allocated ressources from said operating system.
+This even allows for virtual machines being run purely in user-mode,
+as well as portability between different operating systems,
+under the assumption that the software used is available for multiple operating systems.
+This makes type 2 hypervisors a lot more flexible,
+while not having direct access to system resources,
+which may bring with it a performane penalty.
+Examples of such sofware include VirtualBox and VMware Workstation\cite{hypervisor}.
+In addition, all emulators emulating a different architecture always are a type 2 hypervisor.
+
+In addition, some virtualization also emulates other parts of the system,
+for example graphics cards for 3D accelerations, sound cards, network cards
+and other PCI devices.
+As mentioned before, such emulation is usually not very detailed or capable,
+and instead only provides the basic functionality associated with such a device.
+VirtualBox for exampe has the option of emulating a device called \enquote{VMSVGA}
+for the guest system, which implements basic rendering as well as the APIs
+an operating system used to interact with it.
+However it in no way resembles any actual GPU from Nvdia, AMD or Intel,
+and is very limited in functionality.
+As it is emulated by the host CPU, it is of course also a lot slower than a real dedicated GPU,
+and its video memory is limited to 256MB, while real GPUs are usually in the range of 10GB.
+Still, such features make software that offers them a hybrid between virtualization and emulation.
+
+\subsection{Explicit emulators (QEMU)}
+There are many different solutions available that offer emulation of specific architectures,
+however just like emulators for game consoles, they are very restricted and not useful in a flexible environment.
+To mention a single example, DOSBox emulates an Intel 286/386 processor on any hardware it is compiled for.
+This may at first rise the question why one would emulate an x86 CPU on an x86 CPU,
+as this tool is mainly used on Windows,
+however a modern x86 CPU running modern Windows performs very differently than
+an x86 CPU running in realmode and at a speed of 8Mhz.
+
+However, when it comes to "general purpose emulators",
+meaning an emulator which can add or remove ressources to suit the needs of the situation
+and is even capable of emulating different architectures,
+there currently exists only a single tool capable of this,
+which is QEMU (Quick Emulator).
+For this reason, QEMU will be used as the emulator software in this thesis,
+as there are not other tools with the flexibility of QEMU available.
+This point is especially proven as many other tools which offer emulation
+use QEMU under the hood, for example Android Studio runs virtual devices using QEMU,
+and software like Lapidary\cite{lapidary} or Gem5\cite{gem5} also rely on it for their simulations.
+QEMU also offers many resources on its internal workings and is fully open source
+which allows for easy inspecting into its workings.
+The research around it also offers many insights into its capabilities.
+
+Most internals of QEMU will be explicitly discussed in \autoref{chap:QEMU_API},
+as these technical details are both very important for this paper
+but very inconsistent in their technical documentation.
