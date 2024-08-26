@@ -140,6 +140,21 @@ which are often unable to process 3D rendering by default,
 and such a feature must be manually enabled if required.
 But even then, there is no option to emulate an actual GPU which may be used on a physical device.
 
+\subsection{Anomalies in hardware}
+An important part of such full system simulation is the testing of the behavior of code on the actual hardware.
+From time to time code written in languages like C exerts weird behaviors once it is run on actual hardware
+that are not explainable when reading the documentation.
+A very famous example of such an anomaly is bug 323\cite{323} in gcc,
+in which the results of a floating point comparison change depending on when it is executed
+and whether the compiler decides to write a result from the registers into system memory.
+
+Such bugs can only be caught by either testing on the real system
+or by having a very detailed emulator running the code.
+In the case of bug 323, only an emulator that accurately simulates 80 bit floating point registers
+as well as the conversion to 64bit values once the value gets written to memory
+would be able to reproduce this bug.
+Any emulator using only 64 bit floats internally would not be able to reproduce this bug.
+
 \section{Emulation Software}
 As mentioned in \autoref{sec:conclusion_emulation}, most people have heard from emulation in the world of video games.
 These highly specialized emulators get used to correctly simulate the internals of any given console
