@@ -26,7 +26,7 @@ Also, the differences between both protocols, especially regarding their capabil
 are discussed.
 
 \section{QEMU Machine Protocol (QMP)} \label{sec:QMP}
-\enquote{The QEMU Machine Protocol (QMP) is a JSON-based protocol which allows applications to control a QEMU instance}\cite{qmp-description}, as described by the QEMU Wiki itself.
+\enquote{The QEMU Machine Protocol (QMP) is a JSON-based protocol which allows applications to control a QEMU instance}\cite{qmp-description}, as described in the QEMU Wiki.
 The protocol was merged into the main branch of QEMU in version 0.13 in 2010, however to this day its status remains as "experimental"\cite{qmp-merge}.
 The goal was, and still is, to provide the same data QHM provides, but in a format more accessible for machines.
 However, this process is far from complete. To give an example, the patch to add the ability to read register contents was only introduced in 2021,
@@ -39,11 +39,13 @@ But, as mentioned, QMP is the less powerful protocol when used by itself.
 This however directly leads to the most important command\cite{qmp-commands}:
 
 \paragraph{human-monitor-command}
-This command is perhaps the most important one in all of this, as it allows to execute QHM-commands in a QMP-environment.
+This command is a rather special command, as it doesn't provide any information by itself,
+but instead allows for usage of the legacy QHM inside of QMP,
+which gives access to a lot more data not yet accessible directly in QMP.
 The QEMU reference explicitly marks this command as a \enquote{stop-gap} until all QHM-commands have their counterpart in QMP,
 but, as mentioned before, that is not a priority at the moment.
-Still, it's currently the only way to access certain data like register contents, even if in an ugly fashion.\todonote{Maybe rephrase this}
-Further details on how this command is used are described later on in \autoref{sec:QHM}.
+Still, it's currently the only way to access certain data like register contents, even if in a not easily parseable fashion.\todonote{Maybe rephrase this}
+Further details on how this command is used and what its capabilities are are described later on in \autoref{sec:QHM}.
 
 \paragraph{qmp\_capabilities}
 This command must be sent at the beginning of any QMP session to activate the session.
@@ -60,7 +62,7 @@ as registers need to be queried individually for each CPU.
 
 \paragraph{query-block}
 Queries for all kinds of drives. Gives information about attached storage mediums and where their content is stored.
-This of course gets used to back up the necessary files later on.
+This gets used to back up the necessary files later on.
 Also shows empty devices like optical drives which currently don't contain any media.
 
 \paragraph{dump-guest-memory}

@@ -13,13 +13,13 @@
 \chapter{Introduction}
 The planning and development of large-scale software infrastructures often encompasses software distributed over many different devices,
 which may feature vastly different environments for the code running on them.
-Especially devices "out in the field" regularly feature architectures far removed from normal x86 or ARM,
-which makes them very difficult to test in system simulations or generally in early planning stages.
+Especially devices "out in the field" regularly feature architectures very different to the specifications of x86 or ARM,
+which makes them very difficult to predict in system simulations or generally in early planning stages.
 Especially when planning real-time systems,
 it is very important to plan the communication between IoT devices and the servers running in the backend.
-In these scenarios, the backend often runs on x86, or in newer developments ARM,
+In these scenarios, the backend often runs on x86, or in more recently implemented systems ARM,
 while the external devices feature all kinds of different architectures,
-that are often heavily specialized.
+that are usually specialized to the task at hand.
 Even many IoT devices running ARM cores can often not easily be compared to smartphone-
 or server-grade ARM.
 In addition, when modifying such systems, for example when upgrading hardware,
@@ -31,27 +31,26 @@ The idea deduced now is to also use emulation to analyze the behavior of these d
 However, there are issues with emulation, which hinder the use of it in these stages.
 The biggest of which is speed, as emulation may result in a slowdown of the factor 1000-10000\cite{slowdown}.
 Especially in the planning stage, where only the outline of the project needs to be put down,
-such a slowdown is unacceptable, considering the results of the simulation don't need to be 100\% accurate.
+such a slowdown is unacceptable, considering the results of the simulation don't need to be exact.
 
 As there are many different emulation environments available,
-this paper chose QEMU, as it is open source and has the most resources available to work with.
-More details on this will be explained in \todonote{Link emulation chapter once it exists.}.
+this thesis chose QEMU, as it is open source and has the most resources available to work with.
+The details of the process which lead to the selection of QEMU are detailed in \autoref{sec:emulators}.
 This paper tries to generalize findings that may be transferred to other environments,
 however as all of these are heavily specialized tools,
 the amount of transferrable findings is very limited.
 
-This paper now introduces the idea of checkpoints to solve this speed issue.
+This paper now introduces the idea of checkpoints to solve this issue of speed and associated ressource costs.
 The idea is to extract all relevant data from a running emulation
-and store it in a generalized way which allows for further processing.
-The goal in this is to provide a solution with as much flexibility as possible,
+and store it in a generalized way which allows for reusal of the saved state of the system in a different context.
+The goal here is to provide a solution with as much flexibility as possible,
 meaning a tool which does not require manual tweaking depending on the targeted system.
 This especially involves a version-independence in regards to the emulator used.
 In contrast, \Citeauthor{kitcheckpoints} used specific changes in the internal code of QEMU
 to access the data he wanted to extract.
 While that is the much more powerful option, it will likely not work on modern instances of QEMU,
 as their paper is from \citeyear{kitcheckpoints}, and such deep changes in codebases often don't hold up well.
-In addition, he uses the QEMU Human Monitor Protocol to communicate with QEMU.
-They shorten it to HMP, while in this paper QHM gets used, but both reference the same protocol.
+In addition, he uses the QEMU Human Monitor Protocol (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however they refer to the same protocol and both are in use.}) to communicate with QEMU.
 QHM is however somewhat outdated, and especially not meant for processing by other software.
 To achieve this, the QEMU Machine Protocol (QMP) was developed, and the goal is to use this protocol instead,
 as the QEMU team tries to keep it somewhat standardized,
@@ -64,7 +63,7 @@ As mentioned before, emulation is very slow.
 This of course still applies during development, especially when there is not yet a physical prototype of the developed system available.
 To achieve a speedup here, the idea was to make the checkpoints reusable
 and create the ability to inject already existing checkpoints back into a running emulation.
-This would have even given the option to calculate checkpoints centrally and dsitribute them,
+This would have even given the option to calculate checkpoints centrally and distribute them,
 to save on time and especially resources.
 This behavior could not be implemented because of the time restraint as well as limitations of QEMU,
 more details on this will be discussed in \todonote{Link insertion once it exists.}.
