@@ -20,14 +20,19 @@ it is very important to plan the communication between IoT devices and the serve
 In these scenarios, the backend often runs on x86, or in more recently implemented systems ARM,
 while the external devices feature all kinds of different architectures,
 that are usually specialized to the task at hand.
-Even many IoT devices running ARM cores can often not easily be compared to smartphone-
-or server-grade ARM.
+Even many IoT devices running ARM cores can often not easily be compared to smartphone- or server-grade ARM.
 In addition, when modifying such systems, for example when upgrading hardware,
 many of these specialized architectures feature certain behaviors that may be unexpected or not well documented,
 which must be addressed when swapping out these physical parts.
 
-In later development stages, this issue already gets solved using emulation.
-The idea deduced now is to also use emulation to analyze the behavior of these devices during planning.
+In the actual development phase, this issue is already getting solved using emulation.
+In a planning phase, were parts of the software are already available,
+for example when it was purchased externally or the project is a switch of architectures,
+like from x86 to ARM in the server world,
+emulation could also be used to offer for more detailed planning
+like for performance criteria.
+When a server in a datacenter is supposed to communicate with an external part which uses pre-developed software,
+such an emulation can now be used to produce a good estimate of how performant the server needs to be and how long it should expect to wait for replies.
 However, there are issues with emulation, which hinder the use of it in these stages.
 The biggest of which is speed, as emulation may result in a slowdown of the factor 1000-10000\cite{slowdown}.
 Especially in the planning stage, where only the outline of the project needs to be put down,
