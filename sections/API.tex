@@ -276,13 +276,13 @@ but instead used by humans debugging QEMU and does not follow any specified form
 This of course is also stated by the QEMU team\cite{qhm-documentation}.
 However, because this is the only way to access registers through an external interface,
 this output needs to be made parseable by a computer, and for this,
-the following rules are presumed in the hope they are valid for the majority of architectures:
+the following rules are presumed from ARM and x86 in hope they are valid for the majority of architectures:
 
 \begin{itemize}
   \item The CPU number is specified in the first line, even though the command only returns a single CPU which must be specified beforehand.
   \item Registers are formatted in the scheme \$name=\$content.
   \begin{itemize}
-    \item If the name of the register is shorter than 3 letters, the name gets padded with spaces between it and the equals sign.
+    \item On x86, if the name of the register is shorter than 3 letters, the name gets padded with spaces between it and the equals sign.
     \item Longer names are allowed, however as the names of most standard registers are only 3 letters long, this only applies to more specialized registers.
     \item The content is specified in hexadecimal.
   \end{itemize}
@@ -298,17 +298,26 @@ the following rules are presumed in the hope they are valid for the majority of 
     there is no standard whether the remaining bits get put at the back or the front.
     See the floating-point and stack-pointer registers.
   \end{itemize}
-  \item There are 2 ways to represent flags:
+  \item 3 different ways to represent flags were encountered:
   \begin{enumerate}
-    \item Some flags get put in []-brackets,
-    wherein their letter is written if they're set, otherwise a hyphen is shown.
+    \item Some flags get put in []-brackets, wherein their letter is written if they're set, otherwise a hyphen is shown.
     \item Other flags, especially multibit flags, get represented like their own register.
     \begin{itemize}
       \item In this case, the amount of digits gives no indication of the length of the register and therefore its possible values.
       For example, the $A20$-register is only a single bit, while $CPL$ is 2 bit.
     \end{itemize}
+    \item If there is not a dedicated register in the specification,
+    but it's up to the implementation to decide,
+    for example the FPU on ARM,
+    there is no standard in how this is treated.
+    \begin{itemize}
+      \item For the ARM-FPU, \enquote{FPU disabled} gets explicitly written out,
+      while on x86 such information is stored in the specified registers and represented using a 0 or a 1.
+      \item There was no attempt to explicitly search for occurences of this case,
+      as the implementation of these cases is specific to the architecture in question
+      and there exists no documentation of such cases.
   \end{enumerate}
-  \item The targeted line length seems to be 50 symbols.
+  \item The targeted line length seems to be 50 around symbols.
   \item Inside a group of registers with the same or similar purpose, the formatting seems to be somewhat consistent.
   \begin{itemize}
     \item The general purpose and the control registers feature 4 registers per line,
