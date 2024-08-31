@@ -1,0 +1,262 @@
+\chapter{Approach \& Implementation}
+As the aim of this thesis is to provide information and a solution in a general fashion,
+meaning it works as independently from the architectures in use as possible,
+the approach used should be outlined beforehand.
+This chapter will fulfill this requirement
+and explain the ideas for implementation,
+and will also include dropped approaches with explanations of
+why they were either suboptimal or downright impossible to realize.
+To do this, this chapter will be sectioned into a general section explaining interaction with QEMU,
+which affects any kind of data exchange,
+as well as the approaches for extracting the different kinds of data,
+as each one requires an individual solution.
+
+\section{Development environment}
+The main topic of this section is to explain the decision for a programming language and the related toolkit.
+As this is supposed to be a generic solution, a programming language with a high abstraction level,
+preferably running on some sort of runtime allowing for the direct execution of the executable on any kind of system, is preferred.
+Examples of such platform-independent languages are Python, Java, Ruby or PHP.
+
+As the operations may involve operations inside the memory of another process,
+a language which is suited for this manipulation should be used.
+Such a task also requires a lot of performance to process such large memory regions.
+Especially the task of checking memory regions or even file systems for equal contents is very compute-heavy.
+The default for such a task is C or Assembly, and C++, Go, and unsafe Rust are also capable of such tasks.
+
+Also, such tasks produce a lot of side effects by definition,
+making any kind of functional programming language a hindrance if used\todonote{Haskell-Trauma}.
+
+\subsection{Java}
+\enquote{Write once, run anywhere}\cite{WORA} was the motto under which Java was shipped originally,
+and to this day it and its environment are one of the most well-known platform-independent
+programming languages and runtimes.
+In its now nearly 30 years of existence, it has received consistent updates to improve performance,
+and though to this day, a valid performance evaluation of any given Java program remains challenging\cite{Java_Benchmarking},
+the performance of Java seems to be within one order of magnitude when compared to C++ and 2 orders of magnitude when compared to plain C,
+while however requiring a higher development effort and having a much larger memory footprint\cite{Java_Performance}.
+Since Python is the only other JIT-based contender in \citetitle{Java_Performance} being somewhat faster,
+however featuring even fewer capabilities to directly manipulate memory without
+resorting to large external libraries, the decision was made to use Java for this thesis.
+
+\label{JNA}
+Especially the availability of tools like \emph{Java Native Access}\cite{JNA},
+which allows for the ability to use native system libraries while staying inside Java code,
+for which Python or other high-level programming languages feature no alternative,
+reinforced the decision to use Java in this thesis.
+Later on, it turned out such tools were not required, however when initially planning this thesis
+the potential necessity to directly call functions offered by the operating system led to the decision to use Java.
+
+The \emph{java.net} package is also one of the most capable and straightforward implementations of networking,
+and since the communication with QEMU, as shown in \autoref{sec:QEMU_Interaction}, will rely heavily on TCP,
+these capabilities also influenced the pro-Java decision.
+
+\section{Interaction with QEMU}\label{sec:QEMU_Interaction}
+As discussed in \autoref{chap:QEMU_API} the main interface QEMU offers to external machine connections is QMP.
+A QMP connection to a QEMU instance can be established using two ways:
+Either through a Unix socket or Telnet running on a traditional TCP socket.
+The usage of a Unix socket seems to be the preferred way,
+however since it obviously only works on a Unix system,
+this thesis chose to use Telnet to make this thesis applicable
+to Windows and other operating systems as well.
+
+In Java, such a telnet connection can simply be set up by opening a socket connecting to the port the QEMU host is listening on
+and then sending the commands as the bytes of the string representing the command.
+As QEMU sends data through this channel both as direct replies to requests as well as asynchronously
+in case an error occurs or a prolonged action finishes,
+the receiver needs to constantly listen for any incoming data and be able to process them.
+For this, a thread needs to be running as well as interfaces be created
+which can react when data matching their task is received.
+
+\section{CPU registers}
+This section is rather trivial, as the contents of the registers can simply be queried
+by first requesting details from QEMU about all existing CPUs by using \emph{query-cpus-fast}
+and then applying the findings from \autoref{sec:info_registers}.
+The current implementation however is rather rudimentary,
+as the specialities of architectures do not get taken into consideration.
+This means the contents of registers as well as flags written
+\enquote{according to standard}\footnote{There is no standard. Standard herein refers to what I observed in my testing, which of course is highly individual and described in \autoref{sec:info_registers}.}
+get saved, however any other data is lost.
+This means anyone reading data from QEMU needs to be very familiar with the architecture in use
+and read the related specification like for example the \Citetitle{intel-manual}.
+
+An example of such an issue is the floating point unit in ARM,
+which is disabled on boot and needs to be explicitly enabled by the operating system.
+QEMU of course replicates this behavior,
+and when querying the state of the CPU, it explicitly returns
+\enquote{FPU disabled} respective \enquote{FPU enbabled}
+as shown in \autoref{fig:registers_ARM} for the state of the FPU.
+When such information is necessary, any user of this thesis must implement the parsing of such data themselves.
+
+\section{System memory}
+Extracting system memory proved to be the most difficult task of this research.
+Not only because of QEMU's rather complicated memory model,
+which was explained excellently by \Citeauthor{kitcheckpoints}\cite{kitcheckpoints},
+but also because it is pretty evident QEMU's external APIs do not serve the purpose of finding data about the emulation process itself.
+Because of this, many different approaches were tried to access this data
+and many assumptions were proven wrong.
+Those approaches as well as the final solutions are going to be explained in the following,
+as well as issues still existing in the final implementation.
+
+\subsection{Using JNA to access QEMU memory}
+As explained in \autoref{JNA} Java Native Access is a library to directly work with APIs and libraries provided by the operating system.
+It also has bindings for the Win32-API directly implemented,
+basically allowing native usage of these APIs.
+One ability these APIs allow is direct access to another process' memory.
+The idea now was to find the location where QEMU stores the guest's memory,
+and directly extract the data from there while optionally comparing it to previously stored data
+to allow for deduplication.
+
+As already evident by the mention of the Win32-API,
+the first attempts to access the system memory were made under Windows
+and are therefore only valid on Windows.
+If this approach would have yielded results,
+an adaptation to Linux would have also been created
+which may even have had the ability to be generalized into the Unix world.
+However, as this ultimately could not be made to work,
+such a transfer was not attempted.
+
+It also needs to be mentioned that it was tried to avoid using QEMU's functions to perform a full dump to disk,
+but instead to somehow gain access to QEMU memory and read the data from there.
+This path was initially chosen to avoid creating massive memory dumps \emph{before} checking for equal contents,
+to save on disk space and disk access time.
+Instead, the idea was to first transfer the data into the memory of the extraction tool,
+in which such checks for equality and perhaps further compression could have been realized
+before performing an expensive write to disk.
+The obvious issue here is, if one could even get it to work,
+the massive requirement for system memory this could have,
+as memory consumption for every running QEMU instance would have doubled
+during the time of checkpoint creation.
+
+The naive approach here was to just take the physical address returned by \enquote{info tlb} or \enquote{info mtree}
+and read data from there in the hope these were the actual offsets used internally.
+Especially the fact the physical addresses do not start at address 0
+made this an idea at least worth testing
+in hopes it either works immediately or it gives further leads to track down the actual memory location.
+However, this directly turned up an issue:
+
+\paragraph{Address randomization}
+All modern operating systems randomize addresses of loaded programs for increased security.
+This means, there usually is no data when reading from address 0 of a process,
+but instead an error gets returned by the call to \emph{ReadProcessMemory}.
+Instead, one must first load the list of all modules of a process,
+called HMODULE in the Win32-API, find the one with the correct name,
+in this case always the first one, as the executable is always the first module,
+and then access its base address.
+Only now is any access to the memory of the process even possible,
+as all accesses before were made to memory regions
+not existing in the virtual memory space of the process.
+
+After having gained the ability to actually read QEMU's memory from another process,
+the physical addresses provided by \eqnuote{info tlb} were tested,
+but it was quickly determined these were not the actual addresses in QEMU's memory.
+This could be determined because QEMU already offers ways of dumping memory itself.
+One of these is the QMP command \emph{dump-guest-memory},
+which was already presented in \autoref{dump_memory}.
+Two other options are the QHM commands \emph{memsave} and \emph{pmemsave} from \autoref{sec:memsave}.
+These are far less capable, however they produce a raw dump without any metadata,
+which makes quick testing much easier.
+But, when trying for a full dump with additional metadata,
+\emph{dump-guest-memory} from QMP is still preferred.
+
+From this point on, the main topic of research was to find any hint for the location of memory objects
+which could be accessed using external APIs.
+\Citeauthor{kitcheckpoints} used internal QEMU functions to access the RAM list
+and access the individual memory region objects,
+from which all RAM data can be accessed\cite{kitcheckpoints}.
+This is probably the most elegant solution possible at the moment,
+as it allows direct access as desired by this thesis
+while being very fast, as no access to the hard disk is required.
+The big drawback are of course the necessary modifications to QEMU's code to make this work,
+something which this thesis wants to avoid to maintain usability and functionality for any future QEMU versions.
+For this reason, this approach was discarded as it could potentially break with any new QEMU version.
+Especially when trying to work with a debugger to call these internal functions,
+it may not survive the next update to QEMU.
+In addition, it also prevents usage on an already existing QEMU instance
+which is already running some form of emulation that should be parsed without modification.
+
+\subsection{Searching for memory regions}
+The next, still rather naive approach,
+was to get the start of a memory dump and to search for the contents inside the QEMU process.
+For this, using one of the commands mentioned before would create a small dump,
+and the developed program would then search through the whole of QEMU's memory
+to find a region with identical contents.
+This approach has many rather obvious issues.
+
+\paragraph{Performance} It's going to be very slow.
+It must read through the whole memory of the qemu.exe module,
+which isn't something the Win32 API was designed to handle.
+Win32 was designed for very small reads, as such access is both a security risk
+and requires traversal of multiple page tables.
+Additionally, external scanning isn't possible,
+meaning requesting Windows to search for memory contents itself isn't possible.
+
+\paragraph{Duplicate memory}
+When manually getting dumps and searching through process memory with a hex editor,
+even when using a sample size of 1024 bytes multiple matching regions were found.
+In addition, uninitialized memory, which is made up of all zeroes,
+makes this basically impossible,
+as an uninitialized memory region already mapped to the guest would be impossible to correctly categorize.
+
+\paragraph{Amount of memory objects}
+A xemu\cite{xemu} instance, which has 2GB of RAM allocated, uses, depending on circumstances,
+about 50 memory objects, each with its own physical and virtual memory region.
+An emulation instance with more memory allocated,
+or complicated mappings between host RAM, disk-backed memory and virtual devices could potentially have many more.
+In combination with the previous issue of duplicate or uninitialized memory, this is basically impossible.
+
+This approach was experimented with for a short amount of time,
+but after encountering the first instances of memory with equal content,
+it was effectively dropped and no longer pursued
+as it was determined this could never be made reliable to the required extent
+while putting any potential performance improvement of such a process into question.
+
+\subsection{File backed memory}
+As mentioned in \autoref{sec:API_mtree},
+it is possible to create a region of memory inside a QEMU instance
+which is directly mapped to disk memory.
+When creating a file large enough to hold the entire memory of a QEMU instance,
+one could read this file when the emulation is paused and store the checkpoint from this data.
+This way was tried regularly, one example is from \Citeauthor{QEMU_memory_file},
+who wrote a tutorial on how to do this\cite{QEMU_memory_file}.
+Still, there are certain issues this solution creates,
+and while none of these renders this approach impossible,
+they need to be taken into account.
+
+\subsubsection{Performance}
+There are reasons why RAM exists and not all operations are simply performed directly on disk.
+These reasons are latency and memory bandwidth.
+Modern DDR5 RAM is specified for at least 3200MT/s (Megatransfers per second\footnote{A transfer refers to a single write or read operation. One megatransfer therefore consists of a million read or write operations per second.}),
+with usual applications being between 4800MT/s and 5600MT/s,
+and the specification allowing for up to 8800MT/s\cite{JEDEC},
+which results in a specified data rate between 12.8GB/s and 33.6GB/s per channel used.
+At the same time, the latency of DDR5 is specified at around 13-18ns,
+depending on speed and quality of the chips chosen\cite[p.392-406]{JEDEC},
+with overclocked memory being available allowing for even lower latencies.
+
+A typical NVMe hard drive uses 4 PCIe lanes, which on PCIe 5.0 equates to a maximum speed of 15.7GB/s,
+while usually having latencies of around 2ms.\todonote{I need a source here that isn't just the datasheet of some random drive}
+This means the most modern NVMe drives may be able to keep up with RAM in terms of data throughput,
+but in terms of latency they are about 100 times worse,
+which would make their usage as system memory a rather troublesome experience.
+In addition, the current standard for NVMe is still PCIe 4.0, which makes this even worse.
+
+\Citeauthor{QEMU_memory_file} provides a solution for this,
+which consists of simply putting the file in a file system that runs in host RAM.
+The solution he proposes for this under Linux is rather nice as Linux offers support for this natively.
+However, the experience on other operating systems may vary, under Windows one would need additional software for this,
+making this not the desired platform-independent solution.
+
+\subsubsection{Flexibility}
+This only works if the whole guest's memory can be mounted to a large memory file.
+However, as shown in \autoref{fig:mem_ARM},
+there are instances of QEMU needing to have specific memory regions mapped in specific ways.
+If the guest memory must only be mounted to specific files,
+it is of course possible to just read these files as well.
+When emulating external devices however,
+this is not applicable, as that memory must always be mounted by QEMU itself.
+
+In addition, this means to use the findings of this thesis,
+the targeted QEMU instance must again be prepared for the extraction process,
+which is something this thesis tries to avoid.
+
+For these reasons, it was also decided not to follow this approach if possible.

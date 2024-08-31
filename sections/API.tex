@@ -123,7 +123,7 @@ and then combine it with the virtual address translation to store memory in the 
 This throws up the question in which format the RAM should be stored. In the order it is actually on the hardware, meaning the physical addresses,
 or in the order the guest OS sees it, meaning the virtual addresses.
 
-\subsection{info mtree}
+\subsection{info mtree}\label{sec:API_mtree}
 This command shows all memory regions which are currently allocated for the guest.
 This includes main memory, as well as memory for emulated devices like graphic cards.
 These regions are given individual names and are separated by blank lines.
@@ -212,7 +212,7 @@ The main reason these are interesting is them being backed by files on disk.
 This means any changes made to these regions by the guest can be easily read externally by opening those files.
 Of course that comes with a massive performance penalty if many accesses to such regions are made.
 
-\subsection{info registers}
+\subsection{info registers}\label{sec:info_registers}
 This command returns the contents of all the registers for a given CPU.
 It gives a very detailed overview of the data, however it is pretty clear it heavily prefers x86.
 To further illustrate this, in \autoref{fig:registers_x86} and \autoref{fig:registers_ARM} example outputs for this command are provided.
@@ -330,7 +330,7 @@ the following rules are presumed from ARM and x86 in hope they are valid for the
   \end{itemize}
 \end{itemize}
 
-\subsection*{memsave \& pmemsave}
+\subsection{memsave \& pmemsave}\label{sec:memsave}
 These command are the ancestors to \emph{dump-guest-memory} in \autoref{dump_memory}.
 They are far less sophisticated than their QMP succesor,
 which means they should not actually be used anymore.
