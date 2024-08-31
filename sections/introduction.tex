@@ -55,7 +55,7 @@ In contrast, \Citeauthor{kitcheckpoints} used specific changes in the internal c
 to access the data he wanted to extract.
 While that is the much more powerful option, it will likely not work on modern instances of QEMU,
 as their paper is from \citeyear{kitcheckpoints}, and such deep changes in codebases often don't hold up well.
-In addition, he uses the QEMU Human Monitor Protocol (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however they refer to the same protocol and both are in use.}) to communicate with QEMU.
+In addition, he uses the QEMU Human Monitor Protocol (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however both terms refer to the same protocol and both are in use.}) to communicate with QEMU.
 QHM is however somewhat outdated, and especially not meant for processing by other software.
 To achieve this, the QEMU Machine Protocol (QMP) was developed, and the goal is to use this protocol instead,
 as the QEMU team tries to keep it somewhat standardized,
