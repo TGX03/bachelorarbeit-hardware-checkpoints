@@ -65,7 +65,7 @@ Queries for all kinds of drives. Gives information about attached storage medium
 This gets used to back up the necessary files later on.
 Also shows empty devices like optical drives which currently don't contain any media.
 
-\paragraph{dump-guest-memory}
+\paragraph{dump-guest-memory}\label{dump_memory}
 This command dumps the contents of the guest's memory to disk.
 The command itself offers many options, however most of these don't work.
 In the used implementation, the only output format working is ELF, and paging is only possible on x86 guests.
@@ -329,3 +329,19 @@ the following rules are presumed from ARM and x86 in hope they are valid for the
     which is also the only way of finding out which flag is associated with which register.
   \end{itemize}
 \end{itemize}
+
+\subsection*{memsave \& pmemsave}
+These command are the ancestors to \emph{dump-guest-memory} in \autoref{dump_memory}.
+They are far less sophisticated than their QMP succesor,
+which means they should not actually be used anymore.
+However, they do allow for quick and easy testing,
+as they simply create a raw memory dump without any additional metadata.
+When actually extracting data from QEMU, such metadata is of course very helpful,
+but when just debugging these 2 commands are a lot easier to use.
+
+They also allow for the direct separation of physical and virtual memory,
+which requires explicit parsing for \emph{dump-guest-memory}.
+This also means, that \emph{memsave} is only available on guests which allow for paging on \emph{dump-guest-memory},
+meaning currently only x86 is supported.
+\emph{pmemsave} is available on all platforms, however as it's physical memory,
+it is a bit harder to make sense of the data.
