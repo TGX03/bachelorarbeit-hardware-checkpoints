@@ -16,15 +16,17 @@
 		
 \setcounter{figure}{0}
 		
-\begin{figure} [ht]
+\begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{images/StackOverflow}
   \caption{Results when searching the difference between Simulation and Emulation.}
   \label{fig:Google_SO}
 \end{figure}
 
-\begin{figure} [ht]
+\begin{figure}[ht]
+  \tiny
   \centering
+  \begin{minipage}{0.48\linewidth}
   \begin{ffcode}
     address-space: I/O
       0000000000000000-000000000000ffff (prio 0, i/o): io
@@ -89,7 +91,10 @@
         0000000040000000-00000000bfffffff (prio 0, ram): mach-virt.ram
         0000004010000000-000000401fffffff (prio 0, i/o): alias pcie-ecam @pcie-mmcfg-mmio 0000000000000000-000000000fffffff
         0000008000000000-000000ffffffffff (prio 0, i/o): alias pcie-mmio-high @gpex_mmio_window 0000008000000000-000000ffffffffff
-
+    \end{ffcode}
+    \end{minipage}
+    \begin{minipage}{0.48\linewidth}
+    \begin{ffcode}
     address-space: virtio-net-pci
       0000000000000000-ffffffffffffffff (prio 0, i/o): bus master container
 
@@ -153,7 +158,8 @@
 
     memory-region: pcie-mmcfg-mmio
       0000000000000000-000000000fffffff (prio 0, i/o): pcie-mmcfg-mmio
-\end{ffcode}
-\caption{All memory regions on a generic 64bit ARM instance.}
-\label{fig:mem_ARM_full}
+  \end{ffcode}
+  \end{minipage}
+  \caption{Full output of "info mtree" on a 2GB ARM64 instance.}
+  \label{fig:mem_ARM_full}
 \end{figure}
