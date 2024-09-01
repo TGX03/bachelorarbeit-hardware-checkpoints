@@ -227,11 +227,11 @@ There are reasons why RAM exists and not all operations are simply performed dir
 These reasons are latency and memory bandwidth.
 Modern DDR5 RAM is specified for at least 3200MT/s (Megatransfers per second\footnote{A transfer refers to a single write or read operation. One megatransfer therefore consists of a million read or write operations per second.}),
 with usual applications being between 4800MT/s and 5600MT/s,
-and the specification allowing for up to 8800MT/s\cite{JEDEC},
+and the specification allowing for up to 8800MT/s,
 which results in a specified data rate between 12.8GB/s and 33.6GB/s per channel used.
 At the same time, the latency of DDR5 is specified at around 13-18ns,
-depending on speed and quality of the chips chosen\cite[p.392-406]{JEDEC},
-with overclocked memory being available allowing for even lower latencies.
+depending on speed and quality of the chips chosen,
+with overclocked memory being available allowing for even lower latencies\cite[p.392-406]{JEDEC}.
 
 A typical NVMe hard drive uses 4 PCIe lanes, which on PCIe 5.0 equates to a maximum speed of 15.7GB/s,
 while usually having latencies of around 2ms.\todonote{I need a source here that isn't just the datasheet of some random drive}
