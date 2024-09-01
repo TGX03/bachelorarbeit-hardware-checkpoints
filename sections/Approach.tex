@@ -199,7 +199,8 @@ as an uninitialized memory region already mapped to the guest would be impossibl
 
 \paragraph{Amount of memory objects}
 A xemu\cite{xemu} instance, which has 2GB of RAM allocated, uses, depending on circumstances,
-about 50 memory objects, each with its own physical and virtual memory region.
+about 50 memory objects, each with its own physical and virtual memory region,
+and also the ARM example in \autoref{fig:mem_ARM_full} with 2GB of main memory features 58 memory regions if not counting duplicates.
 An emulation instance with more memory allocated,
 or complicated mappings between host RAM, disk-backed memory and virtual devices could potentially have many more.
 In combination with the previous issue of duplicate or uninitialized memory, this is basically impossible.
