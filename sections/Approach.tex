@@ -242,8 +242,8 @@ which would make their usage as system memory a rather troublesome experience.
 In addition, the current standard for NVMe is still PCIe 4.0, which makes this even worse.
 
 \Citeauthor{QEMU_memory_file} provides a solution for this,
-which consists of simply putting the file in a file system that runs in host RAM.
-The solution he proposes for this under Linux is rather nice as Linux offers support for this natively.
+which consists of simply putting the file in a file system allocated in host RAM.
+The solution he proposes for this on Linux is rather simple as Linux offers support for this natively.
 However, the experience on other operating systems may vary, under Windows one would need additional software for this,
 making this not the desired platform-independent solution.
 
