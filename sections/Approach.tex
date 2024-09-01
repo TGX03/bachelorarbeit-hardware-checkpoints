@@ -50,6 +50,25 @@ The \emph{java.net} package is also one of the most capable and straightforward 
 and since the communication with QEMU, as shown in \autoref{sec:QEMU_Interaction}, will rely heavily on TCP,
 these capabilities also influenced the pro-Java decision.
 
+\subsection{Checkpoint format}
+The checkpoint format is an important piece for future work based on this thesis,
+and therefore be explained here.
+The basic format used is JSON, as it is effectively the standard for exchanging data
+in an easily parseable way without causing trouble when a small part of the data format is changed
+like it is the case with serialized data exchange formats.
+
+The exact format will be explained in the section referring to the corresponding data point.
+Here only the top-level container holding the different data points will be explained:
+\begin{itemize}
+    \item \emph{cpu} contains an array made up of CPU objects, each containing all register content and additional data of each CPU.
+    \item \emph{memory} is an array containing all the memory regions extracted.
+    The concept of memory regions is explained in \autoref{sec:memory_extraction}
+    \item \emph{blockdevice} is an array containing all data of blockdevices,
+    referring to any kind of drives mounted to an emulation instance.
+    It also stores data about drives not containing any media, for example empty CD drives,
+    but obviously does not store any contents of such devices.
+\end{itemize}
+
 \section{Interaction with QEMU}\label{sec:QEMU_Interaction}
 As discussed in \autoref{chap:QEMU_API} the main interface QEMU offers to external machine connections is QMP.
 A QMP connection to a QEMU instance can be established using two ways:
@@ -87,7 +106,29 @@ and when querying the state of the CPU, it explicitly returns
 as shown in \autoref{fig:registers_ARM} for the state of the FPU.
 When such information is necessary, any user of this thesis must implement the parsing of such data themselves.
 
-\section{System memory}
+\subsection{Checkpoint format}
+Each CPU object consists of the following fields:
+\begin{itemize}
+    \item \emph{id} referring to the number of the core.
+    \item \emph{architecture} holds the architecture of this CPU core.
+    QEMU outputs this for every CPU individually,
+    though currently QEMU is not capable of running an emulation with different CPU architectures at the same time.
+    \item \emph{hostId} is the ID of the host QEMU thread responsible for simulating this CPU.
+    \item \emph{registers} holds all registers associated with this CPU.
+    For each register, the following fields are stored:
+    \begin{itemize}
+        \item \emph{name} is the name of the register provided by QEMU.
+        \item \emph{contents} holds the bits of each register formatted as hex.
+        Gets stored as a string instead of a JSON int to keep leading zeroes.
+        \item \emph{size} stores the size the program determined for a register.
+        Keep in mind the restrictions laid out in \autoref{sec:info_registers}.
+    \end{itemize}
+    \item \emph{flags} exists only if flags were found.
+    This is currently an unsafe state because of the inconsistencies described in \autoref{sec:info_registers},
+    so therefore it is recommended to check whether it holds correct information for any used architecture.
+\end{itemize}
+
+\section{System memory}\label{sec:memory_extraction}
 Extracting system memory proved to be the most difficult task of this research.
 Not only because of QEMU's rather complicated memory model,
 which was explained excellently by \Citeauthor{kitcheckpoints}\cite{kitcheckpoints},
@@ -131,7 +172,7 @@ The naive approach here was to just take the physical address returned by \enquo
 and read data from there in the hope these were the actual offsets used internally.
 Especially the fact the physical addresses do not start at address 0
 made this an idea at least worth testing
-in hopes it either works immediately or it gives further leads to track down the actual memory location.
+in hopes it either works immediately or gives further leads to track down the actual memory location.
 However, this directly turned up an issue:
 
 \paragraph{Address randomization}
@@ -229,9 +270,9 @@ These reasons are latency and memory bandwidth.
 Modern DDR5 RAM is specified for at least 3200MT/s (Megatransfers per second\footnote{A transfer refers to a single write or read operation. One megatransfer therefore consists of a million read or write operations per second.}),
 with usual applications being between 4800MT/s and 5600MT/s,
 and the specification allowing for up to 8800MT/s,
-which results in a specified data rate between 12.8GB/s and 33.6GB/s per channel used.
+which results in a specified data rate between 12.8GB/s and 33.6GB/s per available channel.
 At the same time, the latency of DDR5 is specified at around 13-18ns,
-depending on speed and quality of the chips chosen,
+depending on the speed and quality of the chips chosen,
 with overclocked memory being available allowing for even lower latencies\cite[p.392-406]{JEDEC}.
 
 A typical NVMe hard drive uses 4 PCIe lanes, which on PCIe 5.0 equates to a maximum speed of 15.7GB/s,
@@ -261,3 +302,147 @@ the targeted QEMU instance must again be prepared for the extraction process,
 which is something this thesis tries to avoid.
 
 For these reasons, it was also decided not to follow this approach if possible.
+
+\subsection{Letting QEMU dump to disk}
+After trying the previous approaches,
+I was not aware of any other way to find the addresses of QEMU's memory regions
+without injecting additional code into QEMU,
+either directly by modifying the codebase or indirectly by attaching a debugger.\todonote{Maybe write this in a way people don't think I was too lazy to do this.}
+This means the APIs offered by QEMU must be used directly,
+with the potential performance penalty attached to it,
+which will later be evaluated in \autoref{chap:Evaluation}.\todonote{Make this reference more precise once the chapter is written.}
+
+QMP only offers a single command which extracts data from a running QEMU instance,
+namely \emph{dump-guest-memory}.
+It allows for dumping of guest memory to either ELF, Windows crashdump or raw formats,
+depending on the guest's architecture.
+In addition, it allows for paging, meaning to include both virtual and physical addresses in the dumped file.
+This however is currently only possible for x86 guests and when using the ELF format for the dumped file.
+
+\subsubsection{ELF}
+Since ELF is a common standard, parsing an ELF file by itself is no special procedure.
+It is however rather uncommon in Java, as Java programs don't get shipped as ELFs
+and Java stacktraces are not comparable to a dump produced by a program crash.
+There is one Java library called \citetitle{jelf} which offers the parsing of ELF files.
+It seems to be developed by a single developer called \Citeauthor{jelf},
+and while he does regularly work on this library,
+its stability is still up to question and will be inspected further in \autoref{chap:Evaluation}\cite{jelf}.\todonote{Make this reference more precise once the chapter is written}
+
+Also it appears the library was not explicitly developed for processing dumps
+and even extracting data from them,
+as the parts of the library for this functionality are very much undocumented.
+Still, a process to read the data from such a dump could be established and now looks as follows:
+\begin{enumerate}
+    \item Read the file from an input stream.
+    The option to read from a byte array is also offered,
+    however this option falls flat for large files because of the reasons mentioned in \autoref{sec:Java_2GB}.
+    \item Parse all program headers. Jelf only parses them when explicitly requested,
+    which means this process cannot be run in parallel as this corrupts the internal state of the used input stream.
+    \item The program headers required are of type \emph{PT\_LOAD},
+    meaning a segment which can simply be loaded into memory.
+    It is assumed all program headers of this type refer to a memory area of the guest,
+    as there seems to be no other data in the ELF file allowing for such differentiation.
+    \item Each header of type \emph{PT\_LOAD} carries the fields
+    \emph{offset}, \emph{filesz}, \emph{paddr} and \emph{vaddr}.
+    The first two describe where the data is in the file,
+    the latter two describe where the data is from the perspective of the guest operating system.
+    \item \emph{offset} and \emph{filesz} get used to extract this memory region from the ELF file into memory.
+    \item If a previous checkpoint is linked, it is now checked
+    whether the previous checkpoint has a memory region with the same contents available,
+    and if so, the previous one gets linked instead.
+    \item If no duplicate was found,
+    the segment gets written to a file at the specified location,
+    with its physical address getting used as the filename.
+\end{enumerate}
+
+\paragraph{Program header fields}
+As mentioned, a program header in an ELF file has 4 fields which are relevant to this thesis.
+The first is \emph{offset}, which simply references the first byte of this area inside the file.
+\emph{filesz} shows the number of bytes stored for this region in the ELF file.
+This may differ from \emph{memsz}, which is the actual size of the memory region when loaded inside QEMU.
+I have never seen these two values differ, therefore only \emph{filesz} is read,
+however this may need changing if discrepancies are found.
+\emph{paddr} is the physical address of the first byte of this segment in the QEMU memory model,
+while \emph{vaddr} is the first virtual address the guest operating system sees for this memory region.
+In case paging is not supported for the guest, currently meaning everything except x86,
+both values are the same and contain the physical address of the segment.
+
+\subsection{Java's 2GB limit}\label{sec:Java_2GB}
+With Java being a product of 1995, it was developed when 32-bit computers were still the standard.
+Because of this, most interfaces in Java work with 32-bit signed integers instead of 64-bit integers.
+In addition, Java has no direct support for unsigned integers.
+This design also affects arrays, which thanks to this can only hold a maximum of $2^{31}$ elements,
+which for a byte array results in 2GiB of maximum available space in such an array.
+Since this thesis should also work on QEMU instances running on more than 2GiB of RAM,
+which would consequently produce an ELF file larger than the Java limit,
+this issue must be circumvented.
+When storing longs in an array, this can theoretically be increased to $2^{34}$, or 16GiB of data.
+For doing something like this, it however also needs to be mentioned that one cannot simply convert a long into 8 bytes in Java by simple casting,
+but instead shift operations are required, which hurt performance.
+To circumvent this, 2 approaches were implemented:
+
+\paragraph{Input Streams}
+Input streams are a fundamental interface in the Java world,
+and they supply an undefined amount of bytes to any given consumer.
+The \enquote{undefined} here explicitly allows for an amount of bytes higher than the usual $2^{31}$ byte limit.
+Since Java 9, this interface was explicitly expanded with the goal to at least somewhat allow 64-bit longs\footnote{See https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/InputStream.html#transferTo(java.io.OutputStream)}.
+This is a decent substitute for transferring bytes using an array,
+and while not every piece of code expects it and produces undefined behavior
+once over $2^{31}$ bytes were received, at least for the libraries in this thesis that was not an issue.
+
+\paragraph{BigArrays}
+The Java library \emph{fastutil}\footnote{See https://fastutil.di.unimi.it/} offers so-called \enquote{Big Arrays},
+which are 2-dimensional arrays with helper methods allowing them to be used like normal arrays.
+This increases the maximum number of bytes stored in \enquote{an array} to $2^{62}$,
+which should suffice for the purposes of this thesis.
+\emph{fastutil} does not provide an Input Stream for such an array itself,
+however developing one was a rather trivial exercise.
+
+\subsection{Checkpoint format}
+Each memory region holds 5 values when stored as a JSON object:
+\begin{itemize}
+    \item \emph{size} stands for the absolute size in bytes reported by \emph{filesz}.
+    \item \emph{startPhysicalAddress} stores the first address this region holds when mapped to a QEMU instance.
+    \item \emph{startVirtualAddress} stores the first address this region holds accessible from the guest operating system.
+    If paging is not supported on the current architecture, its content is identical to \emph{startPhysicalAddress}.
+    \item \emph{hash} stores the hash computed for this memory segment as Base64.
+    \item \emph{storageLocation} holds the absolute path this memory region's dump is stored at on disk.
+\end{itemize}
+
+\section{blockdevices}
+This section again was rather trivial, even though it requires more computation than the CPUs.
+The QMP commands for blockdevices seem to be the most capable of the data points discussed here,
+likely because attaching and removing blockdevices during runtime is a task relevant not only to the scientific community.\todonote{Is that too on the nose?}
+The command \emph{query-block} provides all necessary information for an extraction process,
+and though one may feel overwhelmed when first seeing its output,
+which in parts is because it includes a lot of deprecated and invalid data,
+it is very easy to extract which devices are connected, whether they contain media and where said media is located.
+
+The extraction process therefore only consists of the stepts
+\begin{enumerate}
+    \item Get the array of blockdevices from QEMU.
+    \item Parse all their names and internal identifiers.
+    \item Check if they have media inserted, and if so, get the image and compute its hash.
+    \item If it's not a duplicate, copy the image to the specified checkpoint directory.
+\end{enumerate}
+
+\subsection{Checkpoint format}
+For each blockdevice, the following fields get stored in JSON:
+\begin{itemize}
+    \item \emph{deviceName} is the human-readable name given to this device.
+    \item \emph{qdevID} is the internal name used in QEMU, comparable to /dev/sdX in Linux.
+    This may not always exist in QEMU, and may be the QOM path if no ID was set.
+    \item \emph{virtualSize} is the capacity of the device shown to the guest operating system.
+    If no media is inserted, this shows the value zero,
+    however a value of zero is no indication about the absence of any media.
+    \item \emph{actualSize} is the actual size of the image on disk.
+    If no media is inserted, this has the value zero,
+    however a value of zero is no indication about the absence of any media.
+    \item \emph{hasMedia} shows whether there is actually an image mounted onto this device.
+    If media is inserted, these additional fields are available:
+    \begin{itemize}
+        \item \emph{originalPath} holds the location where the image was originally stored at.
+        \item \emph{hash} stores the hash computed for the media as Base64.
+        \item \emph{storageLocation} holds the absolute path of the copy of this blockdevice's image.
+    \end{itemize}
+\end{itemize}
