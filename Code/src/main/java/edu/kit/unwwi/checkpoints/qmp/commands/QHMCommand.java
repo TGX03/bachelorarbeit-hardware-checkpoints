@@ -1,5 +1,6 @@
 package edu.kit.unwwi.checkpoints.qmp.commands;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -21,11 +22,11 @@ public abstract class QHMCommand extends StatefulCommand {
 		//return "{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"" + commandName() +"\" }}";
 		StringBuilder command = new StringBuilder();
 		command.append("{ \"execute\": \"human-monitor-command\", \"arguments\": { \"command-line\": \"");
-		command.append(commandName()).append('"');
+		command.append(StringEscapeUtils.escapeJson(commandName())).append('"');
 		for (Map.Entry<String, Object> set : additionalArguments().entrySet()) {
 			if (set.getValue() instanceof Number)
-				command.append(String.format(", \"%s\": %s", set.getKey(), set.getValue()));
-			else command.append(String.format(", \"%s\": \"%s\"", set.getKey(), set.getValue()));
+				command.append(StringEscapeUtils.escapeJson(String.format(", \"%s\": %s", set.getKey(), set.getValue())));
+			else command.append(StringEscapeUtils.escapeJson(String.format(", \"%s\": \"%s\"", set.getKey(), set.getValue())));
 		}
 		command.append(" }}");
 		return command.toString();
