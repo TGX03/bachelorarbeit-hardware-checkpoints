@@ -63,7 +63,7 @@ Here only the top-level container holding the different data points will be expl
     \item \emph{cpu} contains an array made up of CPU objects, each containing all register content and additional data of each CPU.
     \item \emph{memory} is an array containing all the memory regions extracted.
     The concept of memory regions is explained in \autoref{sec:memory_extraction}
-    \item \emph{blockdevice} is an array containing all data of blockdevices,
+    \item \emph{blockdevice} is an array containing all data of block devices,
     referring to any kind of drives mounted to an emulation instance.
     It also stores data about drives not containing any media, for example empty CD drives,
     but obviously does not store any contents of such devices.
@@ -409,10 +409,10 @@ Each memory region holds 5 values when stored as a JSON object:
     \item \emph{storageLocation} holds the absolute path this memory region's dump is stored at on disk.
 \end{itemize}
 
-\section{blockdevices}
+\sectionblock devicess}
 This section again was rather trivial, even though it requires more computation than the CPUs.
-The QMP commands for blockdevices seem to be the most capable of the data points discussed here,
-likely because attaching and removing blockdevices during runtime is a task relevant not only to the scientific community.\todonote{Is that too on the nose?}
+The QMP commands foblock deviceses seem to be the most capable of the data points discussed here,
+likely because attaching and removiblock devicesces during runtime is a task relevant not only to the scientific community.\todonote{Is that too on the nose?}
 The command \emph{query-block} provides all necessary information for an extraction process,
 and though one may feel overwhelmed when first seeing its output,
 which in parts is because it includes a lot of deprecated and invalid data,
@@ -420,7 +420,7 @@ it is very easy to extract which devices are connected, whether they contain med
 
 The extraction process therefore only consists of the stepts
 \begin{enumerate}
-    \item Get the array of blockdevices from QEMU.
+    \item Get the arrayblock devicesices from QEMU.
     \item Parse all their names and internal identifiers.
     \item Check if they have media inserted, and if so, get the image and compute its hash.
     \item If it's not a duplicate, copy the image to the specified checkpoint directory.
