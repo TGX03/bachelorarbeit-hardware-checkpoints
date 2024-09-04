@@ -44,7 +44,7 @@ public class BigByteArrayInputStream extends InputStream {
 	public int read() {
 		if (position == BigArrays.length(array) - 1) return -1;
 		else {
-			int result = BigArrays.get(array, position);
+			int result = Byte.toUnsignedInt(BigArrays.get(array, position));
 			position++;
 			return result;
 		}
