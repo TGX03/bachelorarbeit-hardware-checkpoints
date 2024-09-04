@@ -213,6 +213,9 @@ The main reason these are interesting is them being backed by files on disk.
 This means any changes made to these regions by the guest can be easily read externally by opening those files.
 Of course that comes with a massive performance penalty if many accesses to such regions are made.
 
+Additionally, since x86 is often more detailed than other architectures,
+the full output of \emph{info mtree} is also shown in \autoref{fig:xemu_full}.
+
 \subsection{info registers}\label{sec:info_registers}
 This command returns the contents of all the registers for a given CPU.
 It gives a very detailed overview of the data, however it is pretty clear it heavily prefers x86.
