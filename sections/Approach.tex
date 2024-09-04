@@ -138,7 +138,7 @@ and many assumptions were proven wrong.
 Those approaches as well as the final solutions are going to be explained in the following,
 as well as issues still existing in the final implementation.
 
-\subsection{Using JNA to access QEMU memory}
+\subsection{Using JNA to access QEMU memory}\label{sec:JNA_failure}
 As explained in \autoref{JNA} Java Native Access is a library to directly work with APIs and libraries provided by the operating system.
 It also has bindings for the Win32-API directly implemented,
 basically allowing native usage of these APIs.
@@ -303,7 +303,7 @@ which is something this thesis tries to avoid.
 
 For these reasons, it was also decided not to follow this approach if possible.
 
-\subsection{Letting QEMU dump to disk}
+\subsection{Letting QEMU dump to disk}\label{sec:resignation}
 After trying the previous approaches,
 I was not aware of any other way to find the addresses of QEMU's memory regions
 without injecting additional code into QEMU,
@@ -446,3 +446,23 @@ For each blockdevice, the following fields get stored in JSON:
         \item \emph{storageLocation} holds the absolute path of the copy of this blockdevice's image.
     \end{itemize}
 \end{itemize}
+
+\section{External devices}
+There currently is no generic method to interact with devices attached to a QEMU instance
+which do not fall in one of the three aforementioned categories.
+There are dedicated commands for trusted platform modules, input devices, character devices\footnote{In QEMU, keyboards are sometimes character devices and other times input devices, making treating them in a unified way rather difficult.},
+audio and video cards, generic PCI cards and many more\cite{qmp-commands}.
+Implementing these commands could likely be done to allow for some kind of checkpointing,
+and many do provide some way of gathering memory information,
+however one ultimately collides with the issues already mentioned in \autoref{sec:JNA_failure},
+especially since I have not yet discovered a dump command for any device group.
+
+The dump commands discussed in \autoref{dump_memory} and \autoref{sec:memsave}
+have no option to switch them to different memory regions, but only operate on main memory.
+As can be seen in \autoref{fig:mem_ARM_full} and \autoref{fig:xemu_full},
+the memory addresses overlap, meaning it is also not possible to access these regions
+by cleverly choosing addresses.
+This means one would have to individually research each kind of device to dump its data,
+while in such a process also making sure special kinds of data not directly stored in the device's memory,
+like CPU registers, are included as well.
+For these reasons, checkpointing these devices was not pursued further.
