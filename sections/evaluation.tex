@@ -12,26 +12,203 @@
 
 \chapter{Evaluation}
 \label{chap:Evaluation}
+Evaluating the work of this thesis was no trivial task.
+The most important part of an evaluation is obviously the correctness of the gathered results,
+if the results of any program are not correct, there is no point in analyzing its performance or flexibility.
 
-%% -------------------
-%% | Example content |
-%% -------------------
-\dots
+A very interesting approach here would of course have been to use the tool developd by \citeauthor{kitcheckpoints}
+and to compare the results of each solution.
+This especially would have offered the possibility to compare two very different approaches,
+as \citeauthor{kitcheckpoints} directly modified QEMU's code to achieve a goal siumilar to the one of this thesis,
+while this thesis aims to do so without manipulating QEMU in any way to achieve better compatibility.
+Such a comparison would not only have been interesting in regards to correctness of either solution,
+but especially in regards to performance and ressource usage,
+as one might suspect \citeauthor{kitcheckpoints} solution to be better in these regards,
+as my solution uses Java and JSON, both a lot slower tools when compared to C and SQL which were used by \citeauthor{kitcheckpoints}.
+Unfortunately, I could not find the original code \citeauthor{kitcheckpoints} wrote for his paper,
+as they did not link any kind of such a repository in his paper.
+Additionally, one may question whether it would even be possible to get his code to work 11 years after publication,
+as QEMU has of course changed massively in the meantime, which may have broken the modifications they made to QEMU.
+Because of this, it was not possible to perform such a direct comparison.
+It was also refrained from using his original numbers,
+as I do not have similar hardware available,
+making any kind of performance comparison obsolete,
+especially when considering the technological advancements of the last decade\cite{kitcheckpoints}.
 
-\section{First Section}
-\label{sec:Evaluation:FirstSection}
+Another way to verify any extracted data would have been to re-inject them into a running QEMU instance and see if the result is valid.
+However, developing such a mechanism is not the direct goal of this thesis,
+and when looking at the commands QMP and QHM offer, it is also evident such a task is not the purpose of these APIs.
+This means, such a reinjection could likely be its own paper,
+and would thereby throw this chapter completely out of proportion
+and make it a thesis inside a thesis.
+\eqnuote{Re-Injection} is therefore reserved as a topic for future work in \todonote{Link future work}
+and will not be discussed further for the purposes of evaluating this thesis.
 
-\dots
+On the point of specifications, the system used for any kind of testing consists of the following parts:
+\begin{itemize}
+    \item CPU: AMD Ryzen 9 7900X with overclocked all-core boost of 5.5GHz
+    \item RAM: 48GB DDR5-7000 CL36
+    \item GPU\footnote{None of the tests actually require a GPU, only included for completeness}: Nvidia Geforce RTX 3090 overclocked to 2.1GHz
+    \item Hard Drives:
+    \begin{itemize}
+        \item Samsung SSD 990 Pro 1TB
+        \item Samsung SSD 970 Evo Plus 1TB
+        \item 2* Western Digital Blue 1TB in Raid 0 cached by the 990Pro
+    \end{itemize}
+    \item Operating System: Windows 11 Pro
+\end{itemize}
+This is not a clean Windows install, but instead many tools a developer may use,
+like IntelliJ, VS Code, Mircosoft Office and so on are running on this machine.
 
-\section{Second Section}
-\label{sec:Evaluation:SecondSection}
+\section{Correctness \& Completeness}
+As such, the first thing to discuss is whether the results prorduced actually hold up.
+To achieve this, the results are discussed individually for each region in \autoref{chap:implementation}.
+The main issue of this section is the lack of any alternative software to gather the same data for comparison.
+While there are tools like QEMU's internal checkpointing mechanism,
+to compare the data gathered one would first need to parse QEMU's results and the results of this paper,
+which brings multiple possibilities for errors not directly related to this thesis itself,
+especially as QEMU's checkpoints are stored in a serialized format,
+while this thesis aims to use a general purpose format, namely JSON.
+To work around this, for each kind of data point,
+solutions were found and any compromises made are mentioned and justified.
 
-\dots
+\subsection{CPU}\label{sec:eval_cpu}
+When developing the extraction for the CPU,
+the main problem was to work around all the oddities described in \autoref{sec:info_registers}.
+The data itself was however externally accessible in a human-readable form,
+which means, under the assumption QEMU provides correct data through this API,
+the correctness of the data only depends on whether the parser is implemented correctly.
+To verify the extracted data, one must now somehow compare the output of the \emph{info registers} command
+with the data present in the internal model of the developed solution.
 
-\section{Third Section}
-\label{sec:Evaluation:ThirdSection}
+To automate such a process, one would have to implement another parser which parses \emph{info registers}
+and then compare the output of both parsers and check whether they are correct.
+This approach is rather ridiculous, as it assumes when writing the same program 2 times,
+one of them must be correct.
 
-\dots
-%% ---------------------
-%% | / Example content |
-%% ---------------------
+Therefore, to not write the same code with the same errors twice,
+this was done manually for ARM, x86 and x64 during development,
+and for these architectures the parsing now works correctly.
+There are of course different architectures which contain different data
+and may format the data differently, however the basic structure is always similar,
+meaning the developed solution always extracts its data correctly.
+
+Still, when operating on other architectures, for example RISC-V or Power-PC,
+at the beginning special care should be attributed to verifying
+the results produced by this thesis' developments
+correctly handle such architectures.
+
+\subsubsection*{Completeness}
+While the data extracted is correct, the bigger question here is whether all data is extracted.
+On ARM for example, there may exist the line \enquote{FPU disabled}.
+Such plaintext is not parsed at all,
+as there is no easy resource containing all such special data points one may encounter,
+and therefore they are not implemented.
+Additionally, the tool only parses a single flag array reported by \emph{info registers} per CPU,
+meaning any flags not contained in the first registers reported get included in a checkpoint.
+On x86, this means the registers associated with the pointer registers,
+containing information about the access restrictions of the referenced memory region,
+are currently not included at all in a checkpoint.
+
+If one intends to use the checkpoints produced by this thesis for his own purposes,
+it is therefore imperative they check whether the data included in a checkpoint is sufficient for their work.
+Especially analyzing the flags of any CPU requires special care
+and perhaps additional modifications of the code produced by this thesis.
+
+\subsection{System memory}
+The biggest part in the implementation phase of this thesis
+was the extraction of data from the guest's memory.
+This also warrants special attention in the evaluation of this data,
+as all of the approaches attempted faced some issues during implementation.
+
+In addition, this the only one of the three cases
+in which the data provided by QEMU cannot be used as-is.
+Instead, a third-party format is used in between QEMU and the extraction,
+which is implemented using another library
+which is not maintained by a big organisation
+and does not seem to be used in a widespread manner.
+
+At the same time, the amount of data to check for consistency is rather large,
+multiple gigabytes in most cases.
+Like in \autoref{sec:eval_cpu}, this makes the easiest way of verifying the correctness of the data
+to directly compare it with the output of QEMU.
+For this, the QHM commands discussed in \autoref{sec:memsave} seem like good candidates.
+Since the tool developed in this thesis produces multiple dump files
+in relation to the memory regions included in the original ELF file,
+those commands can be used to extract the exact same regions
+and then compare the contents of these files.
+The code of this test is shown in \autoref{fig:test_memory}
+
+\begin{figure}[h]
+    \begin{ffcode}
+        QMPInterface inter = new QMPInterface("localhost", 4444);
+        inter.executeCommand(Stop.INSTANCE);
+        ELFDump elf = new ELFDump(inter);
+        inter.executeCommand(elf);
+        elf.awaitCompletion();
+        for (MemorySegment segment : elf.getSegments()) {
+            long startAddress = segment.getStartPhysicalAddress();
+            long size = segment.getSize();
+            Path target = Paths.get("D:\\Lars\\out\\" + startAddress + ".dmp");
+            PMemsave save = new PMemsave(startAddress, size, target);
+            inter.executeCommand(save);
+            InputStream elfInput = segment.getInputStream();
+            try (InputStream dumpInput = Files.newInputStream(target)) {
+                int elfRead;
+                do {
+                    elfRead = elfInput.read();
+                    int dumpRead = dumpInput.read();
+                    if (elfRead != dumpRead) System.out.print("Found mismatch");
+                } while (elfRead != -1);
+            }
+        inter.executeCommand(Continue.INSTANCE);
+  \end{ffcode}
+  \caption{The code used to check for correct extraction of memory contents.}
+  \label{fig:test_memory}
+\end{figure}
+
+As can be seen, this code writes \enquote{Found mismatch} to the standard output
+if any discrepancies between the two files were found.
+This test did in fact unearth some issues with the code,
+mainly related to the implementation of an Input Stream to read from a 2D-array
+as discussed in \autoref{sec:Java_2GB},
+but in the end all of the data was consistent.
+
+\subsubsection*{Inconsistency during the development cycle}
+At one point during early testing,
+it was observed most of the memory dumps started with the same group of bytes.
+At that time however, no bigger focus was placed on this curiosity,
+as there were still other issues waiting to be solved.
+Later on, this behavior could not be replicated anymore,
+even though no explicit effort was taking before to address it.
+It is possible this \enquote{bug} was solved by accident
+or while fixing another part of the software,
+however such oddities should be mentioned here to make others aware of them and look out for them.
+
+\subsubsection*{Deduplication}
+The tool offers the ability to deduplicate checkpoint data,
+however it is nowhere near as sophisticated as the solution offered by \citeauthor{kitcheckpoints}.
+This can be observed by the amount of memory files created
+when creating follow up checkpoints.
+The more time has passed between 2 checkpoints,
+the more memory dump files get stored in the checkpoint directory.
+In addition, when the emulator is paused and does not run between 2 checkpoints, no new memory files get created.
+
+\subsection{Blockdevices}
+As the implementation of block devices was again rather trivial,
+there is no explicit task to test here.
+The tool simply copies the files from the original location provided by QEMU
+to the destination desired by the user.
+And, if we assmue the copy process provided by Java works,
+it can be assumed this step is fully functional.
+There may be errors in regards to permissions of the file to copy,
+however that is not something this thesis has to look at.
+
+\subsubsection*{Deduplication}
+The approach used for deduplicating blockdevices is essentially the same as the one for memory dumps.
+The code is nearly identical, as the comparison of hashes for both types is the same.
+This also allows for the assumption, if the deduplication works for memory regions,
+it also works for blockdevices.
+The main difference is the rate of follow up checkpoints is much lower,
+as blockdevices generally experience less changes than memory regions.
+Depending on the use case, this can however differ as blockdevices are copied as a whole and not in parts like main memory.
