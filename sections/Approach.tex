@@ -450,7 +450,7 @@ For each blockdevice, the following fields get stored in JSON:
 \section{External devices}
 There currently is no generic method to interact with devices attached to a QEMU instance
 which do not fall in one of the three aforementioned categories.
-There are dedicated commands for trusted platform modules, input devices, character devices\footnote{In QEMU, keyboards are sometimes character devices and other times input devices, making treating them in a unified way rather difficult.},
+There are dedicated commands for trusted platform modules, input devices, character devices\footnote{In QEMU, keyboards are sometimes character devices and other times input devices, making treating them in a unified way especially difficult.},
 audio and video cards, generic PCI cards and many more\cite{qmp-commands}.
 Implementing these commands could likely be done to allow for some kind of checkpointing,
 and many do provide some way of gathering memory information,
