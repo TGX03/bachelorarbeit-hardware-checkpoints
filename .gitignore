@@ -15,3 +15,5 @@ sections/*.pdf
 *.run.xml
 *.synctex.gz
 *.toc
+*.class
+.idea
