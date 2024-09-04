@@ -25,7 +25,7 @@ public class Blockdevice implements Serializable, JSONable {
 	 * The digest to use when computing the hash of the backing file.
 	 * SHA256 by default, can be changed using static method.
 	 */
-	private static MessageDigest DIGEST = DigestUtils.getSha256Digest();
+	private static String DIGEST = "SHA256";
 
 	/**
 	 * The name of this device in QEMU.
@@ -70,7 +70,8 @@ public class Blockdevice implements Serializable, JSONable {
 		this.hasMedia = path != null && Files.exists(path);
 		if (this.hasMedia) {
 			try {
-				this.hash = DigestUtils.digest(DIGEST, Files.newInputStream(path));
+				MessageDigest digest = DigestUtils.getDigest(DIGEST);
+				this.hash = DigestUtils.digest(digest, Files.newInputStream(path));
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 
@@ -89,7 +90,7 @@ public class Blockdevice implements Serializable, JSONable {
 	 *
 	 * @param digest The digest to use.
 	 */
-	public static void setHashAlgorithm(@NotNull MessageDigest digest) {
+	public static void setHashAlgorithm(@NotNull String digest) {
 		DIGEST = digest;
 	}
 

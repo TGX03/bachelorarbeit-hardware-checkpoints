@@ -25,7 +25,7 @@ public class MemorySegment implements Serializable, JSONable {
 	 * The digest to use when computing the hash of a memory segment.
 	 * SHA256 by default, can be changed using static method.
 	 */
-	private static MessageDigest DIGEST = DigestUtils.getSha256Digest();
+	private static String DIGEST = "SHA256";
 
 	/**
 	 * The start address of the contents in this segment in physical  memory.
@@ -63,7 +63,8 @@ public class MemorySegment implements Serializable, JSONable {
 		this.size = size;
 		this.content = BigArrays.copy(content, 0, size);
 		try {
-			this.hash = DigestUtils.digest(DIGEST, this.getInputStream());
+			MessageDigest digest = DigestUtils.getDigest(DIGEST);
+			this.hash = DigestUtils.digest(digest, this.getInputStream());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -94,6 +95,7 @@ public class MemorySegment implements Serializable, JSONable {
 			position = position + read;
 		} while (read != -1 && position < size);
 		try {
+			MessageDigest DIGEST = DigestUtils.getSha256Digest();
 			this.hash = DigestUtils.digest(DIGEST, this.getInputStream());
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
@@ -105,7 +107,7 @@ public class MemorySegment implements Serializable, JSONable {
 	 *
 	 * @param digest The digest to use.
 	 */
-	public static void setHashAlgorithm(@NotNull MessageDigest digest) {
+	public static void setHashAlgorithm(@NotNull String digest) {
 		DIGEST = digest;
 	}
 
