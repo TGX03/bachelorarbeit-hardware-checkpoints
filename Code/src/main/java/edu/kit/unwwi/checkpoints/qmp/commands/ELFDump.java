@@ -166,6 +166,11 @@ public class ELFDump implements EventHandler, Command {
 				this.done = true;
 				awaitCompletion.signalAll();
 				completionLock.unlock();
+				try {
+					Files.delete(target);
+				} catch (IOException _) {
+					// ignored
+				}
 			}
 		}
 	}
