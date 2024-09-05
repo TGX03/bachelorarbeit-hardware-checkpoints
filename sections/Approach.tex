@@ -387,8 +387,10 @@ and they supply an undefined amount of bytes to any given consumer.
 The \enquote{undefined} here explicitly allows for an amount of bytes higher than the usual $2^{31}$ byte limit.
 Since Java 9, this interface was explicitly expanded with the goal to at least somewhat allow 64-bit longs\footnote{See https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/InputStream.html#transferTo(java.io.OutputStream)}.
 This is a decent substitute for transferring bytes using an array,
-and while not every piece of code expects it and produces undefined behavior
-once over $2^{31}$ bytes were received, at least for the libraries in this thesis that was not an issue.
+the big question now is whether all participating libraries support such large input streams.
+For small emulation instances this worked during development,
+however later during evaluation, it turned out this was not the case as hoped.
+The details on this are in \autoref{sec:eval_performance}.
 
 \paragraph{BigArrays}
 The Java library \emph{fastutil}\footnote{See https://fastutil.di.unimi.it/} offers so-called \enquote{Big Arrays},
@@ -447,7 +449,7 @@ For each blockdevice, the following fields get stored in JSON:
     \end{itemize}
 \end{itemize}
 
-\section{External devices}
+\section{External devices}\label{sec:external_approach}
 There currently is no generic method to interact with devices attached to a QEMU instance
 which do not fall under one of the three aforementioned categories.
 There are dedicated commands for trusted platform modules, input devices, character devices\footnote{In QEMU, keyboards are sometimes character devices and other times input devices, making treating them in a unified way especially difficult.},

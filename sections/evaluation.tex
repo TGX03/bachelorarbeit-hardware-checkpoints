@@ -10,8 +10,7 @@
 %%
 %% Version 1.5, 2024-02-12
 
-\chapter{Evaluation}
-\label{chap:Evaluation}
+\chapter{Evaluation}\label{chap:Evaluation}
 Evaluating the work of this thesis was no trivial task.
 The most important part of an evaluation is obviously the correctness of the gathered results,
 if the results of any program are not correct, there is no point in analyzing its performance or flexibility.
@@ -213,7 +212,136 @@ however that is not something this thesis has to look at.
 The approach used for deduplicating block devices is essentially the same as the one for memory dumps.
 The code is nearly identical, as the comparison of hashes for both types is the same.
 This also allows for the assumption, if the deduplication works for memory regions,
-it also works foblock devices.
+it also works for block devices.
 The main difference is the rate of follow-up checkpoints is much lower,
 block devices generally experience fewer changes than memory regions.
-Depending on the use case, this can however differ as block devices are copied as a whole and not in parts like main memory.
+Depending on the use case, this may differ however as block devices are copied as a whole and not in parts like main memory.
+
+\section{Performance}\label{sec:eval_performance}
+Given one of the goals of this thesis is to allow for performance improvements,
+such performance should be tested.
+As discussed in the beginning of \autoref{chap:Evaluation},
+the approach used by this thesis is not the most performance-oriented,
+but instead the main goal is to allow for flexibility.
+This will likely mean a performance disadvantage when compared to the solution offered by \citeauthor{kitcheckpoints},
+but such a comparison is, as mentioned, not possible anyway.
+
+An additional issue here are the problems \citeauthor{Java_Benchmarking} discussed in \citetitle{Java_Benchmarking}\cite{Java_Benchmarking}.
+Any short testing of the performance of a Java program, such as the one developed by this thesis,
+will likely produce results that are hard to validate on other machines,
+as the behavior of the just-in-time compiler makes this somewhat unpredictable.
+The general assumption is Java programs generally reach a \enquote{steady state} after a certain \enquote{warm-up phase}.
+However, as \citeauthor{Java_Benchmarking} described, the duration of this \enquote{warm-up phase}
+is usually just rough guesswork by developers,
+and whether any such guess made is educated is often unpredictable\cite{Java_Benchmarking}.
+
+To evaluate the performance of the program,
+only the performance for creating two checkpoints,
+an initial one and the first follow-up,
+is measured, and it is then assumed the performance of the program will increase as Java's optimizations kick in.
+This effectively makes the results gathered in this thesis a \enquote{Worst-case}.
+To do this, the time taken to create a checkpoint will be measured by Java itself
+by using the \emph{System.currentTimeMillis()} method\footnote{See https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/System.html#currentTimeMillis()}
+and calculating the difference between before and after the creation of a checkpoint.
+The experiment uses a QEMU instance displaying the \enquote{Select Language} screen of the Windows 11 Setup,
+running with 4 CPU cores and 2GiB of RAM.
+The QEMU command to setup this device is shown in \autoref{fig:QEMU_Windows_Test}.
+
+\begin{figure}[h]
+    \begin{ffcode}
+        qemu-system-x86_64 -m 1800 -boot d -cdrom "G:\Win11_23H2_German_x64v2.iso" -smp 4 -qmp tcp:localhost:4444,server,wait=off
+    \end{ffcode}
+    \label{fig:QEMU_Windows_Test}
+    \caption{The command used for the creation of the QEMU test instance}
+\end{figure}
+
+In this command, the first issue can already be seen.
+A normal Windows 11 install requires at least 4GiB of system memory.
+However, when trying to checkpoint such an instance, the process crashed with an \emph{OutOfMemory}-Exception,
+because the jelf library\cite{jelf} attempted to create a byte buffer with more than 2GiB of space.
+This means jelf is not able to handle such large files because of the limitations discussed in \autoref{sec:Java_2GB}.
+
+The exact results for this benchmark are presented in \autoref{tab:benchmark}.
+From those, an average duration of $15.489$ respective $13.420s$ for the creation of an initial and a follow-up checkpoint can be calculated.
+The median is $15.094s$ respective $13.577s$.
+During testing, it was discovered the main slowdown is the copying of the 6.6GiB ISO file containing the Windows Installer,
+when having it stored on an external USB drive, the time for the initial checkpoint tripled.
+This lends credibility to the assumption that the main performance bottleneck is the hard drive speed,
+which makes sense regards to thecompromises from \autoref{sec:memory_extraction}.
+Since memory dumps require disk access because of QEMU's limitations,
+even on NVMe drives like in this benchmark, the drive accesses are the main bottleneck during an extraction process.
+
+To further illustrate this, the total data to process is around 8.4GiB. 6.6GiB for the Windows ISO and 1.8GiB of memory.
+When calculating this for the initial creation, this gives a \eqnuote{speed} of $\frac{6.6GiB + 1.8 GiB}{15s}=0.56\frac{GiB}{second}$,
+which is a third of what the NVMe drives installed in my system achieve during everyday operations.
+And since 3 acceses\footnote{QEMU dump to disk, JELF read from disk, Java write to disk} are required during operation,
+this number seems to be reasonable.
+This is also in line with the slight speed-up for secondary checkpoints, as the third instance of writing usually gets smaller.
+
+A computing speed of around $560\frac{MiB}{second}$ is a very good result,
+and for larger files this speed will likely go up.
+As with standard hard drives, higher speeds are very hard to achieve,
+especially when using parallel accesses like this tool does.
+For this reason, it can be concluded the performance of this tool is reasonable.
+
+\section{Flexibility}\label{sec:eval_flexibility}
+The main goal of this thesis and also its main differentiation from \citeauthor{kitcheckpoints}
+was to make this solution as flexible as possible.
+The main goal was to only use APIs QEMU provides
+and to not modify the code of QEMU in any way.
+
+To achieve this goal, compromises needed to be made.
+As mentioned in \autoref{sec:external_approach}, external devices are in no way supported because the support QEMU offers for this is too restrictive.
+Similarly, the restrictions in place for extracting CPU data mentioned in \autoref{sec:info_registers} mean for any CPU architecture there may be data this tool does not expect.
+Both these obstacles mean the result of this thesis needs to be used with care
+and while it may be useful in some cases, in other cases manual intervention and additional code is required to make it work.
+This is a clear case of future work, to further integrate target-dependent specialties.
+
+One massive problem is however the 2GiB limit imposed by Java discussed in \autoref{sec:Java_2GB}.
+Because of this, currently this tool cannot be used on any emulation instance using more than 2GiB of main memory.
+In the world of IoT devices, this may not be a dealbreaker, but since even handheld devices offer multiple Gigabytes of RAM,
+this thesis cannot be applied to many everyday devices.
+The way to solve this problem would be to create a library similar to jelf\cite{jelf},
+however with the capability of processing files larger than 2GiB.
+The development of such a library could potentially be worth its own paper,
+and is therefore a case for future work as well,
+even though it can be classified as a \emph{neccesity} for the usage of this thesis.
+
+Another solution for this problem would be to use another programming language or environment to implement the tool.
+Java was explicitly chosen since a Java program can basically run anywhere QEMU runs as well,
+therefore supposedly offering a great range of flexibility.
+Java's main competitor, C#, suffers from the same problem however.
+While it does allow for the usage of unsigned integers,
+this still only allows for a maximum array size of 4GiB.
+Considering the minimum requirement for Windows 11 is 4GiB,
+which is not a pleasant experience,
+even such a limit would likely run into the same issues as the ones in this thesis.
+Generally, such large objects in memory are often reserved for low-level languages like C or C++.
+These languages may therefore be a viable candidate for solving this problem,
+however they make the program less flexible in other ways,
+especially when the program should be used on different host operating systems.
+
+The tool is however very flexible in deciding which parts of the accessible data are to be gathered.
+While the basic CLI only creates checkpoints and the rules for such creation are rather limited,
+the toll can also be used as a library, using which the user can individually select which data points they need
+and could theoretically even collect different data points at different intervals.
+With the existence of the interfaces \emph{Command} and \emph{QHMCommand},
+it is also very easy to create new commands which gather data points this thesis does not cover.
+
+\section{Usability}
+As this tool is intended for other developers,
+there were no special requirements for its usability or ease of use.
+The tool basically resembles a library for creating existence,
+with a basic CLI option allowing for the creation of full checkpoints.
+The CLI does document itself using the \ff{-h} flag,
+however there is no GUI which would make the experience easier for inexperienced users.
+However such inexperienced users likely also have no use for the data produced by this thesis.
+
+\section{Conclusion}
+While this thesis does provide useful results,
+it is clear more research is needed if the approach offered by this thesis is to be pursued further.
+Especially the restrictions outlined in \autoref{sec:eval_flexibility}
+mean any time the tool developed by this thesis is to be applied,
+it must first be thoroughly checked whether the tool can correctly handle all the data required.
+This makes this thesis a good basis for further research into the topic of extracting data from an emulation,
+but the results are not yet complete.
