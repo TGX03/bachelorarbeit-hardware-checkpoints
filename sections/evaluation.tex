@@ -208,7 +208,7 @@ however that is not something this thesis has to look at.
 The approach used for deduplicatingblock devices is essentially the same as the one for memory dumps.
 The code is nearly identical, as the comparison of hashes for both types is the same.
 This also allows for the assumption, if the deduplication works for memory regions,
-it also works foblock deviceses.
+it also works foblock devices.
 The main difference is the rate of follow-up checkpoints is much lower,
-block devicesces generally experience fewer changes than memory regions.
-Depending on the use case, this can however differblock devicesices are copied as a whole and not in parts like main memory.
+block devices generally experience fewer changes than memory regions.
+Depending on the use case, this can however differ as block devices are copied as a whole and not in parts like main memory.
