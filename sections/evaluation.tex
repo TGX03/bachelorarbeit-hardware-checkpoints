@@ -188,6 +188,11 @@ however such oddities should be mentioned here to make others aware of them and 
 \subsubsection*{Deduplication}
 The tool offers the ability to deduplicate checkpoint data,
 however it is nowhere near as sophisticated as the solution offered by \citeauthor{kitcheckpoints}.
+Currently the tool has no ability to load comparison data from disk,
+thoug such a process would be trivial to implement,
+as only the created JSON needs to be parsed.
+Still, this results in the tool only deduplicating checkpoint data
+against checkpoints created previously by the same process.
 This can be observed by the amount of memory files created
 when creating follow-up checkpoints.
 The more time has passed between 2 checkpoints,
