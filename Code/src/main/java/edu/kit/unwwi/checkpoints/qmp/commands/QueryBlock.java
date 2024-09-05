@@ -43,7 +43,7 @@ public class QueryBlock extends StatefulCommand {
 		IntStream.range(0, array.length()).parallel().forEach(i -> {
 			JSONObject current = array.getJSONObject(i);
 			String name = current.getString("device");
-			String qdev = current.getString("qdev");
+			String qdev = current.has("qdev") ? current.getString("qdev") : "";
 			if (current.has("inserted") && current.getJSONObject("inserted").has("image")) {
 				JSONObject insert = current.getJSONObject("inserted").getJSONObject("image");
 				long virtualSize = insert.getLong("virtual-size");
