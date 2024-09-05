@@ -43,6 +43,6 @@ public class PMemsave extends QHMCommand {
 
 	@Override
 	protected void receiveResult(@NotNull String result) {
-		// ignored in hope the dump just works
+		assert result.isEmpty();
 	}
 }
