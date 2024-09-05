@@ -25,8 +25,8 @@ public abstract class QHMCommand extends StatefulCommand {
 		command.append(StringEscapeUtils.escapeJson(commandName())).append('"');
 		for (Map.Entry<String, Object> set : additionalArguments().entrySet()) {
 			if (set.getValue() instanceof Number)
-				command.append(StringEscapeUtils.escapeJson(String.format(", \"%s\": %s", set.getKey(), set.getValue())));
-			else command.append(StringEscapeUtils.escapeJson(String.format(", \"%s\": \"%s\"", set.getKey(), set.getValue())));
+				command.append(String.format(", \"%s\": %s", StringEscapeUtils.escapeJson(set.getKey()), set.getValue()));
+			else command.append(StringEscapeUtils.escapeJson(String.format(", \"%s\": \"%s\"", StringEscapeUtils.escapeJson(set.getKey()), StringEscapeUtils.escapeJson(set.getValue().toString()))));
 		}
 		command.append(" }}");
 		return command.toString();
