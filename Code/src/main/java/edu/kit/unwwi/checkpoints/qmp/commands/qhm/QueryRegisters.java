@@ -94,7 +94,8 @@ public class QueryRegisters extends QHMCommand {
 			default -> {
 				BigInteger number = new BigInteger(value, 16);
 				byte[] bytes = number.toByteArray();
-				if (number.bitLength() % 8 == 1) bytes = Arrays.copyOfRange(bytes, 1, bytes.length - 1);
+				int bitLength = number.bitLength();
+				if ((bitLength % 8 == 1) || bitLength / 8 != bytes.length) bytes = Arrays.copyOfRange(bytes, 1, bytes.length);
 				return new RegisterFlexible(name, length, bytes);
 			}
 		}
