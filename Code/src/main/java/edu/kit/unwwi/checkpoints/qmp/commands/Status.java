@@ -75,7 +75,8 @@ public class Status extends StatefulCommand {
 		assert result instanceof JSONObject;
 		JSONObject json = (JSONObject) result;
 		state = State.fromString(json.getString("status"));
-		singlestep = json.getBoolean("singlestep");
+		if (json.has("singlestep")) singlestep = json.getBoolean("singlestep");
+		else singlestep = false;
 		running = json.getBoolean("running");   //TODO: Apparently not always
 	}
 
