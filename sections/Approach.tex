@@ -188,7 +188,7 @@ as all accesses before were made to memory regions
 not existing in the virtual memory space of the process.
 
 After having gained the ability to actually read QEMU's memory from another process,
-the physical addresses provided by \eqnuote{info tlb} were tested,
+the physical addresses provided by \emph{info tlb} were tested,
 but it was quickly determined these were not the actual addresses in QEMU's memory.
 This could be determined because QEMU already offers ways of dumping memory itself.
 One of these is the QMP command \emph{dump-guest-memory},
