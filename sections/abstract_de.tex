@@ -11,12 +11,12 @@
 %% Version 1.5, 2024-02-12
 
 \Abstract
-Die Emulation von Hardware, die nicht von nativer Emulation wie VT-x oder AMD-v profitiert, führt zu enormen Leistungseinbußen.
-Um dieser Verlangsamung entgegenzuwirken, werden Prüfpunkte aus bereits laufenden Emulationen erzeugt,
-die in einem verallgemeinerten Format gespeichert werden um eine weitere Verarbeitung zu ermöglichen.
-Um dies zu erreichen, werden das QEMU Machine Protocol und der QEMU Human Monitor verwendet, um Daten aus einer laufenden QEMU-Instanz zu extrahieren,
-wobei versucht wird, Änderungen am QEMU-Code zu vermeiden, um die Funktionalität über mehrere QEMU-Versionen hinweg beizubehalten.
+Während der Emulation eines Computers oder vergleichbarer Geräte, wie Smartphones oder Videospielkonsolen,
+liegen viele Daten innerhalb der Emulationsinstanz vor, die extern für weitere Forschungen verwendet werden können.
+Diese Arbeit versucht daher, die Daten einer solchen Emulation zu extrahieren und für die weitere Verwendung zugänglich zu machen.
+Um dies zu erreichen, werden das QEMU Machine Protocol (QMP) und der QEMU-Monitor (QHM) verwendet, um diese Daten aus einer laufenden QEMU-Instanz zu extrahieren,
+ohne den QEMU-Code zu modifizieren, um so die Funktionalität über mehrere QEMU-Versionen hinweg zu erhalten.
 Darüber hinaus gibt dieses Dokument Einblicke in die internen Vorgänge der Emulation und diskutiert damit verbundene Probleme.
-Ursprünglich war auch geplant, dass in dieser Arbeit eine Re-Injezierung dieser Daten in eine laufende QEMU-Instanz entwickelt wird,
-jedoch stellte sich diese Aufgabe als zu groß für ein Projekt diesen Rahmens heraus.
-Stattdessen werden deswegen nur grundlegende Ansätze für einen solchen Vorgang erläutert.
+In der Entwicklung sind nämlich diverse solcher Probleme aufgetreten,
+aufgrund welcher diese Arbeit derzeit nur die Möglichkeit, Daten über CPUs, RAM und angeschlossene Speichergeräte aus einer QEMU-Instanz zu extrahieren, bietet.
+Sie ist derzeit außerdem auf maximal 2 GiB Gastspeicher beschränkt und hat einen erheblichen Ressourcenverbrauch.

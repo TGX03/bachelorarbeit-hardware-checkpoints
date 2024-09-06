@@ -11,12 +11,12 @@
 %% Version 1.5, 2024-02-12
 
 \Abstract
-Emulation of hardware that does not profit from native emulation like VT-x or AMD-v carries an enormous performance penalty.
-To combat this slowdown, checkpoints get created from already existing emulations,
-which get stored in a generalised format to allow for further processing.
-To achieve this, the QEMU  machine protocol and the QEMU monitor get used to extract data from a running QEMU instance,
-while trying to avoid modifying QEMU-code to keep functionality across multiple QEMU versions.
+During emulation of a computing device,
+a lot of data exists inside the emulation instance which may be used externally to perform further research.
+This thesis therefore tries to extract the data of such an emulation and make it accessible for further use.
+To achieve this, the QEMU machine protocol and the QEMU monitor get used to extract this data from a running QEMU instance,
+whithout modifying QEMU-code to keep functionality across multiple QEMU versions.
 In addition, this paper gives insights into the internals of emulation and discusses issues with them.
-Initially, this paper also aimed to include a way of reinjecting such gathered checkpoints into a running instance of QEMU,
-however this turned out to be too difficult for a project of this size,
-and instead only the basic outlines of such a process are discussed.
+There were many issues encountered a long the way,
+so currently this thesis only offers to extract data about CPUs, RAM and attached storage devices from a QEMU instance.
+It is also currently limited to a maximum of 2GiB of guest memory and has a considerable resource usage.
