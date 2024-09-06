@@ -11,6 +11,76 @@
 %% Version 1.5, 2024-02-12
 
 \chapter{Conclusion}
-\label{ch:Conclusion}
+The goal of this thesis was to extract data from a running emulation
+with as much flexibility as possible.
+As currently the only general-purpose emulator available is QEMU,
+it was chosen for this thesis as the software to research against.
+To achieve this flexibility, no changes were made to QEMU's code,
+but instead only externally exposed APIs offered by QEMU were used to extract data.
+Both the interfaces QMP and QHM, although wrapped in QMP,
+were used in the attempt to achieve this goal.
 
-\dots
+When implementing the process of such extraction,
+it however quickly became apparent this thesis could only be the first basic attempt at doing this,
+but a lot of further research into the specialties of QEMU is required.
+The 3 main reasons for difficulties directly related to QEMU in this thesis were:
+\begin{itemize}
+    \item Both QHM and QMP not being intended to access internal data.
+    \item QHM offering no documentation or standard for the data it returns,
+    nor any guarantee the format of data will stay consistent across architectures or time.
+    \item The development of QMP being a very low priority.
+\end{itemize}
+Additionally, the approach of this thesis to use Java as the main programming language in this thesis created additional obstacles
+through its limit of $2^{31}$ elements in any given array,
+making the usage of the results of this thesis on any emulation instance with more than 2GiB of system memory impossible.
+
+The core feasibility of such an endeavor was proven however,
+meaning it is possible to create checkpoints from any running QEMU instance in a generalized way,
+however it is no trivial task and requires a lot of research.
+It is also a costly process because a lot of host RAM is required during the extraction process.
+This could be removed by not performing deduplication checks
+or by performing these checks without loading everything into memory,
+but such changes are currently reserved for future work.
+
+\section{Future work}
+As already discussed, there are regions in this thesis requiring additional attention and research in the future to correctly extract certain data from QEMU.
+In addition, there is one very big issue which needs to be solved at the moment:
+
+\subsection{Java and hosts with over 2GiB of memory}
+As discussed in \autoref{sec:Java_2GB} and \autoref{sec:eval_performance},
+the inability of Java to natively work with arrays containing more than $2^{31}$ elements
+is currently the biggest limitation in this thesis,
+which also makes it hard to use when emulating more modern or powerful systems.
+The tool itself is already capable of handling such large amounts of data, as also described in \autoref{sec:Java_2GB}.
+When processing block devices, for which hashes must be computed during deduplication,
+the tool has already demonstrated the implementation of addressing this problem is working.
+The problem however is the jelf library, which is currently needed to parse the result of a QEMU dump,
+which currently does not support working on files larger than 2GiB.
+
+To resolve this issue, the capability of handling such large files must either be added to jelf,
+which seems to be a rather complicated operation,
+as basic Java interfaces like ByteBuffer would have to be substituted with 64bit capable alternatives,
+or an alternative with support for ELF files larger than 2 GiB must be newly developed.
+
+\subsection{External devices}
+Currently, this thesis has only covered the extraction of CPU, RAM and drive data.
+Many additional devices used by a computer are currently not included in a checkpoint created by this thesis.
+Especially graphics cards, which in the days of AI effectively perform much more computations than the CPU,
+are currently not a part of this thesis.
+TPM data, which Windows 11 requires to function, is also not included,
+which may result in a guest instance being unable to boot or at least display security warnings.
+
+For TPMs QMP directly offers commands, graphics cards however must be treated differently, namely as generic PCI devices.
+How to access memory regions containing the data of these devices is also something not researched in this thesis,
+and likely requires a lot of additional effort and research.
+
+\subsection{Re-Injection}
+As shortly mentioned in \autoref{chap:Evaluation},
+the ability to inject previously generated checkpoints into a running QEMU instance is a very interesting use case for this thesis.
+However, the QEMU APIs used in this thesis do not offer any functions to make such modifications.
+Any such process will therefore likely require a lot more research and is potentially impossible to create in a generic way.
+However, if the ability of this was implemented,
+it would create a lot more possible use cases for the results of this thesis,
+as it would allow for both external manipulation of emulation data to test its effects
+as well as to perform emulations centralized on a more powerful machine,
+and then redistribute those created checkpoints to speed up the work of developers.
