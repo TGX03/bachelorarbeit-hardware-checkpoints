@@ -51,12 +51,8 @@ and store it in a generalized way which allows for reusal of the saved state of 
 The goal here is to provide a solution with as much flexibility as possible,
 meaning a tool which does not require manual tweaking depending on the targeted system.
 This especially involves a version-independence in regards to the emulator used.
-In contrast, \Citeauthor{kitcheckpoints} used specific changes in the internal code of QEMU
-to access the data he wanted to extract.
-While that is the much more powerful option, it will likely not work on modern instances of QEMU,
-as their paper is from \citeyear{kitcheckpoints}, and such deep changes in codebases often don't hold up well.
-In addition, he uses the QEMU Human Monitor Protocol (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however both terms refer to the same protocol and both are in use.}) to communicate with QEMU.
-QHM is however somewhat outdated, and especially not meant for processing by other software.
+QEMU has featured the QEMU Human Monitor (QHM) for a long time,
+it is however somewhat outdated, and especially not meant for processing by other software.
 To achieve this, the QEMU Machine Protocol (QMP) was developed, and the goal is to use this protocol instead,
 as the QEMU team tries to keep it somewhat standardized,
 while they explicitly write QHM is not stable and there is no guarantee its used formats will be kept consistent,
