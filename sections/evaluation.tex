@@ -278,11 +278,27 @@ And since 3 acceses\footnote{QEMU dump to disk, JELF read from disk, Java write 
 this number seems to be reasonable.
 This is also in line with the slight speed-up for secondary checkpoints, as the third instance of writing usually gets smaller.
 
+The other important part to consider here is the resource usage displayed by the tool.
+As demonstrated by \citetitle{Java_Performance},
+Java has a very high memory footprint\cite{Java_Performance}.
+Additionally, the QEMU documentation itself mentions the command \emph{dump-guest-memory}
+may allocate several gigabytes of RAM when paging is used,
+which this tool does if available.
+QEMU does not explicitly specify when this occurs,
+only that it \enquote{can happen for a large guest, or a malicious guest pretending to be large.}\cite{qmp-commands}.
+They do not explicitly specify what is considered a \enquote{large guest}.
+As Java however loads the whole dump produced by QEMU into memory effectively twice,
+once for Jelf to parse and afterwars to write the stripped files to disk,
+the memory footprint of this tool is rather catastrophic,
+as the memory usage of any guest is tripled at least.
+
 A computing speed of around $560\frac{MiB}{second}$ is a very good result,
 and for larger files this speed will likely go up.
 As with standard hard drives, higher speeds are very hard to achieve,
 especially when using parallel accesses like this tool does.
-For this reason, it can be concluded the performance of this tool is reasonable.
+For this reason, it can be concluded the performance itself displayed by this tool is very good,
+however the resource usage during the process needs to be reduced,
+as currently more than triple the resources are required to run the tool.
 
 \section{Flexibility}\label{sec:eval_flexibility}
 The main goal of this thesis and also its main differentiation from \citeauthor{kitcheckpoints}
