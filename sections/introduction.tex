@@ -13,8 +13,8 @@
 \chapter{Introduction}
 The planning and development of large-scale software infrastructures often encompasses software distributed over many different devices,
 which may feature vastly different environments for the code running on them.
-Especially devices "out in the field" regularly feature architectures very different to the specifications of x86 or ARM,
-which makes them very difficult to predict in system simulations or generally in early planning stages.
+Especially devices "out in the field" regularly feature architectures very different from the specifications of x86 or ARM,
+which makes them very difficult to predict in system simulations or generally in the early planning stages.
 Especially when planning real-time systems,
 it is very important to plan the communication between IoT devices and the servers running in the backend.
 In these scenarios, the backend often runs on x86, or in more recently implemented systems ARM,
@@ -26,12 +26,12 @@ many of these specialized architectures feature certain behaviors that may be un
 which must be addressed when swapping out these physical parts.
 
 In the actual development phase, this issue is already getting solved using emulation.
-In a planning phase, were parts of the software are already available,
+In a planning phase, where parts of the software are already available,
 for example when it was purchased externally or the project is a switch of architectures,
 like from x86 to ARM in the server world,
-emulation could also be used to offer for more detailed planning
+emulation could also be used to offer more detailed planning
 like for performance criteria.
-When a server in a datacenter is supposed to communicate with an external part which uses pre-developed software,
+When a server in a data center is supposed to communicate with an external part that uses pre-developed software,
 such an emulation can now be used to produce a good estimate of how performant the server needs to be and how long it should expect to wait for replies.
 However, there are issues with emulation, which hinder the use of it in these stages.
 The biggest of which is speed, as emulation may result in a slowdown of the factor 1000-10000\cite{slowdown}.
@@ -40,12 +40,12 @@ such a slowdown is unacceptable, considering the results of the simulation don't
 
 As there are many different emulation environments available,
 this thesis chose QEMU, as it is open source and has the most resources available to work with.
-The details of the process which lead to the selection of QEMU are detailed in \autoref{sec:emulators}.
+The details of the process which led to the selection of QEMU are detailed in \autoref{sec:emulators}.
 This paper tries to generalize findings that may be transferred to other environments,
 however as all of these are heavily specialized tools,
 the amount of transferrable findings is very limited.
 
-This paper now introduces the idea of checkpoints to solve this issue of speed and associated ressource costs.
+This paper now introduces the idea of checkpoints to solve this issue of speed and associated resource costs.
 The idea is to extract all relevant data from a running emulation
 and store it in a generalized way which allows for reusal of the saved state of the system in a different context.
 The goal here is to provide a solution with as much flexibility as possible,
@@ -66,7 +66,7 @@ To achieve a speedup here, the idea was to make the checkpoints reusable
 and create the ability to inject already existing checkpoints back into a running emulation.
 This would have even given the option to calculate checkpoints centrally and distribute them,
 to save on time and especially resources.
-This behavior could not be implemented because of the time restraint as well as limitations of QEMU,
-more details on this will be discussed in \todonote{Link insertion once it exists.}.
+This behavior could not be implemented because of the  limitations of QEMU,
+more details on this can be read in \autoref{sec:injection}.
 In case someone intends to build up on this and implement the re-injection,
 they will find all information regarding such functionality found during this research there.

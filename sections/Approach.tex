@@ -187,7 +187,7 @@ Only now is any access to the memory of the process even possible,
 as all accesses before were made to memory regions
 not existing in the virtual memory space of the process.
 
-After having gained the ability to actually read QEMU's memory from another process,
+After having gained the ability to read QEMU's memory from another process,
 the physical addresses provided by \emph{info tlb} were tested,
 but it was quickly determined these were not the actual addresses in QEMU's memory.
 This could be determined because QEMU already offers ways of dumping memory itself.
@@ -239,9 +239,9 @@ makes this basically impossible,
 as an uninitialized memory region already mapped to the guest would be impossible to correctly categorize.
 
 \paragraph{Amount of memory objects}
-A xemu\cite{xemu} instance, which has 2GB of RAM allocated, uses, depending on circumstances,
+A xemu\cite{xemu} instance, which has 2GiB of RAM allocated, uses, depending on circumstances,
 about 50 memory objects, each with its own physical and virtual memory region,
-and also the ARM example in \autoref{fig:mem_ARM_full} with 2GB of main memory features 58 memory regions if not counting duplicates.
+and also the ARM example in \autoref{fig:mem_ARM_full} with GiBB of main memory features 58 memory regions if not counting duplicates.
 An emulation instance with more memory allocated,
 or complicated mappings between host RAM, disk-backed memory and virtual devices could potentially have many more.
 In combination with the previous issue of duplicate or uninitialized memory, this is basically impossible.
@@ -278,7 +278,7 @@ with overclocked memory being available allowing for even lower latencies\cite[p
 A typical NVMe hard drive uses 4 PCIe lanes, which on PCIe 5.0 equates to a maximum speed of 15.7GB/s,
 while usually having latencies of around 2ms.\todonote{I need a source here that isn't just the datasheet of some random drive}
 This means the most modern NVMe drives may be able to keep up with RAM in terms of data throughput,
-but in terms of latency they are about 100 times worse,
+but in terms of latency, they are about 100 times worse,
 which would make their usage as system memory a rather troublesome experience.
 In addition, the current standard for NVMe is still PCIe 4.0, which makes this even worse.
 
@@ -328,7 +328,7 @@ It seems to be developed by a single developer called \Citeauthor{jelf},
 and while he does regularly work on this library,
 its stability is still up to question and will be inspected further in \autoref{chap:Evaluation}\cite{jelf}.\todonote{Make this reference more precise once the chapter is written}
 
-Also it appears the library was not explicitly developed for processing dumps
+It also appears the library was not explicitly developed for processing dumps
 and even extracting data from them,
 as the parts of the library for this functionality are very much undocumented.
 Still, a process to read the data from such a dump could be established and now looks as follows:
@@ -367,7 +367,7 @@ while \emph{vaddr} is the first virtual address the guest operating system sees 
 In case paging is not supported for the guest, currently meaning everything except x86,
 both values are the same and contain the physical address of the segment.
 
-\subsection{Java's 2GB limit}\label{sec:Java_2GB}
+\subsection{Java's 2GiB limit}\label{sec:Java_2GB}
 With Java being a product of 1995, it was developed when 32-bit computers were still the standard.
 Because of this, most interfaces in Java work with 32-bit signed integers instead of 64-bit integers.
 In addition, Java has no direct support for unsigned integers.
@@ -378,7 +378,7 @@ which would consequently produce an ELF file larger than the Java limit,
 this issue must be circumvented.
 When storing longs in an array, this can theoretically be increased to $2^{34}$, or 16GiB of data.
 For doing something like this, it however also needs to be mentioned that one cannot simply convert a long into 8 bytes in Java by simple casting,
-but instead shift operations are required, which hurt performance.
+instead, shift operations are required, which hurt performance.
 To circumvent this, 2 approaches were implemented:
 
 \paragraph{Input Streams}
@@ -411,16 +411,16 @@ Each memory region holds 5 values when stored as a JSON object:
     \item \emph{storageLocation} holds the absolute path this memory region's dump is stored at on disk.
 \end{itemize}
 
-\sectionblock devices}
-This section again was rather trivial, even though it requires more computation than the CPUs.
-The QMP commands foblock deviceses seem to be the most capable of the data points discussed here,
-likely because attaching and removiblock devicesces during runtime is a task relevant not only to the scientific community.\todonote{Is that too on the nose?}
+\section{block devices}
+This section again was rather trivial, even though it requires more computation than the CPU registers.
+The QMP commands for block devices seem to be the most capable of the data points discussed here,
+likely because attaching and removing block devices during runtime is a task relevant not only to the scientific community.\todonote{Is that too on the nose?}
 The command \emph{query-block} provides all necessary information for an extraction process,
 and though one may feel overwhelmed when first seeing its output,
 which in parts is because it includes a lot of deprecated and invalid data,
 it is very easy to extract which devices are connected, whether they contain media and where said media is located.
 
-The extraction process therefore only consists of the stepts
+The extraction process therefore consists only of the following steps:
 \begin{enumerate}
     \item Get the array of block devices from QEMU.
     \item Parse all their names and internal identifiers.
@@ -429,11 +429,12 @@ The extraction process therefore only consists of the stepts
 \end{enumerate}
 
 \subsection{Checkpoint format}
-For each blockdevice, the following fields get stored in JSON:
+For each block device, the following fields get stored in JSON:
 \begin{itemize}
     \item \emph{deviceName} is the human-readable name given to this device.
     \item \emph{qdevID} is the internal name used in QEMU, comparable to /dev/sdX in Linux.
     This may not always exist in QEMU, and may be the QOM path if no ID was set.
+    In contradiction to the official documentation, it sometimes isn't even present at all.
     \item \emph{virtualSize} is the capacity of the device shown to the guest operating system.
     If no media is inserted, this shows the value zero,
     however a value of zero is no indication about the absence of any media.
@@ -445,7 +446,7 @@ For each blockdevice, the following fields get stored in JSON:
     \begin{itemize}
         \item \emph{originalPath} holds the location where the image was originally stored at.
         \item \emph{hash} stores the hash computed for the media as Base64.
-        \item \emph{storageLocation} holds the absolute path of the copy of this blockdevice's image.
+        \item \emph{storageLocation} holds the absolute path of the copy of this block device's image.
     \end{itemize}
 \end{itemize}
 
@@ -465,6 +466,6 @@ As can be seen in \autoref{fig:mem_ARM_full} and \autoref{fig:xemu_full},
 the memory addresses overlap, meaning it is also not possible to access these regions
 by cleverly choosing addresses.
 This means one would have to individually research each kind of device to dump its data,
-while in such a process also making sure special kinds of data not directly stored in the device's memory,
+while in such a process also making sure there are no special kinds of data which are not directly stored in the device's memory,
 like CPU registers, are included as well.
 For these reasons, checkpointing these devices was not pursued further in this thesis.

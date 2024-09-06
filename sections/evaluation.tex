@@ -46,7 +46,7 @@ and will not be discussed further for the purposes of evaluating this thesis.
 On the point of specifications, the system used for any kind of testing consists of the following parts:
 \begin{itemize}
     \item CPU: AMD Ryzen 9 7900X with overclocked all-core boost of 5.5GHz
-    \item RAM: 48GB DDR5-7000 CL36
+    \item RAM: 48GiB DDR5-7000 CL36
     \item GPU\footnote{None of the tests require a GPU, only included for completeness}: Nvidia Geforce RTX 3090 overclocked to 2.1GHz
     \item Hard Drives:
     \begin{itemize}
@@ -80,7 +80,7 @@ the correctness of the data only depends on whether the parser is implemented co
 To verify the extracted data, one must now somehow compare the output of the \emph{info registers} command
 with the data present in the internal model of the developed solution.
 
-To automate such a process, one would have to implement another parser which parses \emph{info registers}
+To automate such a process, one would have to implement another parser that parses \emph{info registers}
 and then compare the output of both parsers and check whether they are correct.
 This approach is rather ridiculous, as it assumes when writing the same program 2 times,
 one of them must be correct.
@@ -115,7 +115,7 @@ Especially analyzing the flags of any CPU requires special care
 and perhaps additional modifications of the code produced by this thesis.
 
 \subsection{System memory}
-The biggest part in the implementation phase of this thesis
+The biggest part of the implementation phase of this thesis
 was the extraction of data from the guest's memory.
 This also warrants special attention in the evaluation of this data,
 as all of the approaches attempted faced some issues during implementation.
@@ -187,8 +187,8 @@ however such oddities should be mentioned here to make others aware of them and 
 \subsubsection*{Deduplication}
 The tool offers the ability to deduplicate checkpoint data,
 however it is nowhere near as sophisticated as the solution offered by \citeauthor{kitcheckpoints}.
-Currently the tool has no ability to load comparison data from disk,
-thoug such a process would be trivial to implement,
+Currently the tool cannot load comparison data from disk,
+Although such a process would be trivial to implement,
 as only the created JSON needs to be parsed.
 Still, this results in the tool only deduplicating checkpoint data
 against checkpoints created previously by the same process.
@@ -211,7 +211,7 @@ however that is not something this thesis has to look at.
 \subsubsection*{Deduplication}
 The approach used for deduplicating block devices is essentially the same as the one for memory dumps.
 The code is nearly identical, as the comparison of hashes for both types is the same.
-This also allows for the assumption, if the deduplication works for memory regions,
+This also allows for the assumption, that if the deduplication works for memory regions,
 it also works for block devices.
 The main difference is the rate of follow-up checkpoints is much lower,
 block devices generally experience fewer changes than memory regions.
@@ -245,7 +245,7 @@ by using the \emph{System.currentTimeMillis()} method\footnote{See https://docs.
 and calculating the difference between before and after the creation of a checkpoint.
 The experiment uses a QEMU instance displaying the \enquote{Select Language} screen of the Windows 11 Setup,
 running with 4 CPU cores and 2GiB of RAM.
-The QEMU command to setup this device is shown in \autoref{fig:QEMU_Windows_Test}.
+The QEMU command to set up this device is shown in \autoref{fig:QEMU_Windows_Test}.
 
 \begin{figure}[h]
     \begin{ffcode}
@@ -288,7 +288,7 @@ QEMU does not explicitly specify when this occurs,
 only that it \enquote{can happen for a large guest, or a malicious guest pretending to be large.}\cite{qmp-commands}.
 They do not explicitly specify what is considered a \enquote{large guest}.
 As Java however loads the whole dump produced by QEMU into memory effectively twice,
-once for Jelf to parse and afterwars to write the stripped files to disk,
+once for Jelf to parse and afterwards to write the stripped files to disk,
 the memory footprint of this tool is rather catastrophic,
 as the memory usage of any guest is tripled at least.
 

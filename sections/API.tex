@@ -17,7 +17,7 @@ QEMU offers 3 kinds of semi-external APIs: The QEMU Human Monitor (QHM),
 the QEMU Machine Protocol (QMP) and so-called "Internal QEMU APIs"\cite{internal}.
 
 As the name suggests, the internal QEMU APIs are not useful for external use by themselves.
-Instead, they can be used when modifying QEMU-code and then extracting data by means of GDB or directly by the QEMU process.
+Instead, they can be used when modifying QEMU code and then extracting data by employing GDB or directly by the QEMU process.
 As the goal is to use any standard QEMU implementation, these internal APIs will not be regarded further in this paper.
 
 In the two following sections, both QMP and QHM are further explored. Both the basic functionality,
@@ -30,7 +30,7 @@ are discussed.
 The protocol was merged into the main branch of QEMU in version 0.13 in 2010, however to this day its status remains as "experimental"\cite{qmp-merge}.
 The goal was, and still is, to provide the same data QHM provides, but in a format more accessible for machines.
 However, this process is far from complete. To give an example, the patch to add the ability to read register contents was only introduced in 2021,
-but to this day it wasn't merged into the mainline branch.
+but to this day it hasn't been merged into the mainline branch.
 In addition, this patch doesn't actually provide a valid JSON object, but just passes the return of the QHM-command "info registers" into the "result"-string\cite{qmp-registers-patch}.\todonote{Probably needs more detail}
 
 This makes QMP the preferred protocol, as the data is in an easily parseable format, which makes extraction very easy.
@@ -39,7 +39,7 @@ But, as mentioned, QMP is the less powerful protocol when used by itself.
 This however directly leads to the most important command\cite{qmp-commands}:
 
 \paragraph{human-monitor-command}
-This command is a rather special command, as it doesn't provide any information by itself,
+This command is rather special, as it doesn't provide any information by itself,
 but instead allows for usage of the legacy QHM inside of QMP,
 which gives access to a lot more data not yet accessible directly in QMP.
 The QEMU reference explicitly marks this command as a \enquote{stop-gap} until all QHM-commands have their counterpart in QMP,
@@ -51,13 +51,13 @@ Further details on how this command is used and what its capabilities are are de
 This command must be sent at the beginning of any QMP session to activate the session.
 On an unmodified QEMU instance, it returns an empty JSON object.
 The command is intended to show the client additional features of a modified QEMU-instance,
-however in this paper this command serves no purpose except unlocking QMP.
+however in this thesis this command serves no purpose except unlocking QMP.
 
 \paragraph{query-cpus-fast}
 Gives information about all available CPUs, namely their architecture,
 their count, and the ID of the host thread simulating the CPU.
 The command is a replacement for \emph{query-cpus}, which was removed and returned slightly different data.
-The main purpose this command serves for this this paper is to get the CPU count,
+The main purpose this command serves for this paper is to get the CPU count,
 as registers need to be queried individually for each CPU.
 
 \paragraph{query-block}
@@ -69,13 +69,13 @@ Also shows empty devices like optical drives which currently don't contain any m
 This command dumps the contents of the guest's memory to disk.
 The command itself offers many options, however most of these don't work.
 In the used implementation, the only output format working is ELF, and paging is only possible on x86 guests.
-Still, it's the only option in QMP which offers access to the guest's memory.
+Still, it's the only option in QMP that offers access to the guest's memory.
 
 \paragraph{stop}
 Suspends the emulation of the current system. Is necessary to keep the data extracted consistent.
 
 \paragraph{cont}
-Continues execution of the emulated system after data was extracted.
+Continues the execution of a previously paused system.
 
 \section{QEMU Human Monitor (QHM)} \label{sec:QHM}
 The QEMU Human Monitor, sometimes referred to as only the QEMU Monitor,
@@ -117,10 +117,10 @@ The output consists of the linear address shown to the guest OS, the "physical" 
 and the flags associated with each segment.
 As the flags are x86-specific, they are currently not of further interest and just get stored without further processing.
 
-It is important to note the physical address is not the actual address in the QEMU-process, but the offset from the base address of said memory region.
+It is important to note the physical address is not the actual address in the QEMU process, but the offset from the base address of said memory region.
 To correctly extract the guest RAM, one would now need to find the base address of the memory region the QEMU-process uses to emulate RAM,
 and then combine it with the virtual address translation to store memory in the format the guest OS sees it.
-This throws up the question in which format the RAM should be stored. In the order it is actually on the hardware, meaning the physical addresses,
+This throws up the question of which format the RAM should be stored. In the order it is actually on the hardware, meaning the physical addresses,
 or in the order the guest OS sees it, meaning the virtual addresses.
 
 \subsection{info mtree}\label{sec:API_mtree}
@@ -280,7 +280,7 @@ but instead used by humans debugging QEMU and does not follow any specified form
 This of course is also stated by the QEMU team\cite{qhm-documentation}.
 However, because this is the only way to access registers through an external interface,
 this output needs to be made parseable by a computer, and for this,
-the following rules are presumed from ARM and x86 in hope they are valid for the majority of architectures:
+the following rules are presumed from ARM and x86 in the hope they are valid for the majority of architectures:
 
 \begin{itemize}
   \item The CPU number is specified in the first line, even though the command only returns a single CPU which must be specified beforehand.
@@ -307,7 +307,7 @@ the following rules are presumed from ARM and x86 in hope they are valid for the
     \item Some flags get put in []-brackets, wherein their letter is written if they're set, otherwise a hyphen is shown.
     \item Other flags, especially multibit flags, get represented like their own register.
     \begin{itemize}
-      \item In this case, the amount of digits gives no indication of the length of the register and therefore its possible values.
+      \item In this case, the amount of digits does not indicate the length of the register and therefore its possible values.
       For example, the $A20$-register is only a single bit, while $CPL$ is 2 bit.
     \end{itemize}
     \item If there is not a dedicated register in the specification,
@@ -317,7 +317,7 @@ the following rules are presumed from ARM and x86 in hope they are valid for the
     \begin{itemize}
       \item For the ARM-FPU, \enquote{FPU disabled} gets explicitly written out,
       while on x86 such information is stored in the specified registers and represented using a 0 or a 1.
-      \item There was no attempt to explicitly search for occurences of this case,
+      \item There was no attempt to explicitly search for occurrences of this case,
       as the implementation of these cases is specific to the architecture in question
       and there exists no documentation of such cases.
     \end{itemize}
@@ -329,25 +329,25 @@ the following rules are presumed from ARM and x86 in hope they are valid for the
     the pointer registers one register per line, the floating point and SIMD registers show 2 registers per line.
     \item The pointer registers feature a rather strange way to keep consistency for the $GDT$ and $IDT$ registers.
     \item The flags associated with the general purpose registers are simply appended to the registers.
-    Instead, the registers for special CPU features like $EFER$ are written in their own lines.
+    Instead, the registers for special CPU features like $EFER$ are written in their own respective lines.
     The flags for pointer registers get written in the same line as the respective register,
     which is also the only way of finding out which flag is associated with which register.
   \end{itemize}
 \end{itemize}
 
 \subsection{memsave \& pmemsave}\label{sec:memsave}
-These command are the ancestors to \emph{dump-guest-memory} in \autoref{dump_memory}.
-They are far less sophisticated than their QMP succesor,
-which means they should not actually be used anymore.
+These commands are the ancestors to \emph{dump-guest-memory} in \autoref{dump_memory}.
+They are far less sophisticated than their QMP successor,
+which means they should not be used anymore.
 However, they do allow for quick and easy testing,
 as they simply create a raw memory dump without any additional metadata.
 When actually extracting data from QEMU, such metadata is of course very helpful,
-but when just debugging these 2 commands are a lot easier to use.
+but during debugging these 2 commands are a lot easier to use.
 Also, because of this simplicity, there is no special behavior in need of mentioning.
 
 They also allow for the direct separation of physical and virtual memory,
 which requires explicit parsing for \emph{dump-guest-memory}.
-This also means, that \emph{memsave} is only available on guests which allow for paging on \emph{dump-guest-memory},
+This also means that \emph{memsave} is only available on guests which allow for paging on \emph{dump-guest-memory},
 meaning currently only x86 is supported.
 \emph{pmemsave} is available on all platforms, however as it's physical memory,
 it is a bit harder to make sense of the data.

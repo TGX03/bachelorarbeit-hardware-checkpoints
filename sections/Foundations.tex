@@ -16,7 +16,7 @@ which means they carry some relevance in the non-scientific IT community.
 Under the answers of one of the posts, another commentator replies
 \enquote{Exactly the opposite answer here:}\cite{SO_link},
 linking to the other post\cite{SO},
-as indeed the top answes of these posts, as well as the replies on each posts,
+as indeed the top answers of these posts, as well as the replies on each post,
 are in direct conflict with each other.
 As these discrepancies were mentioned,
 a small discussion commences and the involved parties seem to reach the conclusion
@@ -24,14 +24,14 @@ of the definition being not entirely clear in their community and it should like
 to not create confusion.
 
 The purpose of this small example does not serve to bring a conclusive definition into this thesis,
-but to illustrate the neccesity of clearly defining these terms for this thesis.
+but to illustrate the necessity of clearly defining these terms for this thesis.
 To achieve this, information about existing definitions was researched in 2 different approaches,
 the first one outside the scientific community by looking at more generalized definitions from the Oxford dictionary
 as well as by looking at the usage of these terms in the world of video games,
 the second one directly searches for a definition inside the scientific community and its research papers.
 
 \subsection{Emulation \& Simulation outside the scientific community}
-The Oxford English Dictionary defines the 2 terms as following:
+The Oxford English Dictionary defines the 2 terms as follows:
 \begin{itemize}
     \item \emph{Emulation}: \enquote{The technique by which a
     computer is enabled, by means of special
@@ -52,7 +52,7 @@ perhaps by emulating computers involved in such a system,
 however it may also describe the process of imitating the memory management unit of a CPU inside an emulation.
 This may be concluded by saying that emulation is a special type of simulation,
 which itself requires smaller systems of simulation to function,
-but can then be itself used to create bigger systems of simulation.
+but can then itself be used to create bigger systems of simulation.
 
 \subsubsection{Emulation \& Simulation in video games}
 A large field in which emulators and simulators are used and accessible to ordinary people
@@ -60,8 +60,8 @@ is the world of video games,
 where they however fulfill very different purposes.
 Simulators are usually a type of game,
 which allows the player to have an experience he usually does not have in real life.
-Simulators in this field try to make the user feel as if the imitiation they are experiencing is very realistic,
-even though it usually simplified heavily to still allow for high accessibility.
+Simulators in this field try to make the user feel as if the imitation they are experiencing is very realistic,
+even though it is usually simplified heavily to still allow for high accessibility.
 An example are flight simulators, in which many players feel like they are getting a realistic experience,
 even though many features like navigation or communication with Air Traffic Control are heavily simplified
 and can even be turned off.
@@ -72,14 +72,14 @@ Emulators on the other hand get used to play games which were developed for syst
 An example of such an emulator is xemu\cite{xemu},
 which is also used later on in \autoref{chap:QEMU_API} to demonstrate the interaction with QEMU.
 Such emulators \emph{simulate} the physical hardware of a specific game console
-as closely as neccesary for the user to play a specific video game at a reasonable performance.
+as closely as necessary for the user to play a specific video game at a reasonable performance.
 Xemu for example has to emulate the original Intel Coppermine CPU and Nvidia MCPX X3 GPU
 for the games to function, and it must emulate features that may not be needed at all.
 For example, it always must emulate the SIMD registers of the CPU, even though a game may not need them.
 An additional constraint is performance, emulators usually must run at the same speed as the original device,
 and any potential performance benefit a modern computer offers is therefore void.
 This results from the games being developed for a system which offers a specific performance,
-and when run on a faster system, the game, especially its physic simulations,
+and when run on a faster system, the game, especially its physics simulations,
 runs faster in accordance with the performance gain of the emulating system,
 which would usually make the game unusable.
 
@@ -95,7 +95,7 @@ and the definitions are generally compatible with the one before.
     For this, a model must be created and requirements for actual execution developed.
     Later on, the results of such a simulation must then be carefully evaluated to make sure
     there are no errors that come from such abstraction
-    or are accounted for and get compensated.
+    or are accounted for and compensated.
     The advantage of such a process is the high speed it carries,
     as simplifications often take away lots of required computation time.
     The disadvantage, as mentioned, however is the potentially high error rate for results,
@@ -171,7 +171,7 @@ Any emulator using only 64-bit floats for internal calculations would not be abl
 \section{Emulation Software}\label{sec:emulators}
 As mentioned in \autoref{sec:conclusion_emulation}, most people have heard about emulation in the world of video games.
 These highly specialized emulators get used to correctly simulate the internals of a given video game console
-which allows the usage of video games developed for this game console on a different devices or general purpose computer.
+which allows the usage of video games developed for this game console on a different device or general-purpose computer.
 However, such highly specialized emulators are rarely useful for actual research,
 as any kind of simulated hardware cannot be easily swapped for something else without modifying the code of the software.
 
@@ -184,8 +184,8 @@ as software for emulation.
 However, such tools usually do not fall under the definition of \emph{emulation},
 but instead they perform a task called \emph{virtualization}.
 The goal of such software is not to emulate a different architecture from the one the program is run on,
-but instead to create an environment isolated from the host and other operating sytems in which an operating system can still
-be exectued as if it was running on actual hardware.
+but instead to create an environment isolated from the host and other operating systems in which an operating system can still
+be executed as if it were running on actual hardware.
 To allow for an efficient execution of this task, modern CPUs also include specific hardware for virtualization,
 on Intel it is called VT-x and AMD calls it AMD-V.
 These technologies allow for the execution of such isolated code with near-native speed,
@@ -233,7 +233,7 @@ an operating system used to interact with it.
 However it in no way resembles any actual GPU from Nvidia, AMD or Intel,
 and is very limited in functionality.
 As it is emulated by the host CPU, it is also a lot slower than a real dedicated GPU,
-and its video memory is limited to 256MB, while real GPUs are usually in the range of 10GB.
+and its video memory is limited to 256MiB, while real GPUs are usually in the range of 10GiB.
 Still, such features make software that offers them a hybrid between virtualization and emulation.
 
 \subsection{Explicit emulators (QEMU)}
@@ -265,16 +265,16 @@ but very inconsistent in their technical documentation.
 
 \section{Checkpoints}
 When simulating a system, it is of course always possible to interrupt the simulation and freeze the current state of the simulator in memory.
-From such a frozen and consistent state, is is now possible to extract certain data
+From such a frozen and consistent state, it is now possible to extract certain data
 for other uses separate from the simulation itself.
 When permanently stored, such data is generally referred to as a \enquote{checkpoint},
 and to research the ways of creating such a checkpoint is the aim of this thesis.
 It is desired to process the data gathered in a way that makes it accessible to both machines and humans,
 as a simple memory dump from the emulation software is not helpful to the human analyzing it,
 and it contains overhead data from the emulator which would ideally be stripped
-to only analyze the data gathered with regards to the actual hardware executing it in the real world.
+to only analyze the data gathered with regard to the actual hardware executing it in the real world.
 
-In this thesis, checkpoints reference a copy of the complete internal state of a hardware architecture at a specified point of time.
+In this thesis, checkpoints reference a copy of the complete internal state of a hardware architecture at a specified point in time.
 For the purposes of this thesis, this references all CPU registers, flags, system memory,
 storage devices and recursively the state of external devices of a computer.
 This thesis will later on also discuss possible approaches for reinjecting such a checkpoint
@@ -289,7 +289,7 @@ Especially for error states, such checkpoints are very useful,
 as it may not always be possible to create an error state manually,
 or it wasn't yet understood how an error came to be.
 
-For completeness's sake it is also mentioned some tools define a checkpoint only as a copy of the storage devices
+For completeness's sake, it is also mentioned some tools define a checkpoint only as a copy of the storage devices
 which may be booted later to revert to such a state.
 This definition is not used here.
 
@@ -307,17 +307,17 @@ to implement the parser individually for each architecture.
 \section{Related work}
 \Citeauthor{kitcheckpoints} has created a tool to extract checkpoints from QEMU running as part of a SimuBoost instance.
 Curiously, they have chosen a very different way to achieve their goals,
-namely they have chosen to extract the data by modifying the code of QEMU and to then use GDB,
+namely they have chosen to extract the data by modifying the code of QEMU and then using GDB,
 a debugger, to extract the data gathered.
 In addition, he has only used the QEMU Human Monitor (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however both terms refer to the same protocol and both are in use.})
 in his works, as the QEMU Machine Protocol (QMP) was not nearly as developed as it is now, 11 years later.
-They code they developed back then is also nowhere to be found,
+The code they developed back then is also nowhere to be found,
 making his written thesis the only material to use in this thesis\cite{kitcheckpoints}.
 
 With the time passed since their thesis,
 it is also doubtful whether his solution would work on a modern QEMU instance,
 as the ability to merge such old changes into modern software,
-which was heaviliy developed in the meantime,
+which was heavily developed in the meantime,
 is usually a very exhaustive process if not downright impossible.
 This issue is what this thesis tries to solve,
 and while doing so the research by \citeauthor{kitcheckpoints} proved very useful,
