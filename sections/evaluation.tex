@@ -1,6 +1,6 @@
 %% LaTeX2e class for student theses
 %% sections/evaluation.tex
-%% 
+%%
 %% Karlsruhe Institute of Technology
 %% Institute of Information Security and Dependability
 %% Software Design and Quality (SDQ)
@@ -241,7 +241,7 @@ an initial one and the first follow-up,
 is measured, and it is then assumed the performance of the program will increase as Java's optimizations kick in.
 This effectively makes the results gathered in this thesis a \enquote{Worst-case}.
 To do this, the time taken to create a checkpoint will be measured by Java itself
-by using the \emph{System.currentTimeMillis()} method\footnote{See https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/System.html#currentTimeMillis()}
+by using the \emph{System.currentTimeMillis()} method\footnote{See \href{https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/System.html#currentTimeMillis()}{https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/System.html}.}
 and calculating the difference between before and after the creation of a checkpoint.
 The experiment uses a QEMU instance displaying the \enquote{Select Language} screen of the Windows 11 Setup,
 running with 4 CPU cores and 2GiB of RAM.
@@ -264,10 +264,10 @@ This means jelf is not able to handle such large files because of the limitation
 The exact results for this benchmark are presented in \autoref{tab:benchmark}.
 From those, an average duration of $15.489$ respective $13.420s$ for the creation of an initial and a follow-up checkpoint can be calculated.
 The median is $15.094s$ respective $13.577s$.
-During testing, it was discovered the main slowdown is the copying of the 6.6GiB ISO file containing the Windows Installer,
-when having it stored on an external USB drive, the time for the initial checkpoint tripled.
+During testing, it was discovered the main slowdown is the copying of the 6.6GiB ISO file containing the Windows Installer.
+When the ISO is stored on an external USB drive, the time for the initial checkpoint tripled.
 This lends credibility to the assumption that the main performance bottleneck is the hard drive speed,
-which makes sense regards to thecompromises from \autoref{sec:memory_extraction}.
+which makes sense regards to the compromises from \autoref{sec:memory_extraction}.
 Since memory dumps require disk access because of QEMU's limitations,
 even on NVMe drives like in this benchmark, the drive accesses are the main bottleneck during an extraction process.
 
@@ -339,7 +339,7 @@ especially when the program should be used on different host operating systems.
 
 The tool is however very flexible in deciding which parts of the accessible data are to be gathered.
 While the basic CLI only creates checkpoints and the rules for such creation are rather limited,
-the toll can also be used as a library, using which the user can individually select which data points they need
+the tool can also be used as a library, using which the user can individually select which data points they need
 and could theoretically even collect different data points at different intervals.
 With the existence of the interfaces \emph{Command} and \emph{QHMCommand},
 it is also very easy to create new commands which gather data points this thesis does not cover.
@@ -347,8 +347,9 @@ it is also very easy to create new commands which gather data points this thesis
 \section{Usability}
 As this tool is intended for other developers,
 there were no special requirements for its usability or ease of use.
-The tool basically resembles a library for creating existence,
-with a basic CLI option allowing for the creation of full checkpoints.
+The tool basically resembles a library for creating checkpoints,
+with a basic CLI option allowing for the creation of full checkpoints,
+but using it as a library provides much more abilities.
 The CLI does document itself using the \ff{-h} flag,
 however there is no GUI which would make the experience easier for inexperienced users.
 However such inexperienced users likely also have no use for the data produced by this thesis.
