@@ -309,16 +309,16 @@ to implement the parser individually for each architecture.
 Curiously, they have chosen a very different way to achieve their goals,
 namely they have chosen to extract the data by modifying the code of QEMU and then using GDB,
 a debugger, to extract the data gathered.
-In addition, he has only used the QEMU Human Monitor (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however both terms refer to the same protocol and both are in use.})
-in his works, as the QEMU Machine Protocol (QMP) was not nearly as developed as it is now, 11 years later.
+In addition, they only used the QEMU Human Monitor (QHM\footnote{\Citeauthor{kitcheckpoints} uses HMP instead of QHM in his thesis, however both terms refer to the same protocol and both are in use.})
+in their works, as the QEMU Machine Protocol (QMP) was not nearly as developed as it is now, 11 years later.
 The code they developed back then is also nowhere to be found,
-making his written thesis the only material to use in this thesis\cite{kitcheckpoints}.
+making their written thesis the only material to use in this thesis\cite{kitcheckpoints}.
 
 With the time passed since their thesis,
-it is also doubtful whether his solution would work on a modern QEMU instance,
+it is also doubtful whether their solution would work on a modern QEMU instance,
 as the ability to merge such old changes into modern software,
 which was heavily developed in the meantime,
 is usually a very exhaustive process if not downright impossible.
 This issue is what this thesis tries to solve,
 and while doing so the research by \citeauthor{kitcheckpoints} proved very useful,
-especially his explanations of the QEMU memory model\cite{kitcheckpoints}.
+especially their explanations of the QEMU memory model\cite{kitcheckpoints}.
