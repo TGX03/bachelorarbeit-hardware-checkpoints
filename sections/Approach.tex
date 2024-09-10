@@ -1,12 +1,12 @@
 \chapter{Approach \& Implementation}\label{chap:implementation}
 As the aim of this thesis is to provide information and a solution in a general fashion,
-meaning it works as independently from the architectures in use as possible,
+meaning it works as independently from the hardware architectures in use as possible,
 the approach used should be outlined beforehand.
 This chapter will fulfill this requirement
 and explain the ideas for implementation,
 and will also include dropped approaches with explanations of
-why they were either suboptimal or downright impossible to realize.
-To do this, this chapter will be sectioned into a general section explaining interaction with QEMU,
+why they were either suboptimal or impossible to realize.
+To do this, this chapter will be divided into a general section explaining interaction with QEMU,
 which affects any kind of data exchange,
 as well as the approaches for extracting the different kinds of data,
 as each one requires an individual solution.
@@ -34,7 +34,7 @@ In its now nearly 30 years of existence, it has received consistent updates to i
 and though to this day, a valid performance evaluation of any given Java program remains challenging\cite{Java_Benchmarking},
 the performance of Java seems to be within one order of magnitude when compared to C++ and 2 orders of magnitude when compared to plain C,
 while however requiring a higher development effort and having a much larger memory footprint\cite{Java_Performance}.
-Since Python is the only other JIT-based contender in \citetitle{Java_Performance} being somewhat faster,
+Since Python is the only other JIT-based contender in \citetitle{Java_Performance}\cite{Java_Performance} being somewhat faster,
 however featuring even fewer capabilities to directly manipulate memory without
 resorting to large external libraries, the decision was made to use Java for this thesis.
 
@@ -96,7 +96,7 @@ This means the contents of registers as well as flags written
 \enquote{according to standard}\footnote{There is no standard. Standard herein refers to what I observed in my testing, which of course is highly individual and described in \autoref{sec:info_registers}.}
 get saved, however any other data is lost.
 This means anyone reading data from QEMU needs to be very familiar with the architecture in use
-and read the related specification like for example the \Citetitle{intel-manual}.
+and read the related specification like for example the \citetitle{intel-manual}\cite{intel-manual}.
 
 An example of such an issue is the floating point unit in ARM,
 which is disabled on boot and needs to be explicitly enabled by the operating system.
@@ -131,8 +131,8 @@ Each CPU object consists of the following fields:
 \section{System memory}\label{sec:memory_extraction}
 Extracting system memory proved to be the most difficult task of this research.
 Not only because of QEMU's rather complicated memory model,
-which was explained excellently by \Citeauthor{kitcheckpoints}\cite{kitcheckpoints},
-but also because it is pretty evident QEMU's external APIs do not serve the purpose of finding data about the emulation process itself.
+which was explained by \Citeauthor{kitcheckpoints}\cite{kitcheckpoints},
+but also because QEMU's external APIs do not serve the purpose of finding data about the emulation process itself.
 Because of this, many different approaches were tried to access this data
 and many assumptions were proven wrong.
 Those approaches as well as the final solutions are going to be explained in the following,
@@ -153,7 +153,7 @@ and are therefore only valid on Windows.
 If this approach would have yielded results,
 an adaptation to Linux would have also been created
 which may even have had the ability to be generalized into the Unix world.
-However, as this ultimately could not be made to work,
+However, as this ultimately could not be implemented,
 such a transfer was not attempted.
 
 It also needs to be mentioned that it was tried to avoid using QEMU's functions to perform a full dump to disk,
@@ -170,9 +170,8 @@ during the time of checkpoint creation.
 
 The naive approach here was to just take the physical address returned by \enquote{info tlb} or \enquote{info mtree}
 and read data from there in the hope these were the actual offsets used internally.
-Especially the fact the physical addresses do not start at address 0
-made this an idea at least worth testing
-in hopes it either works immediately or gives further leads to track down the actual memory location.
+Especially the fact the physical addresses do not start at address 0 made this a valid approach
+which either works immediately or gives further leads to track down the actual memory location.
 However, this directly turned up an issue:
 
 \paragraph{Address randomization}
@@ -211,7 +210,7 @@ The big drawback are of course the necessary modifications to QEMU's code to mak
 something which this thesis wants to avoid to maintain usability and functionality for any future QEMU versions.
 For this reason, this approach was discarded as it could potentially break with any new QEMU version.
 Especially when trying to work with a debugger to call these internal functions,
-it may not survive the next update to QEMU.
+any changes made to the code of QEMU during an update have the potential to break any such implementation.
 In addition, it also prevents usage on an already existing QEMU instance
 which is already running some form of emulation that should be parsed without modification.
 
@@ -239,9 +238,9 @@ makes this basically impossible,
 as an uninitialized memory region already mapped to the guest would be impossible to correctly categorize.
 
 \paragraph{Amount of memory objects}
-A xemu\cite{xemu} instance, which has 2GiB of RAM allocated, uses, depending on circumstances,
+A xemu\cite{xemu} instance, which has only 64MiB of RAM allocated, uses, depending on circumstances,
 about 50 memory objects, each with its own physical and virtual memory region,
-and also the ARM example in \autoref{fig:mem_ARM_full} with GiBB of main memory features 58 memory regions if not counting duplicates.
+and also the ARM example in \autoref{fig:mem_ARM_full} with GiB of main memory features 58 memory regions if not counting duplicates.
 An emulation instance with more memory allocated,
 or complicated mappings between host RAM, disk-backed memory and virtual devices could potentially have many more.
 In combination with the previous issue of duplicate or uninitialized memory, this is basically impossible.
@@ -279,7 +278,7 @@ A typical NVMe hard drive uses 4 PCIe lanes, which on PCIe 5.0 equates to a maxi
 while usually having latencies of around 2ms.\todonote{I need a source here that isn't just the datasheet of some random drive}
 This means the most modern NVMe drives may be able to keep up with RAM in terms of data throughput,
 but in terms of latency, they are about 100 times worse,
-which would make their usage as system memory a rather troublesome experience.
+which would hurt performance, especially as RAM accesses usually are, as the name implies, random.
 In addition, the current standard for NVMe is still PCIe 4.0, which makes this even worse.
 
 \Citeauthor{QEMU_memory_file} provides a solution for this,
@@ -387,7 +386,7 @@ and they supply an undefined amount of bytes to any given consumer.
 The \enquote{undefined} here explicitly allows for an amount of bytes higher than the usual $2^{31}$ byte limit.
 Since Java 9, this interface was explicitly expanded with the goal to at least somewhat allow 64-bit longs\footnote{See \href{https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/InputStream.html#transferTo(java.io.OutputStream)}{https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/io/InputStream.html}}.
 This is a decent substitute for transferring bytes using an array,
-the big question now is whether all participating libraries support such large input streams.
+however it is dependent on all used libraries supporting such large input streams.
 For small emulation instances this worked during development,
 however later during evaluation, it turned out this was not the case as hoped.
 The details on this are in \autoref{sec:eval_performance}.
@@ -398,7 +397,7 @@ which are 2-dimensional arrays with helper methods allowing them to be used like
 This increases the maximum number of bytes stored in \enquote{an array} to $2^{62}$,
 which should suffice for the purposes of this thesis.
 \emph{fastutil} does not provide an Input Stream for such an array itself,
-however developing one was a rather trivial exercise.
+so an implementation of this interface was also neccesary during this thesis.
 
 \subsection{Checkpoint format}
 Each memory region holds 5 values when stored as a JSON object:
@@ -412,7 +411,7 @@ Each memory region holds 5 values when stored as a JSON object:
 \end{itemize}
 
 \section{Block devices}
-This section again was rather trivial, even though it requires more computation than the CPU registers.
+This section was straightforward again, even though it requires more computation than the CPU registers.
 The QMP commands for block devices seem to be the most capable of the data points discussed here,
 likely because attaching and removing block devices during runtime is a task relevant not only to the scientific community.\todonote{Is that too on the nose?}
 The command \emph{query-block} provides all necessary information for an extraction process,
