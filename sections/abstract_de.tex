@@ -11,12 +11,14 @@
 %% Version 1.5, 2024-02-12
 
 \Abstract
-Während der Emulation eines Computers oder vergleichbarer Geräte, wie Smartphones oder Videospielkonsolen,
-liegen viele Daten innerhalb der Emulationsinstanz vor, die extern für weitere Forschungen verwendet werden können.
-Diese Arbeit versucht daher, die Daten einer solchen Emulation zu extrahieren und für die weitere Verwendung zugänglich zu machen.
-Um dies zu erreichen, werden das QEMU Machine Protocol (QMP) und der QEMU-Monitor (QHM) verwendet, um diese Daten aus einer laufenden QEMU-Instanz zu extrahieren,
-ohne den QEMU-Code zu modifizieren, um so die Funktionalität über mehrere QEMU-Versionen hinweg zu erhalten.
-Darüber hinaus gibt dieses Dokument Einblicke in die internen Vorgänge der Emulation und diskutiert damit verbundene Probleme.
-In der Entwicklung sind nämlich diverse solcher Probleme aufgetreten,
-aufgrund welcher diese Arbeit derzeit nur die Möglichkeit, Daten über CPUs, RAM und angeschlossene Speichergeräte aus einer QEMU-Instanz zu extrahieren, bietet.
-Sie ist derzeit außerdem auf maximal 2 GiB Gastspeicher beschränkt, und hat dabei einen erheblichen Ressourcenverbrauch.
+Während der Softwareentwicklung wird häufig Emulation als Technik eingesetzt,
+um Software für Hardware zu entwickeln, welche noch nicht existiert oder parallel zur Software entwickelt werden soll.
+Das derzeit am häufigsten verfügbare Tool für eine solche Emulation ist QEMU, welches eine Vielzahl von Hardwarearchitekturen unterstützt.
+Während eine Emulation in QEMU ausgeführt wird,
+existieren viele Daten innerhalb von QEMU, die für eine weitere Untersuchung außerhalb einer laufenden QEMU-Emulation nützlich sein könnten.
+Diese Arbeit extrahiert daher die Daten einer solchen Emulation und macht sie für die weitere Verwendung zugänglich.
+Um dies zu erreichen, werden das QEMU-Maschinenprotokoll und der QEMU-Monitor verwendet, um diese Daten aus einer laufenden QEMU-Instanz zu extrahieren,
+ohne den QEMU-Code zu ändern, da dies oft ein langer Prozess ist,
+nicht sehr flexibel ist und auch umfangreiche Nacharbeiten erfordern kann, wenn sich die QEMU-Codebasis ändert.
+Darüber hinaus gibt dieses Dokument Einblicke in die internen Vorgänge der Emulation und diskutiert Probleme damit.
+Derzeit extrahiert diese Arbeit Daten über CPU, Speicher und angeschlossene Speichergeräte aus jeder QEMU-Instanz, die QMP unterstützt.
