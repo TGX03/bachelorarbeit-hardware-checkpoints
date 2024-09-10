@@ -13,8 +13,8 @@
 \chapter{The QEMU API} \label{chap:QEMU_API}
 As the goal of this thesis is to extract data without having to change the code of QEMU,
 it is necessary to take a look at the data QEMU offers by itself.
-QEMU offers 3 kinds of semi-external APIs: The QEMU Human Monitor (QHM),
-the QEMU Machine Protocol (QMP) and so-called "Internal QEMU APIs"\cite{internal}.
+QEMU offers 3 kinds of semi-external APIs: The QEMU Human Monitor (QHM)\cite{qhm-documentation},
+the QEMU Machine Protocol (QMP)\cite{qmp-description} and so-called "Internal QEMU APIs"\cite{internal}.
 
 As the name suggests, the internal QEMU APIs are not useful for external use by themselves.
 Instead, they can be used when modifying QEMU code and then extracting data by employing GDB or directly by the QEMU process.
@@ -29,14 +29,17 @@ are discussed.
 \enquote{The QEMU Machine Protocol (QMP) is a JSON-based protocol which allows applications to control a QEMU instance}\cite{qmp-description}, as described in the QEMU Wiki.
 The protocol was merged into the main branch of QEMU in version 0.13 in 2010, however to this day its status remains as "experimental"\cite{qmp-merge}.
 The goal was, and still is, to provide the same data QHM provides, but in a format more accessible for machines.
+
 However, this process is far from complete. To give an example, the patch to add the ability to read register contents was only introduced in 2021,
 but to this day it hasn't been merged into the mainline branch.
-In addition, this patch doesn't actually provide a valid JSON object, but just passes the return of the QHM-command "info registers" into the "result"-string\cite{qmp-registers-patch}.\todonote{Probably needs more detail}
+In addition, this patch doesn't actually provide a valid JSON object, but just passes the return of the QHM-command "info registers" into the "result"-string\cite{qmp-registers-patch},
+which is also the reason why it was not merged, as it would have been in conflict with the goal of making QMP both machine readable and externally consistent.
 
-This makes QMP the preferred protocol, as the data is in an easily parseable format, which makes extraction very easy.
-Also, the returned data is generally consistent across architectures, and the documentation is very detailed.
-But, as mentioned, QMP is the less powerful protocol when used by itself.
-This however directly leads to the most important command\cite{qmp-commands}:
+This effectively means QMP is the preferred protocol for performing any given task,
+since its outputs are easily parseable and the QEMU team tries to keep them consistent.
+However, there are many tasks QMP cannot (yet) perform,
+so certain tasks require the usage of QHM for lack of QMP support.
+This directly leads to the most important command\cite{qmp-commands}:
 
 \paragraph{human-monitor-command}
 This command is rather special, as it doesn't provide any information by itself,
@@ -44,7 +47,7 @@ but instead allows for usage of the legacy QHM inside of QMP,
 which gives access to a lot more data not yet accessible directly in QMP.
 The QEMU reference explicitly marks this command as a \enquote{stop-gap} until all QHM-commands have their counterpart in QMP,
 but, as mentioned before, that is not a priority at the moment.
-Still, it's currently the only way to access certain data like register contents, even if in a not easily parseable fashion.\todonote{Maybe rephrase this}
+Still, it's currently the only way to access certain data like register contents, even if the results require extensive and complicated parsing.
 Further details on how this command is used and what its capabilities are are described later on in \autoref{sec:QHM}.
 
 \paragraph{qmp\_capabilities}
@@ -112,7 +115,7 @@ An example of the output is provided in \autoref{fig:tlb_x86}:
 \label{fig:tlb_x86}
 \end{figure}
 
-These are the first eleven lines this command outputs the XBox emulator "xemu"\cite{xemu}.
+These are the first eleven lines this command outputs when queried against the XBox emulator "xemu"\cite{xemu}.
 The output consists of the linear address shown to the guest OS, the "physical" address, which represents the offset in QEMU's emulated memory region,
 and the flags associated with each segment.
 As the flags are x86-specific, they are currently not of further interest and just get stored without further processing.
@@ -218,7 +221,7 @@ the full output of \emph{info mtree} is also shown in \autoref{fig:xemu_full}.
 
 \subsection{info registers}\label{sec:info_registers}
 This command returns the contents of all the registers for a given CPU.
-It gives a very detailed overview of the data, however it is pretty clear it heavily prefers x86.
+It gives a detailed overview of the data, however the level of detail on x86 is much higher than it is for other architectures.
 To further illustrate this, in \autoref{fig:registers_x86} and \autoref{fig:registers_ARM} example outputs for this command are provided.
 
 \begin{figure}[H]
