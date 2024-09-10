@@ -26,8 +26,8 @@ many of these specialized architectures feature certain behaviors that may be un
 which must be addressed when swapping out these physical parts.
 
 In the actual development phase, this issue is already getting solved using emulation.
-In a planning phase, where parts of the software are already available,
-for example when it was purchased externally or the project is a switch of architectures,
+In a planning phase, especially during design space exploration, where small experiments are already being run,
+certain external software is already available, or if the project is a switch of architectures,
 like from x86 to ARM in the server world,
 emulation could also be used to offer more detailed planning
 like for performance criteria.
@@ -35,7 +35,7 @@ When a server in a data center is supposed to communicate with an external part 
 such an emulation can now be used to produce a good estimate of how performant the server needs to be and how long it should expect to wait for replies.
 However, there are issues with emulation, which hinder the use of it in these stages.
 The biggest of which is speed, as emulation may result in a slowdown of the factor 1000-10000\cite{slowdown}.
-Especially in the planning stage, where only the outline of the project needs to be put down,
+Especially during exploration of the design space, where only the outline of the project needs to be put down,
 such a slowdown is unacceptable, considering the results of the simulation don't need to be exact.
 
 As there are many different emulation environments available,
@@ -52,11 +52,11 @@ The goal here is to provide a solution with as much flexibility as possible,
 meaning a tool which does not require manual tweaking depending on the targeted system.
 This especially involves a version-independence in regards to the emulator used.
 QEMU has featured the QEMU Human Monitor (QHM) for a long time,
-it is however somewhat outdated, and especially not meant for processing by other software.
-To achieve this, the QEMU Machine Protocol (QMP) was developed, and the goal is to use this protocol instead,
+it is however explicitly not meant for processing by other software.
+To allow interaction with other software, the QEMU Machine Protocol (QMP) was developed, and the goal is to use this protocol instead,
 as the QEMU team tries to keep it somewhat standardized,
 while they explicitly write QHM is not stable and there is no guarantee its used formats will be kept consistent,
-especially for usages are not typical for the normal user.
+especially for usages that are not typical for the normal user.
 The differences and limitations of both protocols are explicitly explored in \autoref{chap:QEMU_API}.
 
 Initially, this research also aimed to make the development of embedded software easier by using emulation checkpoints to speed up development.
