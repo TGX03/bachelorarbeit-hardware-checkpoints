@@ -11,9 +11,9 @@
 %% Version 1.5, 2024-02-12
 
 \chapter{Evaluation}\label{chap:Evaluation}
-Evaluating the work of this thesis was no trivial task.
-The most important part of an evaluation is obviously the correctness of the gathered results,
-if the results of any program are not correct, there is no point in analyzing its performance or flexibility.
+Evaluating the work of this thesis wasn't as straightforward as one may hope.
+The most important part of an evaluation is to verify whether the results gathered are correct and valid,
+since if the results of any program are not correct, there is no point in analyzing its performance or flexibility.
 
 A very interesting approach here would of course have been to use the tool developed by \citeauthor{kitcheckpoints}
 and to compare the results of each solution.
@@ -38,9 +38,8 @@ Another way to verify any extracted data would have been to re-inject them into 
 However, developing such a mechanism is not the direct goal of this thesis,
 and when looking at the commands QMP and QHM offer, it is also evident such a task is not the purpose of these APIs.
 This means, such a reinjection could likely be its own thesis,
-and would thereby throw this chapter completely out of proportion
-and make it a thesis inside a thesis.
-\eqnuote{Re-Injection} is therefore reserved as a topic for future work in \todonote{Link future work}
+and would thereby exceed the scope of this thesis.
+\enquote{Re-Injection} is therefore reserved as a topic for future work in \autoref{sec:injection}
 and will not be discussed further for the purposes of evaluating this thesis.
 
 On the point of specifications, the system used for any kind of testing consists of the following parts:
@@ -138,34 +137,6 @@ those commands can be used to extract the exact same regions
 and then compare the contents of these files.
 The code of this test is shown in \autoref{fig:test_memory}
 
-\begin{figure}[h]
-    \begin{ffcode}
-        QMPInterface inter = new QMPInterface("localhost", 4444);
-        inter.executeCommand(Stop.INSTANCE);
-        ELFDump elf = new ELFDump(inter);
-        inter.executeCommand(elf);
-        elf.awaitCompletion();
-        for (MemorySegment segment : elf.getSegments()) {
-            long startAddress = segment.getStartPhysicalAddress();
-            long size = segment.getSize();
-            Path target = Paths.get("D:\\Lars\\out\\" + startAddress + ".dmp");
-            PMemsave save = new PMemsave(startAddress, size, target);
-            inter.executeCommand(save);
-            InputStream elfInput = segment.getInputStream();
-            try (InputStream dumpInput = Files.newInputStream(target)) {
-                int elfRead;
-                do {
-                    elfRead = elfInput.read();
-                    int dumpRead = dumpInput.read();
-                    if (elfRead != dumpRead) System.out.print("Found mismatch");
-                } while (elfRead != -1);
-            }
-        inter.executeCommand(Continue.INSTANCE);
-  \end{ffcode}
-  \caption{The code used to check for correct extraction of memory contents.}
-  \label{fig:test_memory}
-\end{figure}
-
 As can be seen, this code writes \enquote{Found mismatch} to the standard output
 if any discrepancies between the two files were found.
 This test did in fact unearth some issues with the code,
@@ -188,9 +159,7 @@ however such oddities should be mentioned here to make others aware of them and 
 The tool offers the ability to deduplicate checkpoint data,
 however it is nowhere near as sophisticated as the solution offered by \citeauthor{kitcheckpoints}.
 Currently the tool cannot load comparison data from disk,
-Although such a process would be trivial to implement,
-as only the created JSON needs to be parsed.
-Still, this results in the tool only deduplicating checkpoint data
+which results in the tool only deduplicating checkpoint data
 against checkpoints created previously by the same process.
 This can be observed by the amount of memory files created
 when creating follow-up checkpoints.
@@ -271,6 +240,37 @@ which makes sense regards to the compromises from \autoref{sec:memory_extraction
 Since memory dumps require disk access because of QEMU's limitations,
 even on NVMe drives like in this benchmark, the drive accesses are the main bottleneck during an extraction process.
 
+\begin{table}
+    \centering
+    \begin{tabular}{| c | c |}
+      \hline
+      Initial checkpoint & Follow-up checkpoint \\
+      \hline
+      15247s & 14959s \\
+      \hline
+      14105s & 13810s \\
+      \hline
+      14774s & 13575s \\
+      \hline
+      14612s & 13580s \\
+      \hline
+      18351s & 14631s \\
+      \hline
+      17069s & 11888s \\
+      \hline
+      14997s & 12213s \\
+      \hline
+      14976s & 13340s \\
+      \hline
+      15575s & 14231s \\
+      \hline
+      15191s & 11974s \\
+      \hline
+    \end{tabular}
+    \caption{The timing results when dumping an instance as described.}
+    \label{tab:benchmark}
+  \end{table}
+
 To further illustrate this, the total data to process is around 8.4GiB. 6.6GiB for the Windows ISO and 1.8GiB of memory.
 When calculating this for the initial creation, this gives a \eqnuote{speed} of $\frac{6.6GiB + 1.8 GiB}{15s}=0.56\frac{GiB}{second}$,
 which is a third of what the NVMe drives installed in my system achieve during everyday operations.
@@ -289,16 +289,16 @@ only that it \enquote{can happen for a large guest, or a malicious guest pretend
 They do not explicitly specify what is considered a \enquote{large guest}.
 As Java however loads the whole dump produced by QEMU into memory effectively twice,
 once for Jelf to parse and afterwards to write the stripped files to disk,
-the memory footprint of this tool is rather catastrophic,
+the memory footprint of this tool is very large,
 as the memory usage of any guest is tripled at least.
 
 A computing speed of around $560\frac{MiB}{second}$ is a very good result,
 and for larger files this speed will likely go up.
 As with standard hard drives, higher speeds are very hard to achieve,
 especially when using parallel accesses like this tool does.
-For this reason, it can be concluded the performance itself displayed by this tool is very good,
-however the resource usage during the process needs to be reduced,
-as currently more than triple the resources are required to run the tool.
+For this reason, it seems the computing resources required for this tool are acceptable,
+however it may be questioned if the amount of disk accesses
+and amount of main memory required can be reduced.
 
 \section{Flexibility}\label{sec:eval_flexibility}
 The main goal of this thesis and also its main differentiation from \citeauthor{kitcheckpoints}
@@ -313,8 +313,8 @@ Both these obstacles mean the result of this thesis needs to be used with care
 and while it may be useful in some cases, in other cases manual intervention and additional code is required to make it work.
 This is a clear case of future work, to further integrate target-dependent specialties.
 
-One massive problem is however the 2GiB limit imposed by Java discussed in \autoref{sec:Java_2GB}.
-Because of this, currently this tool cannot be used on any emulation instance using more than 2GiB of main memory.
+One problem this thesis still faces is the 2GiB limit imposed by Java discussed in \autoref{sec:Java_2GB}.
+Because of this, this tool cannot be used on any emulation instance using more than 2GiB of main memory.
 In the world of IoT devices, this may not be a dealbreaker, but since even handheld devices offer multiple Gigabytes of RAM,
 this thesis cannot be applied to many everyday devices.
 The way to solve this problem would be to create a library similar to jelf\cite{jelf},
@@ -326,11 +326,11 @@ even though it can be classified as a \emph{neccesity} for the usage of this the
 Another solution for this problem would be to use another programming language or environment to implement the tool.
 Java was explicitly chosen since a Java program can basically run anywhere QEMU runs as well,
 therefore supposedly offering a great range of flexibility.
-Java's main competitor, C#, suffers from the same problem however.
+Java's main competitor, C\#, suffers from the same problem however.
 While it does allow for the usage of unsigned integers,
 this still only allows for a maximum array size of 4GiB.
-Considering the minimum requirement for Windows 11 is 4GiB,
-which is not a pleasant experience,
+Considering the minimum amount of RAM required by Windows 11 is 4GiB,
+which already leads to Windows 11 experiencing page thrashing,
 even such a limit would likely run into the same issues as the ones in this thesis.
 Generally, such large objects in memory are often reserved for low-level languages like C or C++.
 These languages may therefore be a viable candidate for solving this problem,
@@ -339,7 +339,7 @@ especially when the program should be used on different host operating systems.
 
 The tool is however very flexible in deciding which parts of the accessible data are to be gathered.
 While the basic CLI only creates checkpoints and the rules for such creation are rather limited,
-the tool can also be used as a library, using which the user can individually select which data points they need
+the tool can also be used as a library, in which the user can individually select which data points they need
 and could theoretically even collect different data points at different intervals.
 With the existence of the interfaces \emph{Command} and \emph{QHMCommand},
 it is also very easy to create new commands which gather data points this thesis does not cover.
