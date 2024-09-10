@@ -94,8 +94,7 @@ and the definitions are generally compatible with the one before.
     This means, in its development decisions must be made as to how precise the simulator works.
     For this, a model must be created and requirements for actual execution developed.
     Later on, the results of such a simulation must then be carefully evaluated to make sure
-    there are no errors that come from such abstraction
-    or are accounted for and compensated.
+    there are no errors that come from such abstraction or are accounted for and compensated.
     The advantage of such a process is the high speed it carries,
     as simplifications often take away lots of required computation time.
     The disadvantage, as mentioned, however is the potentially high error rate for results,
@@ -104,7 +103,7 @@ and the definitions are generally compatible with the one before.
     In addition, its field of work is usually smaller and defined very precisely.
     In return, the results of an emulator are very precise, in most cases exact.
     Error states of the real hardware are also modeled, meaning when feeding it with incorrect data,
-    one can observe how the system will behave in abnormal states, which often isn't modeled in a Simulation.
+    one can observe how the system will behave in abnormal states, which often isn't modeled in a simulation.
     The big disadvantage of emulation however is its massive cost,
     both in development time and resources,
     as emulation usually requires a lot more computing power than the device it emulates\cite{definition_iot}.
@@ -155,8 +154,8 @@ which is something not allowed for emulation.
 
 \subsection{Anomalies in hardware}
 An important part of such full system simulation is the testing of the behavior of code on the actual hardware.
-From time to time code written in languages like C exerts weird behaviors once it is run on actual hardware
-that are not explainable when reading the documentation.
+From time to time code written in languages like C exerts behaviors contradicting the official specification
+once it is executed on actual hardware.
 A very famous example of such an anomaly is bug 323\cite{323} in gcc,
 in which the result of a floating point comparison changes depending on when it is executed
 and whether the compiler decides to write a result from the registers into system memory.
@@ -169,7 +168,7 @@ would be able to reproduce this bug.
 Any emulator using only 64-bit floats for internal calculations would not be able to reproduce this bug.
 
 \section{Emulation Software}\label{sec:emulators}
-As mentioned in \autoref{sec:conclusion_emulation}, most people have heard about emulation in the world of video games.
+As mentioned in \autoref{sec:conclusion_emulation}, emulators are often used in the world of video games.
 These highly specialized emulators get used to correctly simulate the internals of a given video game console
 which allows the usage of video games developed for this game console on a different device or general-purpose computer.
 However, such highly specialized emulators are rarely useful for actual research,
@@ -179,8 +178,8 @@ For such tasks, general-purpose emulators are also available.
 Such software can be separated into 2 kinds of software:
 
 \subsection{Virtualization \& Virtual machines}
-When not talking about video games, most people think of software like VMware, VirtualBox or Hyper-V
-as software for emulation.
+When not talking about video games, Hyper-V and especially VMware are names often associated with this topic,
+as they represent a large share of the software used in data centers\cite{VMware}.
 However, such tools usually do not fall under the definition of \emph{emulation},
 but instead they perform a task called \emph{virtualization}.
 The goal of such software is not to emulate a different architecture from the one the program is run on,
@@ -253,7 +252,7 @@ which is QEMU (Quick Emulator).
 For this reason, QEMU will be used as the emulator software in this thesis,
 as there are no other tools with the flexibility of QEMU available.
 This point is especially proven as many other tools which offer emulation
-use QEMU under the hood, for example Android Studio runs virtual devices using QEMU,
+use QEMU under the hood, for example Android Studio runs virtual devices using QEMU\footnote{See \href{https://developer.android.com/studio/run/emulator-commandline?hl=de}{https://developer.android.com/studio/run/emulator-commandline}},
 and software like Lapidary\cite{lapidary} or Gem5\cite{gem5} also rely on it for their simulations.
 QEMU also offers many resources on its internal workings and is fully open-source
 which allows for easy inspection of its workings.
@@ -268,7 +267,7 @@ When simulating a system, it is of course always possible to interrupt the simul
 From such a frozen and consistent state, it is now possible to extract certain data
 for other uses separate from the simulation itself.
 When permanently stored, such data is generally referred to as a \enquote{checkpoint},
-and to research the ways of creating such a checkpoint is the aim of this thesis.
+and to research the ways of creating such a checkpoint from a running QEMU instance is the aim of this thesis.
 It is desired to process the data gathered in a way that makes it accessible to both machines and humans,
 as a simple memory dump from the emulation software is not helpful to the human analyzing it,
 and it contains overhead data from the emulator which would ideally be stripped
