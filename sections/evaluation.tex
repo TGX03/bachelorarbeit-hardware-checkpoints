@@ -24,9 +24,9 @@ Such a comparison would not only have been interesting regarding the correctness
 but especially in regards to performance and resource usage,
 as one might suspect \citeauthor{kitcheckpoints} solution to be better in these regards,
 as my solution uses Java and JSON, both a lot slower tools when compared to C and SQL which were used by \citeauthor{kitcheckpoints}.
-Unfortunately, I could not find the original code \citeauthor{kitcheckpoints} wrote for his paper,
-as they did not link any kind of such a repository in his paper.
-Additionally, one may question whether it would even be possible to get his code to work 11 years after publication,
+Unfortunately, I could not find the original code \citeauthor{kitcheckpoints} wrote for their thesis,
+as they did not link any kind of such a repository in their thesis.
+Additionally, one may question whether it would even be possible to get their code to work 11 years after publication,
 as QEMU has of course changed massively in the meantime, which may have broken the modifications they made to QEMU.
 Because of this, it was not possible to perform such a direct comparison.
 It was also refrained from using his original numbers,
@@ -37,7 +37,7 @@ especially when considering the technological advancements of the last decade\ci
 Another way to verify any extracted data would have been to re-inject them into a running QEMU instance and see if the result is valid.
 However, developing such a mechanism is not the direct goal of this thesis,
 and when looking at the commands QMP and QHM offer, it is also evident such a task is not the purpose of these APIs.
-This means, such a reinjection could likely be its own paper,
+This means, such a reinjection could likely be its own thesis,
 and would thereby throw this chapter completely out of proportion
 and make it a thesis inside a thesis.
 \eqnuote{Re-Injection} is therefore reserved as a topic for future work in \todonote{Link future work}
@@ -64,7 +64,7 @@ As such, the first thing to discuss is whether the results produced actually hol
 To achieve this, the results are discussed individually for each region in \autoref{chap:implementation}.
 The main issue of this section is the lack of any alternative software to gather the same data for comparison.
 While there are tools like QEMU's internal checkpointing mechanism,
-to compare the data gathered one would first need to parse QEMU's results and the results of this paper,
+to compare the data gathered one would first need to parse QEMU's results and the results of this thesis,
 which brings multiple possibilities for errors not directly related to this thesis itself,
 especially as QEMU's checkpoints are stored in a serialized format,
 while this thesis aims to use a general purpose format, namely JSON.
@@ -319,7 +319,7 @@ In the world of IoT devices, this may not be a dealbreaker, but since even handh
 this thesis cannot be applied to many everyday devices.
 The way to solve this problem would be to create a library similar to jelf\cite{jelf},
 however with the capability of processing files larger than 2GiB.
-The development of such a library could potentially be worth its own paper,
+The development of such a library could potentially be worth its own thesis,
 and is therefore a case for future work as well,
 even though it can be classified as a \emph{neccesity} for the usage of this thesis.
 

@@ -11,17 +11,17 @@
 %% Version 1.5, 2024-02-12
 
 \chapter{The QEMU API} \label{chap:QEMU_API}
-As the goal of this paper is to extract data without having to change the code of QEMU,
+As the goal of this thesis is to extract data without having to change the code of QEMU,
 it is necessary to take a look at the data QEMU offers by itself.
 QEMU offers 3 kinds of semi-external APIs: The QEMU Human Monitor (QHM),
 the QEMU Machine Protocol (QMP) and so-called "Internal QEMU APIs"\cite{internal}.
 
 As the name suggests, the internal QEMU APIs are not useful for external use by themselves.
 Instead, they can be used when modifying QEMU code and then extracting data by employing GDB or directly by the QEMU process.
-As the goal is to use any standard QEMU implementation, these internal APIs will not be regarded further in this paper.
+As the goal is to use any standard QEMU implementation, these internal APIs will not be regarded further in this thesis.
 
 In the two following sections, both QMP and QHM are further explored. Both the basic functionality,
-as well as the commands used for this paper are explained in detail.
+as well as the commands used for this thesis are explained in detail.
 Also, the differences between both protocols, especially regarding their capabilities,
 are discussed.
 
@@ -57,7 +57,7 @@ however in this thesis this command serves no purpose except unlocking QMP.
 Gives information about all available CPUs, namely their architecture,
 their count, and the ID of the host thread simulating the CPU.
 The command is a replacement for \emph{query-cpus}, which was removed and returned slightly different data.
-The main purpose this command serves for this paper is to get the CPU count,
+The main purpose this command serves for this thesis is to get the CPU count,
 as registers need to be queried individually for each CPU.
 
 \paragraph{query-block}
