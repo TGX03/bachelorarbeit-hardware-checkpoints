@@ -410,6 +410,17 @@ Each memory region holds 5 values when stored as a JSON object:
     \item \emph{storageLocation} holds the absolute path this memory region's dump is stored at on disk.
 \end{itemize}
 
+\subsubsection*{Inconsistency during the development cycle}
+At one point during early testing,
+it was observed most of the memory dumps started with the same group of bytes.
+At that time however, no bigger focus was placed on this curiosity,
+as there were still other issues waiting to be solved.
+Later on, this behavior could not be replicated anymore,
+even though no explicit effort was taken before to address it.
+It is possible this \enquote{bug} was solved by accident
+or while fixing another part of the software,
+however such oddities should be mentioned here to make others aware of them and look out for them.
+
 \section{Block devices}
 This section was straightforward again, even though it requires more computation than the CPU registers.
 The QMP commands for block devices seem to be the most capable of the data points discussed here,

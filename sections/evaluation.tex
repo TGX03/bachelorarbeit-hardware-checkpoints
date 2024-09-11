@@ -144,17 +144,6 @@ mainly related to the implementation of an Input Stream to read from a 2D array
 as discussed in \autoref{sec:Java_2GB},
 but in the end, all of the data was consistent.
 
-\subsubsection*{Inconsistency during the development cycle}
-At one point during early testing,
-it was observed most of the memory dumps started with the same group of bytes.
-At that time however, no bigger focus was placed on this curiosity,
-as there were still other issues waiting to be solved.
-Later on, this behavior could not be replicated anymore,
-even though no explicit effort was taken before to address it.
-It is possible this \enquote{bug} was solved by accident
-or while fixing another part of the software,
-however such oddities should be mentioned here to make others aware of them and look out for them.
-
 \subsubsection*{Deduplication}
 The tool offers the ability to deduplicate checkpoint data,
 however it is nowhere near as sophisticated as the solution offered by \citeauthor{kitcheckpoints}.
