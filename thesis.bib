@@ -317,4 +317,24 @@
   year         = {2023},
 }
 
+@Online{lapidary_story,
+  author  = {Ian Neal},
+  date    = {2019-07-15},
+  title   = {Lapidary: Crafting more beautiful gem5 simulations},
+  url     = {https://medium.com/@iangneal/lapidary-crafting-more-beautiful-gem5-simulations-4bc6f6aad717},
+  urldate = {2024-09-11},
+}
+
+@Unpublished{qpoints,
+  author       = {Bhargav Reddy Godala and Ishita Chaturvedi and Yucan Wu and Simone Campanoni and David I. August},
+  title        = {QPoints: QEMU to gem5 ARM Full System Checkpointing},
+  abstract     = {Simulating data center workloads on gem5 with ARM model takes a prohibitively long time. The Atomic CPU model in gem5 is orders of magnitude faster than detail mode but still not fast enough to be practical and scalable. We built a framework that converts a checkpoint taken from QEMU to gem5âs checkpoint so that gem5 can resume execution. This approach helps accelerate the startup time in booting a full operating system and running heavy workloads like the ones used in the datacenter. QEMU can be used with KVM support to speedup emulation time. We have added QEMU's virtual hardware model in gem5 so that a checkpoint collected on QEMU could run on the gem5 simulator seamlessly. Checkpoints created using this method are reusable. The framework also supports multicore checkpoints. We used Apple M1 Mac to create checkpoints of various datacenter workloads from DaCapo, Renaissance, Cloudsuite v4, OLTP bench, and Speedometer 2.0 successfully ported them to the gem5 checkpoint format. The checkpoint contains a disk image, memory dump, register state, and hardware state.},
+  event        = {ISCA 2023: The gem5 Workshop},
+  eventdate    = {2023-06-17},
+  howpublished = {Workshop},
+  institution  = {Princeton University},
+  url          = {https://github.com/PrincetonUniversity/QPoints},
+  urldate      = {2024-04-30},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
