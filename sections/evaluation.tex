@@ -343,6 +343,17 @@ The CLI does document itself using the \ff{-h} flag,
 however there is no GUI which would make the experience easier for inexperienced users.
 However such inexperienced users likely also have no use for the data produced by this thesis.
 
+\section{Threats to validity}
+The verification of the outputs of the checkpointing tool were only verified
+on the architectures x86 and ARM.
+This means there may be edge cases on other hardware architectures this evaluation did not unearth.
+Even inside architectures there may be discrepancies,
+for example ARM was tested in a basic setup with even the FPU disabled,
+meaning other extensions to ARM may display unexpected behavior.
+This rather low variance of possible combinations when compared to the 23 architectures available on QEMU,
+especially with the host always being x86,
+may cause issues when using other architectures than the ones in this thesis.
+
 \section{Conclusion}
 While this thesis does provide useful results,
 it is clear more research is needed if the approach offered by this thesis is to be pursued further.
