@@ -11,13 +11,13 @@
 %% Version 1.5, 2024-02-12
 
 \Abstract
-During software development, emulation is a technique often used when developing for hardware solutions which do not yet exist
+During software development, emulation is a technique often used when developing code for hardware solutions which do not yet exist
 or are being developed in parallel with the software.
-The mian tool for such emulation currently available is QEMU, offering support for a wide variety of hardware architectures.
+The main tool for such emulation currently available is QEMU, offering support for a wide variety of hardware architectures.
 While running an emulation inside QEMU,
 a lot of data exists inside QEMU which may be useful for further inspection outside of a running QEMU emulation.
 This thesis therefore extracts the data of such an emulation and makes it accessible for further use.
-To achieve this, the QEMU machine protocol and the QEMU monitor get used to extract this data from a running QEMU instance,
+To achieve this, the QEMU machine protocol and the QEMU monitor are used to extract this data from a running QEMU instance,
 without modifying the QEMU code, which is often a long process,
 not very flexible and may also require extensive rework when the QEMU codebase changes.
 In addition, this thesis gives insights into the internals of emulation and discusses issues with them.

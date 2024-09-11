@@ -313,7 +313,7 @@ which will later be evaluated in \autoref{chap:Evaluation}.\todonote{Make this r
 
 QMP only offers a single command which extracts data from a running QEMU instance,
 namely \emph{dump-guest-memory}.
-It allows for dumping of guest memory to either ELF, Windows crashdump or raw formats,
+It allows for the dumping of guest memory to either ELF, Windows crashdump or raw formats,
 depending on the guest's architecture.
 In addition, it allows for paging, meaning to include both virtual and physical addresses in the dumped file.
 This however is currently only possible for x86 guests and when using the ELF format for the dumped file.
@@ -397,7 +397,7 @@ which are 2-dimensional arrays with helper methods allowing them to be used like
 This increases the maximum number of bytes stored in \enquote{an array} to $2^{62}$,
 which should suffice for the purposes of this thesis.
 \emph{fastutil} does not provide an Input Stream for such an array itself,
-so an implementation of this interface was also neccesary during this thesis.
+so an implementation of this interface was also necessary during this thesis.
 
 \subsection{Checkpoint format}
 Each memory region holds 5 values when stored as a JSON object:

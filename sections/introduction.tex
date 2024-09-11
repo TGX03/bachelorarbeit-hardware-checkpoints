@@ -26,7 +26,7 @@ many of these specialized architectures feature certain behaviors that may be un
 which must be addressed when swapping out these physical parts.
 
 In the actual development phase, this issue is already getting solved using emulation.
-In a planning phase, especially during design space exploration, where small experiments are already being run,
+In the planning phase, especially during design space exploration, where small experiments are already being run,
 certain external software is already available, or if the project is a switch of architectures,
 like from x86 to ARM in the server world,
 emulation could also be used to offer more detailed planning
@@ -35,7 +35,7 @@ When a server in a data center is supposed to communicate with an external part 
 such an emulation can now be used to produce a good estimate of how performant the server needs to be and how long it should expect to wait for replies.
 However, there are issues with emulation, which hinder the use of it in these stages.
 The biggest of which is speed, as emulation may result in a slowdown of the factor 1000-10000\cite{slowdown}.
-Especially during exploration of the design space, where only the outline of the project needs to be put down,
+Especially during the exploration of the design space, where only the outline of the project needs to be put down,
 such a slowdown is unacceptable, considering the results of the simulation don't need to be exact.
 
 As there are many different emulation environments available,

@@ -33,7 +33,7 @@ The goal was, and still is, to provide the same data QHM provides, but in a form
 However, this process is far from complete. To give an example, the patch to add the ability to read register contents was only introduced in 2021,
 but to this day it hasn't been merged into the mainline branch.
 In addition, this patch doesn't actually provide a valid JSON object, but just passes the return of the QHM-command "info registers" into the "result"-string\cite{qmp-registers-patch},
-which is also the reason why it was not merged, as it would have been in conflict with the goal of making QMP both machine readable and externally consistent.
+which is also the reason why it was not merged, as it would have been in conflict with the goal of making QMP both machine-readable and externally consistent.
 
 This effectively means QMP is the preferred protocol for performing any given task,
 since its outputs are easily parseable and the QEMU team tries to keep them consistent.
