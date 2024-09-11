@@ -93,3 +93,32 @@ it would create a lot more possible use cases for the results of this thesis,
 as it would allow for both external manipulation of emulation data to test its effects
 as well as to perform emulations centralized on a more powerful machine,
 and then redistribute those created checkpoints to speed up the work of developers.
+
+\subsection{Security analysis}
+\Citeauthor{lapidary} has used a similar tool for researching security risks of hardware architectures,
+as especiallyin times of speculative execution,
+many security exploits may exist directly in hardware,
+without the ability of developers to directly defend against them\cite{lapidary}.
+Such a checkpointing tool allows for a better understanding of the inner workings of the CPU,
+allowing for better understanding of such exploits.
+It also gives developers of programs the ability to directly test whether their programs
+are affected by such exploits and if they can defend against them.
+
+\subsection{Improvement of models}
+As mentioned in \autoref{chap:introduction},
+such checkpoints can be used for planning larger software infrastructures.
+One possibility may be to directly model the state of such systems
+and therefore allow better analysis for them.
+One could put the whole simulated system into a specific state by loading all the necessary checkpoints,
+and then perform specific actions to check for the responses of the system as a whole,
+without always performing the actions necessary to bring the system into the desired state.
+
+\subsection{Kernel development}
+When developing Kernels or operating systems in general,
+it is always difficult to debug then, as tools like gdb require the operating system to be already loaded.
+Therefore kernel development often uses virtual machines or emulation
+to allow for testing while also having debugging tools available.
+As it is not always apparent what caused an unstable system state
+like a blue screen on Windows or a kernel panic on Linux,
+creating such checkpoints the moment they occur may help the understanding of such errors
+and also allows redistributing them to others so more people can investigate.
