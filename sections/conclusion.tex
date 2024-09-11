@@ -15,7 +15,9 @@ The goal of this thesis was to extract data from a running emulation
 with as much flexibility as possible.
 As currently the only general-purpose emulator available is QEMU,
 it was chosen for this thesis as the software to research against.
-To achieve this flexibility, no changes were made to QEMU's code,
+This research then produced a tool developed in Java
+which is capable of producing checkpoints from a running QEMU instance.
+To achieve flexibility, no changes were made to QEMU's code,
 but instead only externally exposed APIs offered by QEMU were used to extract data.
 Both the interfaces QMP and QHM, although wrapped in QMP,
 were used in the attempt to achieve this goal.
@@ -33,6 +35,13 @@ The 3 main reasons for difficulties directly related to QEMU in this thesis were
 Additionally, the approach of this thesis to use Java as the main programming language in this thesis created additional obstacles
 through its limit of $2^{31}$ elements in any given array,
 making the usage of the results of this thesis on any emulation instance with more than 2GiB of system memory impossible.
+
+This $2^{31}$ limit is however the only limiting factor to this thresis.
+The evaluation has proven this tool produces correct checkpoints and does so with an acceptable speed in regards to the amount of data processed.
+It is also capable of deduplicating checkpoints with identical data and can be used very flexible.
+While the tool does provide a basic interface with some options for automatic checkpointing,
+when directly using the tool as a library inside another program,
+the checkpointing mechanism can be made to suit most needs.
 
 The core feasibility of such an endeavor was proven however,
 meaning it is possible to create checkpoints from any running QEMU instance in a generalized way,
