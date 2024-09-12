@@ -75,7 +75,7 @@ In the used implementation, the only output format working is ELF, and paging is
 Still, it's the only option in QMP that offers access to the guest's memory.
 
 \paragraph{stop}
-Suspends the emulation of the current system. Is necessary to keep the data extracted consistent.
+Suspends the emulation of the current system. It is necessary to keep the data extracted consistent.
 
 \paragraph{cont}
 Continues the execution of a previously paused system.
@@ -111,7 +111,7 @@ An example of the output is provided in \autoref{fig:tlb_x86}:
     0000000000019000: 0000000000189000 ----A----
     000000000001a000: 000000000016a000 ----A----
 \end{ffcode}
-\caption{Output of \emph{info tlb}}
+\caption{Output of \emph{info tlb}.}
 \label{fig:tlb_x86}
 \end{figure}
 
@@ -131,7 +131,7 @@ This command shows all memory regions which are currently allocated for the gues
 This includes main memory, as well as memory for emulated devices like graphic cards.
 These regions are given individual names and are separated by blank lines.
 \autoref{fig:mem_ARM} gives an excerpt of an ARM64 guest running on x86,
-the full output is shown in \autoref{fig:mem_ARM_full}
+the full output is shown in \autoref{fig:mem_ARM_full}.
 
 \begin{figure}[H]
 \begin{ffcode}
@@ -164,7 +164,7 @@ the full output is shown in \autoref{fig:mem_ARM_full}
       000000000a000400-000000000a0005ff (prio 0, i/o): virtio-mmio
       ...
 \end{ffcode}
-\caption{Output of \emph{info mtree} on ARM}
+\caption{Output of \emph{info mtree} for an ARM guest.}
 \label{fig:mem_ARM}
 \end{figure}
 
@@ -194,7 +194,7 @@ Further down the output is the following data:
       000000000a000400-000000000a0005ff (prio 0, i/o): virtio-mmio
       ...
 \end{ffcode}
-\caption{Duplicate data for ARM memory}
+\caption{Duplicate data for \emph{info mtree} on an ARM guest.}
 \label{fig:mem-duplicate}
 \end{figure}
 
@@ -254,7 +254,7 @@ To further illustrate this, in \autoref{fig:registers_x86} and \autoref{fig:regi
     XMM04=0000000000000000 0000000000000000 XMM05=0000000000000000 0000000000000000
     XMM06=0000000000000000 0000000000000000 XMM07=0000000000000000 0000000000000000
   \end{ffcode}
-  \caption{Example Output of \emph{info registers} on an x86 guest}
+  \caption{Example Output of \emph{info registers} on an x86 guest.}
   \label{fig:registers_x86}
 \end{figure}
 
@@ -274,7 +274,7 @@ To further illustrate this, in \autoref{fig:registers_x86} and \autoref{fig:regi
     X29=0000000000000000 X30=0000000000000000  SP=0000000000000000
     PSTATE=000003c5 ---- EL1h  SVCR=00000000 --  BTYPE=0    FPU disabled
   \end{ffcode}
-  \caption{Example output of \emph{info registers} on an ARM guest}
+  \caption{Example output of \emph{info registers} on an ARM guest.}
   \label{fig:registers_ARM}
 \end{figure}
 
@@ -311,7 +311,7 @@ the following rules are presumed from ARM and x86 in the hope they are valid for
     \item Other flags, especially multibit flags, get represented like their own register.
     \begin{itemize}
       \item In this case, the amount of digits does not indicate the length of the register and therefore its possible values.
-      For example, the $A20$-register is only a single bit, while $CPL$ is 2 bit.
+      For example, the $A20$-register is only a single bit, while $CPL$ is 2 bits.
     \end{itemize}
     \item If there is not a dedicated register in the specification,
     but it's up to the implementation to decide,
@@ -330,7 +330,8 @@ the following rules are presumed from ARM and x86 in the hope they are valid for
   \begin{itemize}
     \item The general purpose and the control registers feature 4 registers per line,
     the pointer registers one register per line, the floating point and SIMD registers show 2 registers per line.
-    \item The pointer registers feature a rather strange way to keep consistency for the $GDT$ and $IDT$ registers.
+    \item The pointer registers apparently aim to keep full blocks of 32 bits aligned,
+    meaning the $GDT$ and $IDT$ registers have their content shifted to the right by 5 places so they align with the first full 32 bit of the other registers.
     \item The flags associated with the general purpose registers are simply appended to the registers.
     Instead, the registers for special CPU features like $EFER$ are written in their own respective lines.
     The flags for pointer registers get written in the same line as the respective register,

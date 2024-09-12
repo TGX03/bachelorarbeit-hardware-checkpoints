@@ -67,12 +67,12 @@ which also makes it hard to use when emulating more modern or powerful systems.
 The tool itself is already capable of handling such large amounts of data, as also described in \autoref{sec:Java_2GB}.
 When processing block devices, for which hashes must be computed during deduplication,
 the tool has already demonstrated the implementation of addressing this problem is working.
-The problem however is the jelf library, which is currently needed to parse the result of a QEMU dump,
+The problem however is the \emph{jelf} library, which is currently needed to parse the result of a QEMU dump,
 which currently does not support working on files larger than 2GiB.
 
-To resolve this issue, the capability of handling such large files must either be added to jelf,
+To resolve this issue, the capability of handling such large files must either be added to \emph{jelf},
 which seems to be a rather complicated operation,
-as basic Java interfaces like ByteBuffer would have to be substituted with 64bit capable alternatives,
+as basic Java interfaces like ByteBuffer would have to be substituted with 64-bit capable alternatives,
 or an alternative with support for ELF files larger than 2 GiB must be newly developed.
 
 \subsection{External devices}
@@ -100,7 +100,7 @@ and then redistribute those created checkpoints to speed up the work of develope
 
 \subsection{Security analysis}
 \Citeauthor{lapidary} has used a similar tool for researching security risks of hardware architectures,
-as especiallyin times of speculative execution,
+as especially in times of speculative execution,
 many security exploits may exist directly in hardware,
 without the ability of developers to directly defend against them\cite{lapidary}.
 Such a checkpointing tool allows for a better understanding of the inner workings of the CPU,
@@ -119,7 +119,7 @@ without always performing the actions necessary to bring the system into the des
 
 \subsection{Kernel development}
 When developing Kernels or operating systems in general,
-it is always difficult to debug then, as tools like gdb require the operating system to be already loaded.
+it is always difficult to debug then, as tools like GDB require the operating system to be already loaded.
 Therefore kernel development often uses virtual machines or emulation
 to allow for testing while also having debugging tools available.
 As it is not always apparent what caused an unstable system state

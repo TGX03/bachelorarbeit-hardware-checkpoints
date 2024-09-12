@@ -325,7 +325,7 @@ and Java stacktraces are not comparable to a dump produced by a program crash.
 There is one Java library called \citetitle{jelf} which offers the parsing of ELF files.
 It seems to be developed by a single developer called \Citeauthor{jelf},
 and while he does regularly work on this library,
-its stability is still up to question and will be inspected further in \autoref{chap:Evaluation}\cite{jelf}.\todonote{Make this reference more precise once the chapter is written}
+its stability is still up to question and will be inspected further in \autoref{sec:eval_flexibility}\cite{jelf}.
 
 It also appears the library was not explicitly developed for processing dumps
 and even extracting data from them,
@@ -335,7 +335,7 @@ Still, a process to read the data from such a dump could be established and now 
     \item Read the file from an input stream.
     The option to read from a byte array is also offered,
     however this option falls flat for large files because of the reasons mentioned in \autoref{sec:Java_2GB}.
-    \item Parse all program headers. Jelf only parses them when explicitly requested,
+    \item Parse all program headers. \emph{Jelf} only parses them when explicitly requested,
     which means this process cannot be run in parallel as this corrupts the internal state of the used input stream.
     \item The program headers required are of type \emph{PT\_LOAD},
     meaning a segment which can simply be loaded into memory.

@@ -135,7 +135,7 @@ Since the tool developed in this thesis produces multiple dump files
 in relation to the memory regions included in the original ELF file,
 those commands can be used to extract the exact same regions
 and then compare the contents of these files.
-The code of this test is shown in \autoref{fig:test_memory}
+The code of this test is shown in \autoref{fig:test_memory}.
 
 As can be seen, this code writes \enquote{Found mismatch} to the standard output
 if any discrepancies between the two files were found.
@@ -216,7 +216,7 @@ The QEMU command to set up this device is shown in \autoref{fig:QEMU_Windows_Tes
 In this command, the first issue can already be seen.
 A normal Windows 11 install requires at least 4GiB of system memory.
 However, when trying to checkpoint such an instance, the process crashed with an \emph{OutOfMemory}-Exception,
-because the jelf library\cite{jelf} attempted to create a byte buffer with more than 2GiB of space.
+because the \emph{jelf} library\cite{jelf} attempted to create a byte buffer with more than 2GiB of space.
 This means jelf is not able to handle such large files because of the limitations discussed in \autoref{sec:Java_2GB}.
 
 The exact results for this benchmark are presented in \autoref{tab:benchmark}.
@@ -263,7 +263,7 @@ even on NVMe drives like in this benchmark, the drive accesses are the main bott
 To further illustrate this, the total data to process is around 8.4GiB. 6.6GiB for the Windows ISO and 1.8GiB of memory.
 When calculating this for the initial creation, this gives a \eqnuote{speed} of $\frac{6.6GiB + 1.8 GiB}{15s}=0.56\frac{GiB}{second}$,
 which is a third of what the NVMe drives installed in my system achieve during everyday operations.
-And since 3 acceses\footnote{QEMU dump to disk, JELF read from disk, Java write to disk} are required during operation,
+And since 3 accesses\footnote{QEMU dump to disk, jelf read from disk, Java write to disk} are required during operation,
 this number seems to be reasonable.
 This is also in line with the slight speed-up for secondary checkpoints, as the third instance of writing usually gets smaller.
 
@@ -277,7 +277,7 @@ QEMU does not explicitly specify when this occurs,
 only that it \enquote{can happen for a large guest, or a malicious guest pretending to be large.}\cite{qmp-commands}.
 They do not explicitly specify what is considered a \enquote{large guest}.
 As Java however loads the whole dump produced by QEMU into memory effectively twice,
-once for Jelf to parse and afterwards to write the stripped files to disk,
+once for \emph{jelf} to parse and afterwards to write the stripped files to disk,
 the memory footprint of this tool is very large,
 as the memory usage of any guest is tripled at least.
 
@@ -306,7 +306,7 @@ One problem this thesis still faces is the 2GiB limit imposed by Java discussed 
 Because of this, this tool cannot be used on any emulation instance using more than 2GiB of main memory.
 In the world of IoT devices, this may not be a dealbreaker, but since even handheld devices offer multiple Gigabytes of RAM,
 this thesis cannot be applied to many everyday devices.
-The way to solve this problem would be to create a library similar to jelf\cite{jelf},
+The way to solve this problem would be to create a library similar to \emph{jelf}\cite{jelf},
 however with the capability of processing files larger than 2GiB.
 The development of such a library could potentially be worth its own thesis,
 and is therefore a case for future work as well,

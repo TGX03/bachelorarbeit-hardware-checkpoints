@@ -341,7 +341,7 @@ QPoints is directly targeted at ARM, and while it supports QEMU instances runnin
 it only supports 64-bit ARM guests and the host must run a UNIX-like operating system like Mac OS or Linux.
 It also doesn't support QEMU's QCOW2 disk format, which is effectively the default on modern instances.
 It similarly achieves this as the work of \citeauthor{kitcheckpoints},
-namely by attaching gdb to the emulation process, fully dumping the data
+namely by attaching GDB to the emulation process, fully dumping the data
 and then parsing it according to predefined templates.
 
 This generally makes the work by \citeauthor{qpoints} very interesting,
@@ -357,7 +357,7 @@ However, because they did not have time to design and produce such hardware,
 they decided to use the Gem5 hardware simulator\cite{gem5} and create checkpoints
 they could later use while demonstrating their findings\cite{lapidary_story}.
 
-The tool was developed in Python and extracts data from Gem5 by attaching gdb.
+The tool was developed in Python and extracts data from Gem5 by attaching GDB.
 The tool simply takes a full dump of a Gem5 instance,
 from which it then extracts all the necessary data.
 Sadly however this process is not documented,
